@@ -1,0 +1,3385 @@
+<!doctype html>
+<html lang="ru">
+<head>
+<meta charset="utf-8" />
+<meta name="viewport" content="width=device-width, initial-scale=1, maximum-scale=1, user-scalable=no, viewport-fit=cover">
+<meta name="theme-color" content="#ffffff" />
+<meta name="mobile-web-app-capable" content="yes" />
+<meta name="apple-mobile-web-app-capable" content="yes" />
+<meta name="apple-mobile-web-app-status-bar-style" content="black-translucent" />
+<meta name="apple-mobile-web-app-title" content="NeDzat" />
+<link rel="manifest" href="/public/manifest.webmanifest" />
+<link rel="apple-touch-icon" href="/public/assets/img/logo-gemini.png" />
+<title>NeDzat | SatuBooster - WhatsApp & Instagram AI Automation</title>
+<meta name="description" content="NeDzat — платформа для управления ИИ-агентами и WhatsApp-ботами. Подключайте номера, настраивайте сценарии и следите за статистикой.">
+<meta name="keywords" content="NeDzat, ИИ агент, WhatsApp бот, чат-бот, satubooster, автоматизация, SAAS">
+<meta name="robots" content="index,follow">
+<meta property="og:type" content="website">
+<meta property="og:url" content="https://nedzat.satubooster.kz/">
+<meta property="og:title" content="NeDzat — AI-AGENT">
+<meta property="og:description" content="Manage AI agents and WhatsApp bots from one convenient dashboard.">
+<meta property="og:image" content="https://nedzat.satubooster.kz/panel/assets/img/og-image.png">
+<meta name="twitter:card" content="summary_large_image">
+<meta name="twitter:title" content="NeDzat — AI-AGENT">
+<meta name="twitter:description" content="Manage AI agents and WhatsApp bots from one convenient dashboard.">
+<meta name="twitter:image" content="https://nedzat.satubooster.kz/panel/assets/img/og-image.png">
+<link rel="preconnect" href="https://cdn.tailwindcss.com" crossorigin>
+<link rel="icon" type="image/x-icon" href="assets/favicon.ico">
+<!-- Tailwind (CDN build is ok for admin panel) -->
+<script src="https://cdn.tailwindcss.com"></script>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&display=swap" rel="stylesheet">
+<style>
+  :root{ --bg: #f8fafc; --card: #ffffff; --text: #0f172a;         /* slate-900 */ --muted: #64748b;        /* slate-500 */ --line: rgba(148,163,184,.28); /* slate-400 alpha */ --brand: #2563eb;        /* blue-600 (site primary) */ --brand-2: #1d4ed8; --shadow: 0 10px 25px rgba(2,6,23,.08); --radius: 16px; }
+  html, body { height: 100%; }
+
+  html, body{ overflow-x:hidden; touch-action: manipulation; }
+
+  /* ===== Mobile App Layout (WhatsApp-like) ===== */
+  :root{
+    --topbar-h: 52px;
+    --bottomnav-h: 0px;      /* desktop: none */
+    --safe-b: env(safe-area-inset-bottom, 0px);
+    --vh: 1vh;               /* iOS fix via JS */
+  }
+
+  /* ===== Mobile: App Topbar (center logo only) ===== */
+.app-topbar{
+  position: sticky;
+  top: 0;
+  z-index: 200;
+  height: var(--topbar-h);
+  display: none; /* desktop hidden */
+  align-items: center;
+  justify-content: center;
+  background: rgba(255,255,255,.92);
+  backdrop-filter: blur(12px);
+  border-bottom: 1px solid rgba(148,163,184,.28);
+  padding-top: env(safe-area-inset-top);
+}
+
+.app-topbar .app-logo{
+  display:flex;
+  align-items:center;
+  justify-content:center;
+  gap:10px;
+  min-width:0;
+}
+.app-topbar .app-logo img{
+  height:32px;
+  width:auto;
+  border-radius:10px;
+}
+.app-topbar .app-title{
+  font-weight: 900;
+  color:#0a84ff;
+  letter-spacing:-0.02em;
+  font-size:18px;
+  white-space:nowrap;
+  overflow:hidden;
+  text-overflow:ellipsis;
+  max-width: 80vw;
+}
+
+/* On mobile: hide old complex header, show app-topbar */
+@media (max-width: 767px){
+  header.topbar{ display:none !important; }
+  .app-topbar{ display:flex; }
+}
+
+  @media (max-width: 767px){
+    :root{ --bottomnav-h: 64px; } /* mobile bottom nav height */
+  }
+
+  /* main area height: screen - topbar - bottomnav */
+  .app-main{
+    height: calc((var(--vh) * 100) - var(--topbar-h) - var(--bottomnav-h));
+    min-height: calc((var(--vh) * 100) - var(--topbar-h) - var(--bottomnav-h));
+  }
+
+  /* smoother mobile scrolling */
+  #messages{
+    -webkit-overflow-scrolling: touch;
+    overscroll-behavior: contain;
+  }
+
+  /* prevent background scroll when panels open */
+  body.no-scroll{ overflow: hidden !important; touch-action: none; }
+
+  /* ===== Bottom Nav (mobile) ===== */
+  .bottom-nav{
+    position: fixed;
+    left: 0; right: 0; bottom: 0;
+    height: calc(var(--bottomnav-h) + var(--safe-b));
+    padding-bottom: var(--safe-b);
+    z-index: 120;
+    background: rgba(255,255,255,.92);
+    backdrop-filter: blur(12px);
+    border-top: 1px solid rgba(148,163,184,.28);
+    display: flex;
+    align-items: center;
+    justify-content: space-around;
+  }
+  .bottom-item{
+    width: 50%;
+    height: var(--bottomnav-h);
+    display:flex;
+    flex-direction: column;
+    align-items:center;
+    justify-content:center;
+    gap: 4px;
+    color: #334155;
+    font-weight: 700;
+    font-size: 11px;
+    user-select:none;
+    -webkit-tap-highlight-color: transparent;
+  }
+  .bottom-item svg{ width: 22px; height: 22px; }
+  .bottom-item.is-active{ color: #2563eb; }
+  .bottom-item.is-active .dot{
+    width: 6px; height: 6px; border-radius: 999px;
+    background: #2563eb;
+    margin-top: -2px;
+  }
+
+  body { font-family: Inter, ui-sans-serif, system-ui, -apple-system, Segoe UI, Roboto, "Helvetica Neue", Arial; background: var(--bg); color: var(--text); }
+  .scrollbar::-webkit-scrollbar { width: 10px; height: 10px; }
+  .scrollbar::-webkit-scrollbar-thumb { background: rgba(148,163,184,.35); border-radius: 999px; }
+  .scrollbar::-webkit-scrollbar-track { background: transparent; }
+  .topbar{ position: sticky; top: 0; z-index: 50; background: rgba(255,255,255,.86); backdrop-filter: blur(12px); border-bottom: 1px solid var(--line); }
+  .burger-btn{ width: 40px; height: 40px; display: inline-flex; align-items:center; justify-content:center; border-radius: 12px; border: 1px solid var(--line); background: rgba(255,255,255,.9); }
+  .burger-btn:hover{ background: #fff; }
+  .burger-ic{ width: 18px; height: 18px; stroke: #334155; stroke-width: 2; stroke-linecap: round; }
+  .chip{ display:flex; align-items:center; gap:8px; border: 1px solid var(--line); background: rgba(255,255,255,.9); border-radius: 999px; padding: 6px 10px; }
+  .select{ background: transparent; outline: none; font-size: 12px; padding: 0; font-weight: 700; color: #0f172a; max-width: 260px; white-space: nowrap; overflow: hidden; text-overflow: ellipsis; }
+  /* account filter dropdown sizing */
+  #accountSelect{ width: 240px; max-width: 100%; }
+  @media (max-width: 640px){ #accountSelect{ width: 200px; } }
+  .btn-ghost{ display:inline-flex; align-items:center; justify-content:center; border-radius: 12px; border: 1px solid var(--line); background: rgba(255,255,255,.9); padding: 10px 12px; font-weight: 600; font-size: 13px; color: #0f172a; }
+  .btn-ghost:hover{ background: #fff; }
+  .btn-primary{ display:inline-flex; align-items:center; justify-content:center; border-radius: 12px; background: var(--brand); padding: 10px 14px; font-weight: 700; font-size: 13px; color: #fff; }
+  .btn-primary:hover{ background: var(--brand-2); }
+  .btn-primary:disabled, .btn-ghost:disabled{ opacity:.55; cursor:not-allowed; }
+  .field{ width: 100%; border: 1px solid var(--line); border-radius: 12px; background: rgba(255,255,255,.92); padding: 10px 12px; font-size: 13px; outline: none; }
+  .field:focus{ box-shadow: 0 0 0 3px rgba(37,99,235,.15); border-color: rgba(37,99,235,.45); }
+  .leftpane{ position: fixed; top: 52px; left: 0; height: calc(100vh - 52px); width: min(86vw, 380px); transform: translateX(-110%); transition: transform .18s ease; background: var(--card); border-right: 1px solid var(--line); z-index: 60; display: flex; flex-direction: column; min-height: 0; box-shadow: none; }
+  .leftpane.open{ transform: translateX(0); box-shadow: var(--shadow); }
+  .backdrop{ position: fixed; top: 52px; left: 0; right: 0; bottom: 0; background: rgba(2,6,23,.45); opacity: 0; pointer-events: none; transition: opacity .18s ease; z-index: 55; }
+  .backdrop.show{ opacity: 1; pointer-events: auto; }
+  @media (min-width: 768px){ .leftpane{ position: relative; top: auto; height: auto; width: auto; transform: none !important; z-index: auto; box-shadow: none !important; } .backdrop{ display: none; } }
+  .chat-bg{ background: radial-gradient(900px 500px at 20% 0%, rgba(37,99,235,.10), transparent 60%), radial-gradient(900px 500px at 80% 100%, rgba(16,185,129,.08), transparent 60%), linear-gradient(180deg, rgba(255,255,255,.65), rgba(255,255,255,.35)); }
+  .bubble{ border-radius: 18px; padding: 10px 12px; font-size: 13px; line-height: 1.35; box-shadow: 0 1px 0 rgba(2,6,23,.04); max-width: 72%; white-space: pre-wrap; }
+  .bubble-out{ background: var(--brand); color: #fff; border-bottom-right-radius: 8px; }
+  .bubble-in{ background: rgba(255,255,255,.92); color: #0f172a; border: 1px solid rgba(148,163,184,.20); border-bottom-left-radius: 8px; }
+  .msg-meta{ font-size: 10px; opacity: .75; margin-top: 6px; text-align: right; }
+  .contact-row{ width: 100%; text-align: left; padding: 10px 12px; border-bottom: 1px solid rgba(148,163,184,.18); display:flex; gap: 10px; align-items: flex-start; }
+  .contact-row:hover{ background: rgba(2,6,23,.03); }
+  .contact-row.active{ background: rgba(37,99,235,.08); }
+  .avatar{ width: 40px; height: 40px; border-radius: 999px; background: rgba(148,163,184,.22); display:flex; align-items:center; justify-content:center; font-weight: 800; color: #334155; flex: 0 0 auto; }
+  .avatar img{ width:100%; height:100%; border-radius:999px; object-fit:cover; display:block; }
+  .chan-ic{ width: 14px; height: 14px; object-fit: contain; flex: 0 0 auto; opacity: .9; }
+  .copy-mini{ width:26px; height:26px; border-radius:10px; border:1px solid var(--line); background: rgba(255,255,255,.9); display:inline-flex; align-items:center; justify-content:center; }
+  .copy-mini:hover{ background:#fff; }
+  .copy-mini svg{ width:16px; height:16px; stroke:#334155; stroke-width:2; fill:none; }
+  .ic{ width:18px; height:18px; stroke: currentColor; fill: none; stroke-width: 2; stroke-linecap: round; stroke-linejoin: round; }
+  .btn-icon{ width:44px; height:44px; padding:0; }
+  .btn-round{ border-radius: 999px; }
+  .btn-primary .ic{ stroke: #fff; }
+  .recordbar{ display:flex; align-items:center; gap:10px; border: 1px solid var(--line); background: rgba(255,255,255,.92); border-radius: 14px; padding: 10px 10px; min-height: 44px; }
+  .dot{ width: 8px; height: 8px; border-radius: 999px; background: #ef4444; box-shadow: 0 0 0 6px rgba(239,68,68,.12); animation: pulse 1.2s ease-in-out infinite; }
+  @keyframes pulse{ 0%,100%{ transform: scale(1); opacity: 1; } 50%{ transform: scale(1.15); opacity: .85; } }
+  .wave{ display:flex; align-items:center; gap:3px; height: 18px; }
+  .wave span{ width: 3px; border-radius: 999px; background: rgba(37,99,235,.35); animation: wave 1s ease-in-out infinite; }
+  .wave span:nth-child(2){ animation-delay: .12s; }
+  .wave span:nth-child(3){ animation-delay: .24s; }
+  .wave span:nth-child(4){ animation-delay: .36s; }
+  .wave span:nth-child(5){ animation-delay: .48s; }
+  @keyframes wave{ 0%,100%{ transform: scaleY(.65); opacity: .7; } 50%{ transform: scaleY(1.1); opacity: 1; } }
+  @media (max-width: 640px){ input, select, textarea { font-size: 16px !important; } }
+  /* ===== Chat background themes (WhatsApp-like) ===== */
+  .chat-bg{ position: relative; --chat-bg-img: url("assets/img/default-chat.svg"); --chat-bg-size: auto; --chat-bg-repeat: repeat; background-image: var(--chat-bg-img); background-size: var(--chat-bg-size); background-repeat: var(--chat-bg-repeat); background-position: center; }
+  /* лёгкая “дымка” как в WA, чтобы текст читался */
+  .chat-bg::before{ content:""; position:absolute; inset:0; background: rgba(255,255,255,.60); pointer-events:none; z-index:0; }
+  .chat-bg > *{ position:relative; z-index:1; }
+  /* Подсветка выбранной темы */
+  .theme-item.active{ background: rgba(37,99,235,.10); }
+  .theme-item.active .theme-thumb{ outline: 2px solid rgba(37,99,235,.35); }
+  /* Empty state when no chat selected */
+  .chat-empty{ position:absolute; inset:0; display:flex; align-items:center; justify-content:center; padding: 24px; pointer-events:none; z-index: 2; }
+  .chat-empty-card{ pointer-events:none; width:min(520px, 100%); background: rgba(255,255,255,.72); border: 1px solid rgba(226,232,240,.9); border-radius: 18px; box-shadow: 0 18px 40px rgba(15,23,42,.10); padding: 18px 18px; backdrop-filter: blur(6px); }
+  .chat-empty-row{ display:flex; align-items:center; justify-content:center; gap: 14px; margin-bottom: 10px; }
+  .chat-empty-row img{ width: 44px; height: 44px; object-fit: contain; filter: drop-shadow(0 6px 10px rgba(15,23,42,.12)); }
+  .chat-empty-title{ font-weight: 700; font-size: 16px; color: #0f172a; text-align:center; }
+  .chat-empty-sub{ margin-top: 6px; font-size: 13px; color:#64748b; text-align:center; }
+  /* ===== New chat modal ===== */
+  .modal{ position:fixed; inset:0; z-index:9999; display:flex; align-items:center; justify-content:center; padding:16px; }
+  .modal.hidden{ display:none; }
+  .modal-back{ position:absolute; inset:0; background: rgba(2,6,23,.45); }
+  .modal-card{ position:relative; width:min(560px, 100%); background: rgba(255,255,255,.92); border:1px solid var(--line); border-radius:18px; box-shadow: var(--shadow); padding:16px; }
+  .modal-head{ display:flex; align-items:center; justify-content:space-between; gap:12px; }
+  .modal-actions{ display:flex; justify-content:flex-end; gap:10px; margin-top:14px; }
+  /* ===== Attach menu (WhatsApp-like) ===== */
+  .attach-wrap{ position: relative; }
+.attach-menu { 
+  position: absolute; 
+  left: 0; 
+  bottom: 54px; 
+  width: 260px; 
+  background: #fff;  /* ← Непрозрачный белый */
+  border: 1px solid var(--line); 
+  border-radius: 16px; 
+  box-shadow: 0 4px 20px rgba(0,0,0,0.15); 
+  padding: 8px; 
+  z-index: 100;  /* ← Выше */
+  pointer-events: auto;  /* ← Кликабельно */
+}
+.attach-item { 
+  width: 100%; 
+  display: flex; 
+  gap: 10px; 
+  align-items: center; 
+  padding: 10px; 
+  border-radius: 14px; 
+  text-align: left;
+  border: none;  /* ← Убрать границу button */
+  background: transparent;  /* ← Прозрачный фон */
+  cursor: pointer;  /* ← Важно! */
+  -webkit-tap-highlight-color: transparent;  /* ← Для мобилки */
+  touch-action: manipulation;  /* ← Быстрый клик */
+}
+
+.attach-item:hover,
+.attach-item:active { 
+  background: rgba(2,6,23,.08); 
+}
+
+.attach-item:active {
+  transform: scale(0.97);  /* ← Визуальная обратная связь */
+}
+  .attach-sub{ font-size: 12px; color: var(--muted); margin-top: 2px; }
+  /* === WA-like reactions + file cards === */
+  .msg-wrap{ position:relative; }
+  .react-btn{ position:absolute; top:-10px; right:-10px; width:28px; height:28px; border-radius:999px; display:none; align-items:center; justify-content:center; background: rgba(0,0,0,.08); border: 1px solid rgba(0,0,0,.10); cursor:pointer; user-select:none; }
+  .msg-wrap:hover .react-btn{ display:flex; }
+  .react-btn:hover{ background: rgba(0,0,0,.12); }
+  .reaction-bar{ margin-top:6px; display:flex; gap:6px; align-items:center; flex-wrap:wrap; }
+  .reaction-pill{ font-size:13px; line-height:1; padding:4px 8px; border-radius:999px; background: rgba(0,0,0,.08); border: 1px solid rgba(0,0,0,.10); }
+  .reaction-picker{ position: fixed; z-index: 9999; display:flex; gap:8px; padding:8px 10px; border-radius:14px; background:#fff; border: 1px solid rgba(0,0,0,.12); box-shadow: 0 10px 30px rgba(0,0,0,.18); }
+  .reaction-picker button{ width:34px; height:34px; border-radius:12px; border: none; background: rgba(0,0,0,.06); cursor:pointer; font-size:18px; }
+  .reaction-picker button:hover{ background: rgba(0,0,0,.12); }
+  .file-card{ display:flex; gap:10px; align-items:center; padding:10px 10px; border-radius:14px; background: rgba(0,0,0,.06); border: 1px solid rgba(0,0,0,.10); margin-bottom:8px; max-width: 360px; }
+  .file-ico{ width:40px; height:40px; border-radius:12px; display:flex; align-items:center; justify-content:center; background: rgba(0,0,0,.10); font-weight:700; }
+  .file-meta{ min-width:0; }
+  .file-name{ font-size:13px; font-weight:700; white-space:nowrap; overflow:hidden; text-overflow:ellipsis; max-width: 260px; }
+  .file-sub{ font-size:12px; opacity:.8; margin-top:2px; }
+  .file-open{ margin-left:auto; font-size:12px; padding:6px 10px; border-radius:12px; background: rgba(0,0,0,.10); border: 1px solid rgba(0,0,0,.12); cursor:pointer; user-select:none; white-space:nowrap; }
+  .file-open:hover{ background: rgba(0,0,0,.14); }
+  /* WA-like: на обоях делаем дымку слабее (чтобы фон было видно) */
+  .chat-bg:not([data-bg="default"])::before{ background: rgba(255,255,255,.22); }
+  /* если в файле были старые стили с ::after — глушим их */
+  .chat-bg::after{ content:none !important; }
+  /* ===== Chat background themes (WA-like) ===== */
+  .chat-bg{ --chat-bg-img: url("assets/img/default-chat.svg"); --chat-bg-size: auto; --chat-bg-repeat: repeat; background-image: var(--chat-bg-img) !important; background-size: var(--chat-bg-size) !important; background-repeat: var(--chat-bg-repeat) !important; background-position: center !important; background-attachment: scroll !important; }
+  .chat-bg::before{ content:""; position:absolute; inset:0; background: rgba(255,255,255,.60); pointer-events:none; z-index:0; }
+  .chat-bg > *{ position:relative; z-index:1; }
+  .theme-wrap{ position: relative; }
+  .theme-menu{ position:absolute; right:0; top:44px; width: 260px; padding: 8px; border-radius: 16px; background: rgba(255,255,255,.95); border: 1px solid var(--line); box-shadow: var(--shadow); backdrop-filter: blur(10px); z-index: 120; }
+  .theme-item{ width:100%; display:flex; gap:10px; align-items:center; padding: 10px; border-radius: 14px; text-align:left; cursor: pointer; border: none; background: transparent; }
+  .theme-item:hover{ background: rgba(2,6,23,.06); }
+  .theme-item.active{ outline: 2px solid rgba(2,6,23,.14); }
+  .theme-thumb{ width: 42px; height: 34px; border-radius: 12px; background-size: cover; background-position: center; background-repeat: no-repeat; border: 1px solid rgba(2,6,23,.10); flex: 0 0 auto; }
+  .theme-label{ font-size: 13px; font-weight: 700; color: #0f172a; }
+  /* FIX: theme dropdown should be clickable (above #messages) */
+  #chatHeader{ position: relative; z-index: 500; }
+  #messages{ position: relative; z-index: 1; }
+  #themeMenu{ position: absolute; z-index: 9999; pointer-events: auto; }
+  #themeMenu, #themeMenu *{ pointer-events: auto; }
+  /* ===== Right mini sidebar (icons only) ===== */
+  .rightnav{ border-left: 1px solid var(--line); background: rgba(255,255,255,.75); backdrop-filter: blur(10px); padding: 10px 8px; display:flex; flex-direction: column; align-items: center; gap: 10px; min-height: 0; }
+  .rnav-btn{ width: 46px; height: 46px; border-radius: 16px; border: 1px solid rgba(2,6,23,.10); background: rgba(255,255,255,.55); box-shadow: 0 6px 18px rgba(2,6,23,.06); display:flex; align-items:center; justify-content:center; color: #0f172a; transition: transform .12s ease, background .12s ease, border-color .12s ease; }
+  .rnav-btn:hover{ background: rgba(255,255,255,.85); transform: translateY(-1px); }
+  .rnav-btn.is-active{ background: rgba(37,99,235,.12); border-color: rgba(37,99,235,.25); }
+  .rnav-btn svg{ width: 20px; height: 20px; }
+  .rnav-sep{ width: 28px; height: 1px; background: rgba(2,6,23,.12); border-radius: 999px; margin: 2px 0; }
+  /* ===== Brand mini (logo) ===== */
+  .brand-mini{ display:flex; align-items:center; gap:10px; min-width: 0; }
+  .brand-logo{ width:32px; height:32px; border-radius: 12px; object-fit: cover; border: 1px solid rgba(2,6,23,.10); }
+  .brand-title{ font-weight: 800; letter-spacing: -.01em; color: #0f172a; max-width: 180px; }
+  /* ===== SatuCoin + user menu (header) ===== */
+  .satu-badge{ display:inline-flex; align-items:center; gap:8px; padding:6px 10px; border-radius:999px; background:rgba(10,132,255,.09); border:1px solid rgba(10,132,255,.22); color:#0a84ff; font-size:12px; line-height:1; white-space:nowrap; user-select:none; flex:0 1 auto; min-width:0; }
+  .satu-coin-label{ font-weight:700; color:#0a84ff; }
+  .satu-coin-value{ font-weight:700; color:#0a84ff; }
+  .satu-coin-approx{ color:#0a84ff; opacity:.9; font-size:12px; }
+  #satu-topup{ flex:0 0 auto; }
+  .btn-sc{display:inline-flex; align-items:center; gap:8px; height: 36px; padding: 0 12px; border-radius: 14px; border: 1px solid rgba(2,6,23,.10); background: rgba(15,23,42,.92); color: #fff; font-weight: 800; font-size: 13px; box-shadow: 0 10px 26px rgba(2,6,23,.14); }
+  .btn-sc:hover{ filter: brightness(1.05); }
+
+  
+  .user-btn{ width: 40px; height: 40px; border-radius: 16px; border: 1px solid rgba(2,6,23,.10); background: rgba(255,255,255,.70); box-shadow: 0 10px 24px rgba(2,6,23,.08); display:flex; align-items:center; justify-content:center; }
+  .user-avatar{ width: 30px; height: 30px; border-radius: 12px; background: rgba(15,23,42,.92); color:#fff; font-weight: 900; display:flex; align-items:center; justify-content:center; font-size: 12px; }
+  .user-pop{ position:absolute; right: 0; top: calc(100% + 10px); width: 260px; padding: 10px; border-radius: 18px; background: rgba(255,255,255,.95); border: 1px solid var(--line); box-shadow: var(--shadow); backdrop-filter: blur(10px); z-index: 120; }
+  .user-pop-head{ display:flex; gap: 10px; align-items:center; padding: 10px; border-radius: 14px; border: 1px solid rgba(2,6,23,.08); background: rgba(2,6,23,.02); }
+  .user-pop-avatar{ width: 36px; height: 36px; border-radius: 14px; background: rgba(15,23,42,.92); color:#fff; font-weight: 900; display:flex; align-items:center; justify-content:center; font-size: 12px; flex: 0 0 auto; }
+  .user-pop-name{ font-size: 13px; font-weight: 900; color:#0f172a; white-space:nowrap; overflow:hidden; text-overflow:ellipsis; }
+  .user-pop-sub{ font-size: 11px; font-weight: 700; color:#64748b; }
+  .user-pop-actions{ margin-top: 8px; display:flex; flex-direction: column; gap: 6px; }
+  .user-pop-item{ width:100%; display:flex; align-items:center; justify-content: space-between; padding: 10px 12px; border-radius: 14px; border: 1px solid rgba(2,6,23,.08); background: rgba(255,255,255,.70); font-weight: 800; font-size: 13px; color:#0f172a; }
+  .user-pop-item:hover{ background: rgba(255,255,255,.95); }
+  .user-pop-item.danger{ color:#b91c1c; }
+  
+
+  /* ===== Header styles (from index.html) ===== */
+  .topbar{position:sticky;top:0;z-index:30;background:rgba(255,255,255,.92);backdrop-filter:saturate(120%) blur(8px);border-bottom:1px solid #e6e8eb}
+  .logo-snow-wrap{ position:relative; overflow:hidden; border-radius:12px; }
+  .logo-snow{ position:absolute; inset:0; width:100%; height:100%; pointer-events:none; z-index:5; opacity:.75; }
+  .logo-snow-wrap #brand-logo,
+  .logo-snow-wrap #brand-title{ position:relative; z-index:2; }
+  .chan-btn{ height:36px; padding:0 12px; border-radius:999px; display:inline-flex; align-items:center; gap:8px; border:1px solid rgba(15,23,42,.12); background:#fff; color:#0f172a; font-weight:700; font-size:13px; transition: transform .12s ease, background .12s ease, filter .12s ease, border-color .12s ease; }
+  .chan-btn svg{ width:16px; height:16px; flex:0 0 16px; }
+  .chan-text{ display:none; }
+  @media (min-width: 640px){ .chan-text{ display:inline; } }
+  .chan-btn:active{ filter: brightness(1.12); }
+  .chan-btn:hover{ background: rgba(15,23,42,.04); }
+  .chan-btn--sc{ border-color: rgba(10,132,255,.45); color:#0a84ff; }
+  .chan-btn--sc:hover{ background: rgba(10,132,255,.08); }
+  .chan-btn--sc:active{ filter: brightness(1.12); }
+  .satu-badge{ display:inline-flex; align-items:center; gap:8px; padding:0 12px; height:36px; border-radius:999px; border:1px solid rgba(10,132,255,.35); background:#fff; box-shadow:0 1px 1px rgba(0,0,0,.04); font-size:12px; line-height:1; white-space:nowrap; user-select:none; }
+  .satu-coin-label{ font-weight:700; color:#0a84ff; }
+  .satu-coin-value{ font-weight:700; color:#0a84ff; }
+  .satu-coin-approx{ margin-left:2px; color:#3b82f6; font-weight:600; }
+  .user-btn{ height:36px; width:36px; border-radius:999px; background:rgba(15,23,42,.92); border:1px solid rgba(255,255,255,.14); display:inline-flex; align-items:center; justify-content:center; }
+  .user-btn:active{ transform: translateY(1px); }
+  .user-avatar{ height:30px; width:30px; border-radius:999px; display:flex; align-items:center; justify-content:center; font-size:12px; font-weight:800; color:#0a84ff; background:rgba(255,255,255,0.08); }
+  .user-pop{ position:absolute; right:0; top:44px; width:220px; background:#fff; border:1px solid rgba(15,23,42,.12); border-radius:14px; box-shadow:0 14px 40px rgba(2,6,23,.12); overflow:hidden; z-index:60; }
+  .user-pop-head{ padding:10px; background:rgba(15,23,42,.02); border-bottom:1px solid rgba(15,23,42,.08); }
+  .user-pop-email-row{ display:flex; align-items:center; gap:8px; }
+  .user-pop-email{ flex:1 1 auto; font-size:12px; font-weight:700; color:#0f172a; overflow:hidden; text-overflow:ellipsis; white-space:nowrap; }
+  .user-pop-copy{ height:30px; width:30px; border-radius:10px; border:1px solid rgba(15,23,42,.10); background:#fff; display:inline-flex; align-items:center; justify-content:center; }
+  .user-ic{ width:16px; height:16px; }
+  .user-pop-item{ width:100%; display:flex; align-items:center; gap:10px; padding:10px 12px; font-size:13px; background:#fff; color:#0f172a; }
+  .user-pop-item:hover{ background: rgba(15,23,42,.03); }
+  .user-pop-item.danger{ color:#b91c1c; }
+/* ===== Header: 1-в-1 как profile.html ===== */
+.topbar{ position: sticky; top: 0; z-index: 30; background: rgba(255,255,255,.92); backdrop-filter: saturate(120%) blur(8px); border-bottom: 1px solid #e6e8eb; }
+
+.burger-btn{ height: 36px; width: 40px; display: inline-flex; align-items: center; justify-content: center; border-radius: 10px; border: 1px solid #e6e8eb; background: #fff; box-shadow: 0 1px 1px rgba(0,0,0,.04); }
+.burger-btn:hover{ background:#f6f7f9; }
+.burger-ic{ width:18px; height:18px; stroke:#334155; stroke-width:2; stroke-linecap:round; }
+
+/* SatuCoin pill: ВАЖНО — делаем строкой (не колонкой) */
+.satu-badge{ display: inline-flex; align-items: center; gap: 8px; padding: 6px 10px; border-radius: 999px; background: rgba(10,132,255,.09); border: 1px solid rgba(10,132,255,.22); color: #0a84ff; font-size: 12px; line-height: 1; white-space: nowrap; user-select: none; min-width: 0; box-shadow: none; }
+.satu-coin-label{ font-weight:700; color:#0a84ff; }
+.satu-coin-value{ font-weight:700; color:#0a84ff; }
+.satu-coin-approx{ color:#0a84ff; opacity:.9; font-size:12px; }
+
+/* Avatar button */
+.user-btn{ height: 36px; width: 36px; border-radius: 999px; background: rgba(10,132,255,.09); border: 1px solid rgba(10,132,255,.22); display: inline-flex; align-items: center; justify-content: center; }
+.user-btn:active{ transform: translateY(1px); }
+
+.user-avatar{ height: 30px; width: 30px; border-radius: 999px; display: flex; align-items: center; justify-content: center; font-weight: 900; color: #0a84ff; background: rgba(255,255,255,.9); overflow: hidden; }
+.user-avatar img{ width:100%; height:100%; display:block; object-fit:cover; border-radius:999px; }
+
+/* dropdown menu */
+.user-pop{ position: absolute; right: 0; top: 44px; width: 220px; border-radius: 16px; background: #fff; border: 1px solid #e6e8eb; box-shadow: 0 14px 40px rgba(2,6,23,.12); overflow: hidden; z-index: 60; }
+.user-pop.hidden{ display:none; }
+
+/* ===== Force user menu like profile/index ===== */
+.user-btn{ height:36px;width:36px;border-radius:999px; background:rgba(10,132,255,.10); border:1px solid rgba(10,132,255,.22); display:inline-flex;align-items:center;justify-content:center; }
+.user-btn:active{transform:translateY(1px)}
+
+.user-avatar{ height:30px;width:30px;border-radius:999px; display:inline-flex;align-items:center;justify-content:center; font-weight:900;color:#0a84ff; background:rgba(255,255,255,.9); overflow:hidden; }
+.user-avatar img{ width:100%;height:100%;display:block;object-fit:cover;border-radius:999px; }
+
+.user-pop{ position:absolute;right:0;top:44px;width:220px; background:#fff;border:1px solid #e6e8eb;border-radius:14px; box-shadow:0 14px 40px rgba(2,6,23,.12); overflow:hidden;z-index:60; }
+.user-pop.hidden{display:none}
+.user-pop-head{padding:10px 12px;border-bottom:1px solid #e6e8eb;background:#fbfdff}
+.user-pop-email-row{display:flex;align-items:center;gap:8px;min-width:0}
+.user-pop-email{flex:1 1 auto;min-width:0;overflow:hidden;text-overflow:ellipsis;white-space:nowrap;font-size:12px;font-weight:800;color:#0f172a}
+.user-pop-copy{ height:28px;width:28px;flex:0 0 auto; display:inline-flex;align-items:center;justify-content:center; border:1px solid #e6e8eb;border-radius:10px; background:#fff;color:#64748b; }
+.user-pop-copy:hover{background:#f6f7f9}
+.user-pop-copy:active{transform:translateY(1px)}
+.user-pop-copy.is-copied{color:#0a84ff;border-color:rgba(10,132,255,.35)}
+.user-pop-item{width:100%;display:flex;align-items:center;gap:10px;padding:10px 12px;font-size:13px;background:#fff;color:#0f172a}
+.user-pop-item:hover{background:#f6f7f9}
+.user-pop-item.danger{color:#ef4444}
+.user-ic{width:18px;height:18px}
+.user-ic path{stroke:currentColor;stroke-width:2.2;stroke-linecap:round;stroke-linejoin:round;fill:none}
+
+/* === Header: match index/profile (logo left + avatar menu) === */
+.brand-title{ font-size:24px; font-weight:900; color:#0a84ff; letter-spacing:-0.02em; white-space:nowrap; }
+@media (max-width:640px){ .brand-title{ font-size:20px; } }
+
+/* ===== user menu EXACT like index.html ===== */
+.user-btn{
+  height:36px;
+  width:36px;
+  border-radius:999px;
+  background: rgba(10,132,255,0.10);
+  display:inline-flex;
+  align-items:center;
+  justify-content:center;
+}
+.user-btn:active{ transform:translateY(1px); }
+
+.user-avatar{
+  height:30px;
+  width:30px;
+  border-radius:999px;
+  display:inline-flex;
+  align-items:center;
+  justify-content:center;
+  font-weight:800;
+  color:#0a84ff;
+  background:rgba(255,255,255,0.08);
+  overflow:hidden;
+}
+.user-avatar img{
+  width:100%;
+  height:100%;
+  display:block;
+  object-fit:cover;
+  border-radius:999px;
+}
+
+.user-pop{
+  position:absolute;
+  right:0;
+  top:44px;
+  width:220px;
+  background:#fff;
+  border:1px solid #e6e8eb;
+  border-radius:14px;
+  box-shadow:0 14px 40px rgba(2,6,23,.12);
+  overflow:hidden;
+  z-index:60;
+}
+.user-pop.hidden{ display:none; }
+
+.user-pop-head{
+  padding:10px 12px;
+  border-bottom:1px solid #e6e8eb;
+  background:#fbfdff;
+}
+.user-pop-email-row{
+  display:flex;
+  align-items:center;
+  gap:8px;
+  min-width:0;
+}
+.user-pop-email{
+  flex:1 1 auto;
+  min-width:0;
+  font-size:12px;
+  font-weight:700;
+  color:#0f172a;
+  overflow:hidden;
+  text-overflow:ellipsis;
+  white-space:nowrap;
+}
+.user-pop-copy{
+  height:28px;
+  width:28px;
+  flex:0 0 auto;
+  display:inline-flex;
+  align-items:center;
+  justify-content:center;
+  border:1px solid #e6e8eb;
+  border-radius:10px;
+  background:#fff;
+  color:#64748b;
+}
+.user-pop-copy:hover{ background:#f6f7f9; }
+.user-pop-copy:active{ transform:translateY(1px); }
+.user-pop-copy.is-copied{ color:#0a84ff; border-color: rgba(10,132,255,.35); }
+
+.user-pop-item{
+  width:100%;
+  display:flex;
+  align-items:center;
+  gap:10px;
+  padding:10px 12px;
+  font-size:13px;
+  background:#fff;
+  color:#0f172a;
+  text-decoration:none;
+}
+.user-pop-item:hover{ background:#f6f7f9; }
+.user-pop-item.danger{ color:#ef4444; }
+
+.user-ic{ width:18px; height:18px; }
+.user-ic path{
+  stroke:currentColor;
+  stroke-width:2.2;
+  stroke-linecap:round;
+  stroke-linejoin:round;
+  fill:none;
+}
+
+/* ===== OVERRIDE: avatar popup EXACT like index.html (fix any old styles) ===== */
+#user-pop.user-pop{
+  position:absolute !important;
+  right:0 !important;
+  top:44px !important;
+  width:220px !important;
+  padding:0 !important;
+  background:#fff !important;
+  border:1px solid #e6e8eb !important;
+  border-radius:14px !important;
+  box-shadow:0 14px 40px rgba(2,6,23,.12) !important;
+  overflow:hidden !important;
+  z-index:60 !important;
+}
+#user-pop .user-pop-head{
+  padding:10px 12px !important;
+  border-bottom:1px solid #e6e8eb !important;
+  background:#fbfdff !important;
+}
+#user-pop .user-pop-item{
+  width:100% !important;
+  display:flex !important;
+  align-items:center !important;
+  gap:10px !important;
+  padding:10px 12px !important;
+  margin:0 !important;
+  border:0 !important;
+  border-radius:0 !important;
+  background:#fff !important;
+  color:#0f172a !important;
+  text-decoration:none !important;
+}
+#user-pop .user-pop-item:hover{ background:#f6f7f9 !important; }
+#user-pop .user-pop-item.danger{ color:#ef4444 !important; }
+
+</style>
+</head>
+  <body class="h-screen w-screen overflow-hidden">
+
+    <!-- Mobile App Topbar (logo centered) -->
+<div class="app-topbar md:hidden" aria-label="NeDzat">
+  <div class="app-logo">
+    <img src="assets/img/logo.png" alt="Logo" onerror="this.style.display='none'">
+    <div class="app-title">SatuBooster</div>
+  </div>
+</div>
+
+  <!-- SVG Icon Sprite -->
+  <svg aria-hidden="true" focusable="false" style="position:absolute; width:0; height:0; overflow:hidden">
+    <symbol id="i-refresh" viewBox="0 0 24 24"><path d="M21 12a9 9 0 0 1-15.3 6.36"/><path d="M3 12a9 9 0 0 1 15.3-6.36"/><path d="M3 4v6h6"/><path d="M21 20v-6h-6"/></symbol>
+
+    <symbol id="i-compose" viewBox="0 0 24 24">
+    <path d="M12 20h9"/>
+    <path d="M16.5 3.5a2.1 2.1 0 0 1 3 3L8 18l-4 1 1-4 11.5-11.5z"/>
+  </symbol>
+  <symbol id="i-x" viewBox="0 0 24 24">
+    <path d="M18 6L6 18"/>
+    <path d="M6 6l12 12"/>
+  </symbol>
+
+
+    <symbol id="i-compose" viewBox="0 0 24 24"><path d="M20 3a2.1 2.1 0 0 0-3 0L8 12v4h4l9-9a2.1 2.1 0 0 0 0-3z" fill="none" stroke="currentColor" stroke-width="2" stroke-linejoin="round"/><path d="M7 17h10" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round"/></symbol>
+    <symbol id="i-paperclip" viewBox="0 0 24 24"><path d="M21.44 11.05 12.25 20.24a6 6 0 0 1-8.49-8.49L13 2.5a4.5 4.5 0 1 1 6.36 6.36L9.78 18.44a3 3 0 1 1-4.24-4.24L15.3 4.44"/></symbol>
+    <symbol id="i-mic" viewBox="0 0 24 24"><path d="M12 14a3 3 0 0 0 3-3V5a3 3 0 0 0-6 0v6a3 3 0 0 0 3 3Z"/><path d="M19 11a7 7 0 0 1-14 0"/><path d="M12 18v4"/><path d="M8 22h8"/></symbol>
+    <symbol id="i-send" viewBox="0 0 24 24"><path d="M22 2 11 13"/><path d="M22 2 15 22 11 13 2 9 22 2Z"/></symbol>
+    <symbol id="i-arrow-left" viewBox="0 0 24 24"><path d="M15 18l-6-6 6-6"/><path d="M9 12h12"/></symbol>
+    <symbol id="i-user" viewBox="0 0 24 24"><path d="M20 21a8 8 0 0 0-16 0"/><path d="M12 13a4 4 0 1 0-4-4 4 4 0 0 0 4 4Z"/></symbol>
+    <symbol id="i-copy" viewBox="0 0 24 24"><path d="M8 8h12v12H8z"/><path d="M4 4h12v12"/></symbol>
+    <symbol id="i-file" viewBox="0 0 24 24"><path d="M14 2H6a2 2 0 0 0-2 2v16a2 2 0 0 0 2 2h12a2 2 0 0 0 2-2V8Z"/><path d="M14 2v6h6"/></symbol>
+    <symbol id="i-file-text" viewBox="0 0 24 24"><path d="M14 2H6a2 2 0 0 0-2 2v16a2 2 0 0 0 2 2h12a2 2 0 0 0 2-2V8Z"/><path d="M14 2v6h6"/><path d="M16 13H8"/><path d="M16 17H8"/><path d="M10 9H8"/></symbol>
+    <symbol id="i-trash" viewBox="0 0 24 24"><path d="M3 6h18"/><path d="M8 6V4a2 2 0 0 1 2-2h4a2 2 0 0 1 2 2v2"/><path d="M19 6l-1 14a2 2 0 0 1-2 2H8a2 2 0 0 1-2-2L5 6"/><path d="M10 11v6"/><path d="M14 11v6"/></symbol>
+    <symbol id="i-theme" viewBox="0 0 24 24"><path d="M12 3a9 9 0 1 0 9 9"/> <path d="M21 12a9 9 0 0 1-9 9V12Z"/> <path d="M7.5 7.5l.01.01"/> <path d="M16.5 7.5l.01.01"/> <path d="M12 16.5l.01.01"/> </symbol>
+  </svg>
+  <!-- Header (в стиле index.html) -->
+   <header class="topbar">
+    <div class="w-full px-4 md:px-6">
+      <div class="h-[52px] flex items-center justify-between">
+        <div class="flex items-center gap-2">
+          <button id="burger" class="lg:hidden burger-btn" aria-label="Открыть меню" aria-expanded="false">
+            <svg class="burger-ic" viewBox="0 0 24 24" fill="none" aria-hidden="true">
+              <path d="M4 7H20" />
+              <path d="M4 12H20" />
+              <path d="M4 17H20" />
+            </svg>
+          </button>
+
+          <div class="flex items-center gap-2 min-w-0 logo-snow-wrap">
+            <canvas class="logo-snow" aria-hidden="true"></canvas>
+            <img id="brand-logo" class="h-10 w-auto hidden" alt="Logo">
+            <div id="brand-title" class="brand-title">SatuBooster</div>
+          </div>
+
+        </div>
+
+        <div class="flex items-center gap-2">
+
+          <!-- SatuCoin -->
+          <div id="satu-pill" class="satu-badge" title="Баланс SatuCoin">
+            <span class="satu-coin-ic" aria-hidden="true">
+              <svg viewBox="0 0 24 24" width="18" height="18" fill="none" aria-hidden="true">
+                <defs>
+                  <linearGradient id="scg" x1="2" y1="2" x2="22" y2="22">
+                    <stop stop-color="#0a84ff"/>
+                    <stop offset="1" stop-color="#3b82f6"/>
+                  </linearGradient>
+                </defs>
+                <circle cx="12" cy="12" r="8.2" stroke="url(#scg)" stroke-width="1.8"/>
+                <circle cx="12" cy="12" r="5.7" stroke="url(#scg)" stroke-width="1.4" opacity="0.7"/>
+                <path d="M9 9.2c.9-1 2-1.5 3-1.6" stroke="url(#scg)" stroke-width="1.6" stroke-linecap="round" opacity="0.7"/>
+              </svg>
+            </span>
+            <span class="satu-coin-label">SatuCoin</span>
+            <span class="satu-coin-value" id="satu-balance">—</span>
+            <span class="satu-coin-approx" id="satu-approx" hidden></span>
+          </div>
+
+          <!-- Пополнить SatuCoin -->
+          <a
+            id="satu-topup"
+            class="chan-btn chan-btn--sc"
+            href="https://wa.me/77079652832?text=%D0%A1%D3%99%D0%BB%D0%B5%D0%BC%D0%B5%D1%82%D1%81%D1%96%D0%B7%D0%B1%D0%B5%21%20SatuCoin%20%D1%82%D0%BE%D0%BB%D1%82%D1%8B%D1%80%D2%93%D1%8B%D0%BC%20%D0%BA%D0%B5%D0%BB%D0%B5%D0%B4%D1%96"
+            target="_blank"
+            rel="noopener"
+            title="Пополнить SatuCoin"
+          >
+            <svg viewBox="0 0 24 24" fill="none" aria-hidden="true">
+              <path d="M12 5v14M5 12h14" stroke="currentColor" stroke-width="2.4" stroke-linecap="round"/>
+            </svg>
+            <span class="chan-text">Пополнить</span>
+          </a>
+
+          <!-- Аккаунт -->
+          <div class="relative">
+            <button id="user-btn" class="user-btn" type="button" aria-label="Аккаунт" aria-expanded="false">
+              <span id="user-avatar" class="user-avatar">U</span>
+            </button>
+
+            <div id="user-pop" class="user-pop hidden" role="menu" aria-label="Меню аккаунта">
+              <div class="user-pop-head">
+                <div class="user-pop-email-row">
+                  <div class="user-pop-email" id="user-email" title="—">—</div>
+
+                  <button type="button" class="user-pop-copy" id="user-email-copy"
+                          aria-label="Копировать почту" title="Копировать">
+                    <svg viewBox="0 0 24 24" class="user-ic" fill="none" aria-hidden="true">
+                      <path d="M9 9h10v10H9z"></path>
+                      <path d="M5 15H4a2 2 0 0 1-2-2V4a2 2 0 0 1 2-2h9a2 2 0 0 1 2 2v1"></path>
+                    </svg>
+                  </button>
+                </div>
+              </div>
+
+              <a class="user-pop-item" href="profile.html" id="user-profile" role="menuitem">
+                <svg viewBox="0 0 24 24" class="user-ic" fill="none" aria-hidden="true">
+                  <path d="M12 12a4 4 0 1 0-4-4 4 4 0 0 0 4 4Z" />
+                  <path d="M4 20c1.6-3 4.5-5 8-5s6.4 2 8 5" />
+                </svg>
+                <span>Профиль</span>
+              </a>
+
+              <button class="user-pop-item danger" type="button" id="user-logout" role="menuitem">
+                <svg viewBox="0 0 24 24" class="user-ic" fill="none" aria-hidden="true">
+                  <path d="M10 7V6a2 2 0 0 1 2-2h6a2 2 0 0 1 2 2v12a2 2 0 0 1-2 2h-6a2 2 0 0 1-2-2v-1" />
+                  <path d="M4 12h10" />
+                  <path d="M7 9l-3 3 3 3" />
+                </svg>
+                <span>Выйти</span>
+              </button>
+            </div>
+          </div>
+
+          <!-- оставляем id=me (теперь скрыт), чтобы не ломать текущий JS -->
+          <div id="me" class="hidden"></div>
+        </div>
+      </div>
+    </div>
+  </header>
+
+  <div id="backdrop" class="backdrop md:hidden"></div>
+
+  <main id="appMain" class="app-main grid md:grid-cols-[360px,1fr,72px]">
+    <!-- Left: contacts (offcanvas on mobile) -->
+    <aside id="leftPane" class="leftpane">
+      <div class="p-3 border-b" style="border-color: var(--line)">
+        <div class="flex gap-2">
+          <input id="searchInput" type="text" placeholder="Поиск по имени/городу/интересу/номеру" class="field" />
+            <button id="refreshBtn" class="btn-ghost btn-icon" title="Написать первым (WhatsApp)">
+              <svg class="ic" viewBox="0 0 24 24" aria-hidden="true"><use href="#i-compose"></use></svg>
+            </button>
+        </div>
+
+        <div class="mt-2 flex items-center gap-2">
+          <div class="chip relative pr-8">
+            <span class="text-xs text-slate-500 hidden sm:inline">Аккаунт</span>
+            <select id="accountSelect" class="select appearance-none pr-7"></select>
+            <svg class="absolute right-2 top-1/2 -translate-y-1/2 w-4 h-4 text-slate-500 pointer-events-none"
+                viewBox="0 0 24 24" fill="none" aria-hidden="true">
+              <path d="M6 9l6 6 6-6" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"/>
+            </svg>
+          </div>
+          <span id="accStatus" class="text-xs text-slate-500 truncate"></span>
+        </div>
+
+      </div>
+      <div id="contactList" class="flex-1 overflow-y-auto scrollbar"></div>
+    </aside>
+
+    <!-- Right: chat -->
+    <section class="flex flex-col min-h-0">
+      <!-- Chat header -->
+      <div id="chatHeader" class="h-[56px] border-b bg-white/80 backdrop-blur-sm px-3 md:px-4 flex items-center justify-between gap-2" style="border-color: var(--line)">
+        <div class="flex items-center gap-2 min-w-0">
+          <button id="backBtn" class="btn-ghost btn-icon md:hidden" title="Назад к списку"><svg class="ic" viewBox="0 0 24 24" aria-hidden="true"><use href="#i-arrow-left"></use></svg></button>
+          <div id="chatAvatar" class="avatar w-9 h-9 text-[12px]"><svg class="ic" viewBox="0 0 24 24" aria-hidden="true"><use href="#i-user"></use></svg></div>
+          <div class="min-w-0">
+            <div id="chatTitle" class="font-semibold truncate">Выберите контакт</div>
+            <div id="chatSubtitle" class="text-xs text-slate-500 truncate">—</div>
+          </div>
+        </div>
+        <div class="flex items-center gap-2 shrink-0">
+          <span id="stageBadge" class="text-xs px-2 py-1 rounded-full bg-slate-100 text-slate-600">—</span>
+
+          <div class="theme-wrap">
+            <button id="themeBtn" class="btn-ghost btn-icon" title="Тема чата">
+              <svg class="ic" viewBox="0 0 24 24" aria-hidden="true"><use href="#i-theme"></use></svg>
+            </button>
+
+            <div id="themeMenu" class="theme-menu hidden" role="menu" aria-label="Тема чата">
+              <button class="theme-item" data-bg="default" type="button">
+                <span class="theme-thumb" style="background-image:url('assets/img/default-chat.svg')"></span>
+                <span class="theme-label">Рельеф</span>
+              </button>
+
+              <button class="theme-item" data-bg="black-and-white-chat" type="button">
+                <span class="theme-thumb" style="background-image:url('assets/img/black-and-white-chat.jpg')"></span>
+                <span class="theme-label">Шөлдалада өзені</span>
+              </button>
+
+              <button class="theme-item" data-bg="metallic-aesthetic-chat" type="button">
+                <span class="theme-thumb" style="background-image:url('assets/img/metallic-aesthetic-chat.jpg')"></span>
+                <span class="theme-label">Қызған темір</span>
+              </button>
+
+              <button class="theme-item" data-bg="porsche-911-carrera-chat" type="button">
+                <span class="theme-thumb" style="background-image:url('assets/img/porsche-911-carrera-chat.jpg')"></span>
+                <span class="theme-label">Porsche 911</span>
+              </button>
+
+              <button class="theme-item" data-bg="mont-blanc-massif-chat" type="button">
+                <span class="theme-thumb" style="background-image:url('assets/img/mont-blanc-massif-chat.jpg')"></span>
+                <span class="theme-label">Іле-алатау</span>
+              </button>
+
+              <button class="theme-item" data-bg="hazrat-sultan-chat" type="button">
+                <span class="theme-thumb" style="background-image:url('assets/img/hazrat-sultan-chat.jpg')"></span>
+                <span class="theme-label">Әзірет Сұлтан мешіті</span>
+              </button>
+            </div>
+          </div>
+
+        </div>
+      </div>
+
+      <!-- Messages -->
+      <div id="messages" class="flex-1 overflow-y-auto p-3 md:p-4 scrollbar chat-bg relative chat-bg relative">
+
+        <!-- EMPTY STATE (показывается пока чат не выбран) -->
+        <div id="chatEmpty" class="chat-empty">
+          <div class="chat-empty-card">
+            <div class="chat-empty-row">
+              <img src="assets/img/wa.png" alt="WhatsApp">
+              <img src="assets/img/tg.png" alt="Telegram">
+              <img src="assets/img/ig.png" alt="Instagram">
+            </div>
+            <div class="chat-empty-title">Чатты таңдаңыз</div>
+            <div class="chat-empty-sub">Сол жақтан контакт таңдасаңыз — диалог ашылады</div>
+          </div>
+        </div>
+        <div id="typingLine" class="hidden" style="opacity:.7; padding:6px 10px;">Печатает…</div>
+      </div>
+
+      <!-- Composer -->
+      <div id="composerBar" class="border-t bg-white/85 backdrop-blur-sm p-3" style="border-color: var(--line)">
+        <div id="composerRow" class="flex items-end gap-2">
+
+          <div class="attach-wrap">
+            <button id="attachBtn" class="btn-ghost btn-icon" title="Прикрепить">
+              <svg class="ic" viewBox="0 0 24 24" aria-hidden="true"><use href="#i-paperclip"></use></svg>
+            </button>
+
+            <div id="attachMenu" class="attach-menu hidden">
+              <button class="attach-item" data-mode="media">
+                <div class="file-ico">📷</div>
+                <div class="file-meta">
+                  <div class="file-name">Фото / Видео</div>
+                  <div class="attach-sub">image/*, video/*</div>
+                </div>
+              </button>
+
+              <button class="attach-item" data-mode="document">
+                <div class="file-ico">📄</div>
+                <div class="file-meta">
+                  <div class="file-name">Документ</div>
+                  <div class="attach-sub">PDF, Word, Excel, архивы…</div>
+                </div>
+              </button>
+
+              <button class="attach-item" data-mode="gif">
+                <div class="file-ico">GIF</div>
+                <div class="file-meta">
+                  <div class="file-name">GIF</div>
+                  <div class="attach-sub">.gif</div>
+                </div>
+              </button>
+
+              <button class="attach-item" data-mode="sticker">
+                <div class="file-ico">WEBP</div>
+                <div class="file-meta">
+                  <div class="file-name">Стикер</div>
+                  <div class="attach-sub">.webp</div>
+                </div>
+              </button>
+              <button class="attach-item" data-mode="any">
+                <div class="file-ico">📎</div>
+                <div class="file-meta">
+                  <div class="file-name">Любой файл</div>
+                  <div class="attach-sub">Все форматы</div>
+                </div>
+              </button>
+            </div>
+          </div>
+
+          <textarea id="msgInput" rows="1" placeholder="Сообщение"
+            class="field resize-none"
+            style="min-height: 44px; max-height: 140px;"></textarea>
+
+          <button id="micBtn" class="btn-ghost btn-icon btn-round" title="Голосовое сообщение"><svg class="ic" viewBox="0 0 24 24" aria-hidden="true"><use href="#i-mic"></use></svg></button>
+          <button id="sendBtn" class="btn-primary btn-round inline-flex items-center justify-center"><svg class="ic" viewBox="0 0 24 24" aria-hidden="true"><use href="#i-send"></use></svg><span class="hidden sm:inline ml-2">Отправить</span></button>
+
+          <input id="fileInput" type="file" class="hidden" multiple />
+        </div>
+
+        <div id="recordBar" class="hidden mt-2">
+  <div class="recordbar">
+    <button id="recCancel" class="btn-ghost btn-icon btn-round" title="Отменить запись">
+      <svg class="ic" viewBox="0 0 24 24" aria-hidden="true"><use href="#i-trash"></use></svg>
+    </button>
+
+    <div class="flex items-center gap-3 flex-1 min-w-0">
+      <span class="dot" aria-hidden="true"></span>
+      <div class="min-w-0">
+        <div class="text-[12px] font-semibold leading-4 truncate">Запись голосового сообщения</div>
+        <div class="text-[11px] text-slate-500 leading-4"><span id="recTimer">00:00</span></div>
+      </div>
+      <div class="wave" aria-hidden="true">
+        <span style="height:10px"></span><span style="height:6px"></span><span style="height:14px"></span><span style="height:9px"></span><span style="height:16px"></span>
+      </div>
+    </div>
+
+    <button id="recStop" class="btn-primary btn-icon btn-round" title="Остановить и отправить">
+      <svg class="ic" viewBox="0 0 24 24" aria-hidden="true"><use href="#i-send"></use></svg>
+    </button>
+  </div>
+</div>
+
+        <div id="hint" class="text-xs text-slate-400 mt-1">
+          Текст, фото, видео и голосовые. (Документы — как файл.)
+        </div>
+      </div>
+    </section>
+
+    <!-- Right mini sidebar -->
+     <aside id="rightNav" class="rightnav hidden md:flex" aria-label="Навигация">
+        <button class="rnav-btn" data-nav="accounts" title="Аккаунты" aria-label="Аккаунты">
+          <svg class="nav-icon" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"
+            stroke-linecap="round" stroke-linejoin="round" aria-hidden="true">
+            <path d="M17 21v-2a4 4 0 0 0-4-4H5a4 4 0 0 0-4 4v2"></path>
+            <circle cx="9" cy="7" r="4"></circle>
+            <path d="M23 21v-2a4 4 0 0 0-3-3.87"></path>
+            <path d="M16 3.13a4 4 0 0 1 0 7.75"></path>
+          </svg>
+        </button>
+
+        <button class="rnav-btn" data-nav="ig" title="Instagram" aria-label="Instagram">
+          <svg class="nav-icon nav-icon--ig" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"
+            stroke-linecap="round" stroke-linejoin="round" aria-hidden="true">
+            <rect x="3" y="3" width="18" height="18" rx="5"></rect>
+            <circle cx="12" cy="12" r="4"></circle>
+            <circle cx="17" cy="7" r="1"></circle>
+          </svg>
+        </button>
+
+        <button class="rnav-btn" data-nav="tt" title="TikTok" aria-label="TikTok">
+          <svg class="nav-icon nav-icon--tt" viewBox="0 0 16 16" aria-hidden="true">
+            <path fill="currentColor" d="M9 0h1.98c.144.715.54 1.617 1.235 2.312.695.695 1.597 1.091 2.312 1.235V7.82c-1.22.03-2.407-.356-3.386-1.033v4.213a5 5 0 1 1-5-5v2a3 3 0 1 0 3 3z"/>
+          </svg>
+        </button>
+
+        <button class="rnav-btn is-active" data-nav="chat" title="Чаты" aria-label="Чаты">
+          <svg class="nav-icon" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"
+            stroke-linecap="round" stroke-linejoin="round" aria-hidden="true">
+            <path d="M21 15a4 4 0 0 1-4 4H8l-5 3V7a4 4 0 0 1 4-4h10a4 4 0 0 1 4 4z"></path>
+          </svg>
+        </button>
+
+        <button class="rnav-btn" data-nav="profiles" title="Лиды" aria-label="Лиды">
+          <svg class="nav-icon" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"
+            stroke-linecap="round" stroke-linejoin="round" aria-hidden="true">
+            <path d="M20 21v-2a4 4 0 0 0-4-4H8a4 4 0 0 0-4 4v2"></path>
+            <circle cx="12" cy="7" r="4"></circle>
+          </svg>
+        </button>
+
+        <div class="rnav-sep" aria-hidden="true"></div>
+
+        <button class="rnav-btn" data-nav="media" title="Медиа отправка" aria-label="Медиа отправка">
+          <svg class="nav-icon" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"
+            stroke-linecap="round" stroke-linejoin="round" aria-hidden="true">
+            <rect x="3" y="3" width="18" height="18" rx="2"></rect>
+            <circle cx="8.5" cy="8.5" r="1.5"></circle>
+            <path d="M21 15l-5-5L5 21"></path>
+          </svg>
+        </button>
+
+        <button class="rnav-btn" data-nav="follow" title="Follow-up" aria-label="Follow-up">
+          <svg class="nav-icon" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"
+            stroke-linecap="round" stroke-linejoin="round" aria-hidden="true">
+            <circle cx="12" cy="12" r="10"></circle>
+            <path d="M12 6v6l4 2"></path>
+          </svg>
+        </button>
+
+        <div class="rnav-sep" aria-hidden="true"></div>
+
+        <button class="rnav-btn" data-nav="kb" title="База знаний" aria-label="База знаний">
+          <svg class="nav-icon" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"
+            stroke-linecap="round" stroke-linejoin="round" aria-hidden="true">
+            <path d="M2 3h6a4 4 0 0 1 4 4v14a3 3 0 0 0-3-3H2z"></path>
+            <path d="M22 3h-6a4 4 0 0 0-4 4v14a3 3 0 0 1 3-3h7z"></path>
+          </svg>
+        </button>
+
+        <div class="rnav-sep" aria-hidden="true"></div>
+
+        <button class="rnav-btn" data-nav="tg" title="Telegram уведомление" aria-label="Telegram уведомление">
+          <svg class="nav-icon" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"
+            stroke-linecap="round" stroke-linejoin="round" aria-hidden="true">
+            <path d="M15 10l-4 4l6 6l4 -16l-18 7l4 2l2 6l3 -4"></path>
+          </svg>
+        </button>
+
+        <button class="rnav-btn" data-nav="integrations" title="SatuBooster CRM" aria-label="SatuBooster CRM">
+          <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" aria-hidden="true">
+            <path d="M10 13a5 5 0 0 0 7.07 0l1.41-1.41a5 5 0 0 0-7.07-7.07L10 4.93"/>
+            <path d="M14 11a5 5 0 0 0-7.07 0L5.52 12.4a5 5 0 0 0 7.07 7.07L14 19.07"/>
+          </svg>
+        </button>
+
+        <div class="rnav-sep" aria-hidden="true"></div>
+
+        <button class="rnav-btn" data-nav="settings" title="Настройки" aria-label="Настройки">
+          <svg class="nav-icon" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"
+            stroke-linecap="round" stroke-linejoin="round" aria-hidden="true">
+            <circle cx="12" cy="12" r="3"></circle>
+            <path d="M19.4 15a1.65 1.65 0 0 0 .33 1.82l.06.06a2 2 0 0 1 0 2.83 2 2 0 0 1-2.83 0l-.06-.06a1.65 1.65 0 0 0-1.82-.33 1.65 1.65 0 0 0-1 1.51V21a2 2 0 0 1-2 2 2 2 0 0 1-2-2v-.09a1.65 1.65 0 0 0-1-1.51 1.65 1.65 0 0 0-1.82.33l-.06.06a2 2 0 0 1-2.83 0 2 2 0 0 1 0-2.83l.06-.06a1.65 1.65 0 0 0 .33-1.82 1.65 1.65 0 0 0-1.51-1H3a2 2 0 0 1-2-2 2 2 0 0 1 2-2h.09a1.65 1.65 0 0 0 1.51-1 1.65 1.65 0 0 0-.33-1.82l-.06-.06a2 2 0 0 1 0-2.83 2 2 0 0 1 2.83 0l.06.06a1.65 1.65 0 0 0 1.82.33 1.65 1.65 0 0 0 1-1.51V3a2 2 0 0 1 2-2 2 2 0 0 1 2 2v.09a1.65 1.65 0 0 0 1 1.51 1.65 1.65 0 0 0 1.82-.33l.06-.06a2 2 0 0 1 2.83 0 2 2 0 0 1 0 2.83l-.06.06a1.65 1.65 0 0 0-.33 1.82 1.65 1.65 0 0 0 1.51 1H21a2 2 0 0 1 2 2 2 2 0 0 1-2 2h-.09a1.65 1.65 0 0 0-1.51 1z"></path>
+          </svg>
+        </button>
+      </aside>
+
+  </main>
+
+  <!-- New Chat Modal (WhatsApp first message) -->
+  <div id="newChatModal" class="modal hidden" role="dialog" aria-modal="true">
+    <div class="modal-back" data-close="1"></div>
+
+    <div class="modal-card">
+      <div class="modal-head">
+        <div class="text-base font-semibold">Написать первым (WhatsApp)</div>
+        <button id="newChatCancelX" class="btn-ghost btn-icon" title="Закрыть">
+          <svg class="ic" viewBox="0 0 24 24" aria-hidden="true"><use href="#i-x"></use></svg>
+        </button>
+      </div>
+
+      <div class="mt-3 grid gap-2">
+        <div class="text-xs text-slate-500">WhatsApp аккаунт (online)</div>
+        <select id="newChatAcc" class="field"></select>
+
+        <div class="text-xs text-slate-500 mt-2">Номер телефона</div>
+        <input id="newChatPhone" class="field" placeholder="+7707..." />
+
+        <div class="text-xs text-slate-500 mt-2">Первое сообщение</div>
+        <textarea id="newChatText" class="field" rows="3" placeholder="Здравствуйте!"></textarea>
+      </div>
+
+      <div class="modal-actions">
+        <button id="newChatCancel" class="btn-ghost" type="button">Отмена</button>
+        <button id="newChatSend" class="btn-primary" type="button">Отправить</button>
+      </div>
+    </div>
+  </div>
+
+  <!-- Mobile Bottom Nav (WhatsApp-like) -->
+<nav id="bottomNav" class="bottom-nav md:hidden" aria-label="Навигация">
+  <button class="bottom-item is-active" data-nav="chat" type="button" aria-label="Чаты">
+    <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true">
+      <path d="M21 15a4 4 0 0 1-4 4H8l-5 3V7a4 4 0 0 1 4-4h10a4 4 0 0 1 4 4z"></path>
+    </svg>
+    <div>Чаты</div>
+    <span class="dot" aria-hidden="true"></span>
+  </button>
+
+  <button class="bottom-item" data-nav="profiles" type="button" aria-label="Лиды">
+    <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true">
+      <path d="M20 21v-2a4 4 0 0 0-4-4H8a4 4 0 0 0-4 4v2"></path>
+      <circle cx="12" cy="7" r="4"></circle>
+    </svg>
+    <div>Лиды</div>
+  </button>
+</nav>
+
+  <script src="/socket.io/socket.io.js"></script>
+  <script src="https://cdn.jsdelivr.net/npm/axios@1.6.8/dist/axios.min.js"></script>
+
+  <script>
+    // ===== State =====
+    const state = {
+      tenantId: 0,
+      // accId = активный аккаунт ОТКРЫТОГО чата (для отправки/истории)
+      accId: null,
+
+      sendAccId: null, // acc_id для отправки (может отличаться от accId истории)
+
+      // filterAccId = фильтр списка слева (0 = все аккаунты)
+      filterAccId: 0,
+
+      accounts: [],
+      contacts: [],
+      selected: null, // {jid, name, stage, summary}
+      socket: null,
+      mediaRecorder: null,
+      audioChunks: [],
+      poll: { timer: null, lastId: 0, key: '' },
+      seenMsgIds: new Set(),    // сообщения из БД (есть id)
+      seenTempKeys: new Set(),  // временные (без id)
+      unread: {}, // jid -> count
+    };
+
+    // ===== Responsive left pane =====
+    function isDesktop() { return window.matchMedia('(min-width: 768px)').matches; }
+
+    function setLeftOpen(open){
+      const left = document.getElementById('leftPane');
+      const bd = document.getElementById('backdrop');
+      const burger = document.getElementById('burger');
+
+      if (isDesktop()){
+        // On desktop it's always visible; just ensure backdrop is off.
+        bd.classList.remove('show');
+        burger?.setAttribute('aria-expanded', 'false');
+        return;
+      }
+
+      if (open){
+        left.classList.add('open');
+        bd.classList.add('show');
+        document.body.classList.add('no-scroll');
+        burger?.setAttribute('aria-expanded', 'true');
+      } else {
+        left.classList.remove('open');
+        bd.classList.remove('show');
+        document.body.classList.remove('no-scroll');
+        burger?.setAttribute('aria-expanded', 'false');
+      }
+    }
+
+    // ===== Helpers =====
+    function avatarFromName(s) {
+      const t = (s || '').trim();
+      if (!t) return `<svg class="ic" viewBox="0 0 24 24" aria-hidden="true"><use href="#i-user"></use></svg>`;
+      const parts = t.split(/\s+/).slice(0,2);
+      return parts.map(p => p[0]).join('').toUpperCase();
+    }
+
+    function avatarHtml(p){
+      const url0 = (p && p.avatar_url) ? String(p.avatar_url).trim() : '';
+      if (url0){
+        // поддержка: абсолютные (http/https/data) и относительные (/uploads/.. или uploads/..)
+        const src = /^(https?:)?\/\//i.test(url0) || url0.startsWith('data:')
+          ? url0
+          : ('/' + url0.replace(/^\/+/, ''));
+
+        const alt = (p && (p.name || p.jid)) ? String(p.name || p.jid) : '';
+        // если картинка не загрузилась — покажем буквы
+        return `<img src="${src}" alt="${escapeHtml(alt)}"
+          class="w-full h-full rounded-full object-cover"
+          onerror="this.remove(); this.parentNode && (this.parentNode.innerHTML='${avatarFromName((p && (p.name || p.jid)) || '')}')"
+        />`;
+      }
+      return avatarFromName((p && (p.name || p.jid)) || '');
+    }
+
+    // ===== Avatar loader (from backend) =====
+    const AVATAR_CACHE = new Map(); // key: accId|jid -> url
+
+    async function fetchPeerAvatarUrl(accId, jid){
+      const key = `${accId}|${jid}`;
+      if (AVATAR_CACHE.has(key)) return AVATAR_CACHE.get(key);
+
+      try{
+        const { data } = await axios.get('/api/profile/avatar', { params: { acc_id: accId, jid } });
+        const url = (data && data.url) ? String(data.url) : '';
+        AVATAR_CACHE.set(key, url || '');
+        return url || '';
+      }catch(_){
+        AVATAR_CACHE.set(key, '');
+        return '';
+      }
+    }
+
+    // containerEl — это div.avatar (слева) или #chatAvatar (в шапке)
+    async function ensureAvatarRendered(p, containerEl){
+      try{
+        if (!containerEl || !p || !p.jid || !state.accId) return;
+
+        // если уже есть avatar_url — просто перерисуем (на случай если раньше были буквы)
+        if (p.avatar_url){
+          containerEl.innerHTML = avatarHtml(p);
+          return;
+        }
+
+        // Подгружаем с бэка (WA вернёт url, TG вернёт пусто — будет буква)
+        const url = await fetchPeerAvatarUrl(state.accId, p.jid);
+        if (url){
+          p.avatar_url = url;          // сохраним в объект контакта
+          containerEl.innerHTML = avatarHtml(p);
+        }
+      }catch(_){}
+    }
+
+    async function copyTextSafe(text){
+      const t = String(text || '').trim();
+      if(!t) return;
+      try{
+        await navigator.clipboard.writeText(t);
+      }catch(_){
+        // fallback
+        const ta = document.createElement('textarea');
+        ta.value = t;
+        document.body.appendChild(ta);
+        ta.select();
+        document.execCommand('copy');
+        ta.remove();
+      }
+    }
+
+  function toast(text){
+      const msg = String(text||'').trim();
+      if (!msg) return;
+      const id = 'ndz_toast';
+      let el = document.getElementById(id);
+      if (!el){
+        el = document.createElement('div');
+        el.id = id;
+        el.className = 'fixed top-3 left-1/2 -translate-x-1/2 z-[9999] px-3 py-2 rounded-xl text-xs font-semibold shadow bg-slate-900 text-white opacity-0 transition-opacity';
+        document.body.appendChild(el);
+      }
+      el.textContent = msg;
+      el.style.opacity = '1';
+      clearTimeout(el._t);
+      el._t = setTimeout(()=>{ el.style.opacity = '0'; }, 1100);
+    }
+
+    // ===== JID normalization (важно для WA, чтобы не было дублей и "невидимых" сообщений) =====
+    function currentAccKind(){
+      const a = (state.accounts || []).find(x => Number(x.id) === Number(state.accId));
+      return String(a?.kind || 'wa').toLowerCase(); // 'wa' по умолчанию
+    }
+
+    function normalizeWaJid(jid){
+      let s = String(jid || '').trim();
+      if (!s) return '';
+      // убираем device часть: "7705...:73@s.whatsapp.net" -> "7705...@s.whatsapp.net"
+      if (s.includes(':') && s.includes('@s.whatsapp.net')) {
+        const at = s.indexOf('@');
+        const colon = s.indexOf(':');
+        if (colon > 0 && colon < at) s = s.slice(0, colon) + s.slice(at);
+      }
+      // иногда jid приходит без домена — подстрахуемся
+      if (/^\d+$/.test(s)) s = s + '@s.whatsapp.net';
+      return s;
+    }
+
+    function normalizeTgJid(jid){
+      let s = String(jid || '').trim();
+      if (!s) return '';
+      // приводим к виду tg:<id>
+      if (s.startsWith('tg:')) return s;
+      const digits = s.replace(/\D+/g, '');
+      return digits ? ('tg:' + digits) : s;
+    }
+
+    function normalizeIgJid(jid){
+      let s = String(jid || '').trim();
+      if (!s) return '';
+      if (s.startsWith('ig:')) return s;
+      return 'ig:' + s; // если пришёл только id
+    }
+
+    function jidKey(jid){
+      const kind = currentAccKind();
+      if (kind === 'tg') return normalizeTgJid(jid);
+      if (kind === 'ig') return normalizeIgJid(jid);
+      return normalizeWaJid(jid);
+    }
+
+    function sameJid(a, b){
+      return jidKey(a) && jidKey(a) === jidKey(b);
+    }
+
+    function prettyPeer(jid=''){
+      const s0 = String(jid||'').trim();
+      if (!s0) return '';
+      if (s0.startsWith('tg:')) return 'TG ' + s0.slice(3);
+      if (s0.startsWith('ig:')) return 'IG ' + s0.slice(3);
+
+      // WA: "7705...@s.whatsapp.net" / "7705..." / "+7705 ..."
+      let raw = s0.replace(/^(\d+):/, '');          // accId:... защита
+      raw = raw.replace(/@s\.whatsapp\.net$/, ''); // домен WA
+      // WA @lid — это скрытый ID, НЕ телефон. Не показываем как +номер.
+      if (raw.endsWith('@lid')) return 'WhatsApp User';
+      
+      let digits = raw.replace(/\D+/g, '');
+      if (!digits) return s0.replace(/@.*/, '');
+
+      // KZ/RU: 8XXXXXXXXXX -> 7XXXXXXXXXX
+      if (digits.length === 11 && digits.startsWith('8')) digits = '7' + digits.slice(1);
+
+      if (digits.length >= 8 && digits.length <= 15) return '+' + digits;
+
+      return s0.replace(/@.*/, '');
+    }
+
+    function canonJid(jid=''){
+      const s0 = String(jid||'').trim();
+      if (!s0) return '';
+      if (s0.startsWith('tg:')) return s0; // tg как есть
+      if (s0.startsWith('ig:')) return s0; // ig как есть
+
+      // wa: убираем "accId:" если вдруг попалось
+      let raw = s0.replace(/^(\d+):/, '');
+
+      // если это @lid / группы и т.п. — оставим как есть (это не телефон)
+      if (raw.endsWith('@lid') || raw.endsWith('@g.us') || raw.endsWith('@broadcast') || raw.endsWith('@newsletter')) {
+        return raw;
+      }
+
+      // нормализуем phone@s.whatsapp.net
+      if (raw.endsWith('@s.whatsapp.net')) {
+        const digits = raw.replace(/@s\.whatsapp\.net$/,'').replace(/\D+/g,'');
+        if (digits.length >= 8 && digits.length <= 15) return digits + '@s.whatsapp.net';
+        return raw;
+      }
+
+      // если пришли просто цифры
+      const digits = raw.replace(/\D+/g,'');
+      if (digits.length >= 8 && digits.length <= 15) return digits + '@s.whatsapp.net';
+
+      return raw;
+    }
+
+    function contactPhoneKey(jid){
+      const s0 = String(jid||'').trim();
+      if (!s0) return '';
+      if (s0.startsWith('tg:')) return s0; // tg не трогаем
+      if (s0.startsWith('ig:')) return s0; // ig не трогаем
+      let raw = s0.replace(/^(\d+):/, '').replace(/@s\.whatsapp\.net$/, '');
+      if (raw.endsWith('@lid')) return s0; // lid как отдельный, телефона нет
+      let digits = raw.replace(/\D+/g,'');
+      if (digits.length === 11 && digits.startsWith('8')) digits = '7' + digits.slice(1);
+      return digits ? ('wa:' + digits) : s0;
+    }
+
+    function dedupeContactsByPhone(list){
+      const m = new Map(); // key -> contact
+      for (const c of (list||[])){
+        const key = String(c.acc_id||'') + '|' + contactPhoneKey(c.jid);
+        // оставляем первый (обычно самый свежий по сортировке бэка)
+        if (!m.has(key)) m.set(key, c);
+      }
+      return Array.from(m.values());
+    }
+
+    function stagePill(stage){
+      const map = {
+        booked: ['bg-emerald-100','text-emerald-700','Бронь/сделка'],
+        not_interested: ['bg-gray-100','text-gray-600','Не интересно'],
+        human_needed: ['bg-amber-100','text-amber-700','Нужен менеджер'],
+        need_identified: ['bg-blue-100','text-blue-700','Запрос понятен'],
+        unknown: ['bg-slate-100','text-slate-600','Неопределено']
+      };
+      const k = map[stage] || map.unknown;
+      return `<span class="text-[10px] ${k[0]} ${k[1]} rounded-full px-2 py-0.5">${k[2]}</span>`;
+    }
+
+    function formatDuration(sec){
+      sec = Math.max(0, Math.round(Number(sec)||0));
+      const m = Math.floor(sec/60);
+      const s = sec % 60;
+      return String(m).padStart(2,'0') + ':' + String(s).padStart(2,'0');
+    }
+
+    function safeJsonParse(s, fallback){ try{ return JSON.parse(s); }catch(_){ return fallback; } }
+function uniq(arr){ const o=[]; const s=new Set(); for(const x of arr){ if(!x) continue; if(s.has(x)) continue; s.add(x); o.push(x);} return o; }
+
+function parseReactions(reactions_json){
+  const d = safeJsonParse(reactions_json, null);
+  if (!d) return [];
+  const e = Array.isArray(d.e) ? d.e : [];
+  return uniq(e.map(x=>String(x||'').trim()).filter(Boolean));
+}
+function toggleReactionJson(reactions_json, emoji){
+  const cur = parseReactions(reactions_json);
+  const has = cur.includes(emoji);
+  const next = has ? cur.filter(x=>x!==emoji) : [...cur, emoji];
+  return JSON.stringify({ e: next });
+}
+
+function formatBytes(n){
+  const v = Number(n||0);
+  if (!v) return '';
+  const units = ['B','KB','MB','GB','TB'];
+  let x = v, i = 0;
+  while (x >= 1024 && i < units.length-1){ x/=1024; i++; }
+  return `${x.toFixed(x>=10 || i===0 ? 0 : 1)} ${units[i]}`;
+}
+
+function fileLabelByName(name, mime, urlLower){
+  const n = (name||'').toLowerCase();
+  const u = (urlLower||'').toLowerCase();
+  const ext = (n.split('.').pop() || u.split('.').pop() || '').replace(/\?.*$/,'');
+  if (mime === 'application/pdf' || ext === 'pdf') return { ico:'PDF', kind:'PDF' };
+  if (['doc','docx'].includes(ext)) return { ico:'W', kind:'Word' };
+  if (['xls','xlsx','csv'].includes(ext)) return { ico:'X', kind:'Excel' };
+  if (['ppt','pptx'].includes(ext)) return { ico:'P', kind:'PowerPoint' };
+  if (['zip','rar','7z'].includes(ext)) return { ico:'ZIP', kind:'Архив' };
+  return { ico:'FILE', kind:'Файл' };
+}
+
+function cssEsc(s){
+  if (window.CSS && CSS.escape) return CSS.escape(String(s));
+  return String(s).replace(/["\\]/g, '\\$&');
+}
+
+// --- Reaction picker (one instance) ---
+let __reactionPickerEl = null;
+function ensureReactionPicker(){
+  if (__reactionPickerEl) return __reactionPickerEl;
+  const el = document.createElement('div');
+  el.className = 'reaction-picker';
+  el.style.display = 'none';
+  const emojis = ['👍','❤️','😂','😮','😢','🙏'];
+  emojis.forEach(e=>{
+    const b = document.createElement('button');
+    b.type = 'button';
+    b.textContent = e;
+    b.addEventListener('click', ()=>{
+      const msgRef = el.dataset.msgref || '';
+      if (!msgRef) return;
+      const wrap = document.querySelector(`[data-msgref="${cssEsc(msgRef)}"]`);
+      if (wrap) applyReactionToWrap(wrap, e, true);
+      el.style.display = 'none';
+    });
+    el.appendChild(b);
+  });
+  document.body.appendChild(el);
+  __reactionPickerEl = el;
+
+  document.addEventListener('click', (ev)=>{
+    if (!__reactionPickerEl || __reactionPickerEl.style.display === 'none') return;
+    if (__reactionPickerEl.contains(ev.target)) return;
+    __reactionPickerEl.style.display = 'none';
+  });
+
+  return el;
+}
+
+async function sendReaction(msgRef, emoji){
+  // Визуально для WA+TG+IG: всегда пишем в наш backend overlay
+  const acc_id = state.accId;
+  const jid = state.selected?.jid;
+  if (!acc_id || !jid) return;
+  try{
+    await axios.post('/api/react', { acc_id, jid, msg_ref: msgRef, emoji });
+  }catch(e){
+    console.warn('sendReaction failed', e?.message || e);
+  }
+}
+
+function renderReactionBar(bubble, reactions_json){
+  // remove old
+  const old = bubble.querySelector('.reaction-bar');
+  if (old) old.remove();
+
+  const emojis = parseReactions(reactions_json);
+  if (!emojis.length) return;
+
+  const bar = document.createElement('div');
+  bar.className = 'reaction-bar';
+  emojis.forEach(e=>{
+    const pill = document.createElement('span');
+    pill.className = 'reaction-pill';
+    pill.textContent = e;
+    bar.appendChild(pill);
+  });
+  bubble.appendChild(bar);
+}
+
+function applyReactionToWrap(wrap, emoji, doSend){
+  const bubble = wrap.querySelector('.bubble');
+  if (!bubble) return;
+
+  const cur = bubble.getAttribute('data-reactions') || '';
+  const next = toggleReactionJson(cur, emoji);
+  bubble.setAttribute('data-reactions', next);
+  renderReactionBar(bubble, next);
+
+  if (doSend){
+    const msgRef = wrap.getAttribute('data-msgref') || '';
+    if (msgRef) sendReaction(msgRef, emoji);
+  }
+}
+
+    function escapeHtml(s){
+      return String(s||'').replaceAll('&','&amp;').replaceAll('<','&lt;').replaceAll('>','&gt;');
+    }
+
+    
+
+    async function copyText(txt){
+      const t = String(txt||'').trim();
+      if (!t) return;
+      try{
+        await navigator.clipboard.writeText(t);
+        toast('Скопировано');
+      }catch(_){
+        // fallback
+        const ta = document.createElement('textarea');
+        ta.value = t;
+        ta.style.position = 'fixed';
+        ta.style.left = '-9999px';
+        document.body.appendChild(ta);
+        ta.select();
+        try{ document.execCommand('copy'); toast('Скопировано'); }catch(e){ toast('Не удалось скопировать'); }
+        ta.remove();
+      }
+    }
+
+    function setComposerReadonly(on){
+      const ta = document.getElementById('msgInput');
+      const sb = document.getElementById('sendBtn');
+      const ab = document.getElementById('attachBtn');
+      const mb = document.getElementById('micBtn');
+
+      ta.disabled = !!on;
+      sb.disabled = !!on;
+      ab.disabled = !!on;
+      mb.disabled = !!on;
+
+      if (on){
+        ta.placeholder = 'Аккаунт отключён/удалён — только просмотр истории';
+      } else {
+        ta.placeholder = 'Сообщение';
+      }
+    }
+
+    function resolveSendAccIdForChat(historyAccId){
+      const hid = Number(historyAccId || 0) || 0;
+      const cur = (state.accounts||[]).find(a => Number(a.id) === hid);
+      if (!cur) return hid;
+
+      const kind = String(cur.kind || 'wa').toLowerCase();
+      if (kind !== 'wa' && kind !== 'whatsapp') return hid;
+
+      // если текущий аккаунт живой — отправляем через него
+      if (!cur.orphan && String(cur.status||'') === 'online') return hid;
+
+      const me = String(cur.me_jid || '').trim();
+      if (!me) return hid;
+
+      // ищем самый новый ONLINE аккаунт с тем же me_jid (тот же номер)
+      const cand = (state.accounts||[])
+        .filter(a => {
+          const k = String(a.kind || 'wa').toLowerCase();
+          return (k === 'wa' || k === 'whatsapp')
+            && !a.orphan
+            && String(a.status||'') === 'online'
+            && String(a.me_jid||'').trim() === me;
+        })
+        .sort((a,b)=> Number(b.id) - Number(a.id))[0];
+
+      return cand ? Number(cand.id) : hid;
+    }
+
+    // Autogrow textarea
+    function fitTextarea(){
+      const ta = document.getElementById('msgInput');
+      if (!ta) return;
+      ta.style.height = 'auto';
+      ta.style.height = Math.min(ta.scrollHeight, 140) + 'px';
+    }
+
+    // ===== Topbar extras (brand + SatuCoin + user menu) =====
+
+    function setAvatar(el, avatarUrl, email){
+      if(!el) return;
+      const first = (String(email||'').trim()[0] || 'U').toUpperCase();
+      el.innerHTML = '';
+      if(avatarUrl){
+        const img = document.createElement('img');
+        const u = String(avatarUrl || '').trim();
+        const src =
+          u.startsWith('http://') || u.startsWith('https://') || u.startsWith('data:') || u.startsWith('/')
+            ? u
+            : ('/' + u);
+        img.src = src;
+        img.alt = 'avatar';
+        img.onerror = ()=>{ el.textContent = first; };
+        el.appendChild(img);
+      }else{
+        el.textContent = first;
+      }
+    }
+
+    async function loadBrand(){
+      try{
+      const r = await fetch('/api/brand', { credentials:'include' });
+      if(!r.ok) return;
+      const data = await r.json().catch(()=>null);
+      const url = String(data?.logo_url || '').trim();
+
+      const img = document.getElementById('brand-logo');
+      const title = document.getElementById('brand-title');
+
+      if (img && title) {
+        if (url) {
+          img.src = url + '?v=' + Date.now();
+          img.classList.remove('hidden');
+          title.classList.add('hidden');
+        } else {
+          img.classList.add('hidden');
+          title.classList.remove('hidden');
+        }
+      }
+      }catch(_){}
+    }
+
+    async function loadSatuHeader(){
+      const pill = document.getElementById('satu-pill');
+      if (!pill) return;
+
+      const balEl = document.getElementById('satu-balance');
+      const apxEl = document.getElementById('satu-approx');
+
+      try {
+        const res = await fetch('/api/satu/balance', { credentials: 'include' });
+        if (!res.ok) {
+          if (balEl) balEl.textContent = '—';
+          if (apxEl) { apxEl.hidden = true; apxEl.textContent = ''; }
+          return;
+        }
+
+        const data = await res.json();
+
+        const bal = Number(data.balance || 0);
+        const approxRaw = (data.approx_chats ?? data.approx_leads ?? data.approx);
+        const approxN = Number(approxRaw);
+        const approx = Number.isFinite(approxN) ? approxN : null;
+
+        if (balEl) balEl.textContent = String(bal);
+
+        if (apxEl) {
+          if (approx !== null) {
+            apxEl.hidden = false;
+            apxEl.textContent = `≈ ${approx} лид`;
+          } else {
+            apxEl.hidden = true;
+            apxEl.textContent = '';
+          }
+        }
+      } catch (e) {
+        if (balEl) balEl.textContent = '—';
+        if (apxEl) { apxEl.hidden = true; apxEl.textContent = ''; }
+      }
+    }
+
+    function initUserMenu(){
+      const btn = document.getElementById('user-btn');
+      const pop = document.getElementById('user-pop');
+      if(!btn || !pop) return;
+      if(btn.dataset.bound) return;
+      btn.dataset.bound = '1';
+
+      const close = ()=>{ pop.classList.add('hidden'); btn.setAttribute('aria-expanded','false'); };
+      const open  = ()=>{ pop.classList.remove('hidden'); btn.setAttribute('aria-expanded','true'); };
+      const toggle= ()=> pop.classList.contains('hidden') ? open() : close();
+
+      btn.addEventListener('click', (e)=>{ e.preventDefault(); e.stopPropagation(); toggle(); });
+      pop.addEventListener('click', (e)=> e.stopPropagation());
+      document.addEventListener('click', (e)=>{ if(!pop.contains(e.target) && !btn.contains(e.target)) close(); });
+      document.addEventListener('keydown', (e)=>{ if(e.key==='Escape') close(); });
+
+      // подтянуть профиль (почта + аватар)
+      (async ()=>{
+        try{
+          const r = await fetch('/api/profile', { credentials:'include' });
+          if(!r.ok) return;
+          const u = await r.json().catch(()=> ({}));
+          const email = String(u.email || '').trim();
+
+          const emailEl = document.getElementById('user-email');
+          if (emailEl){
+            emailEl.textContent = email || '—';
+            emailEl.title = email || '';
+          }
+          const me = document.getElementById('me');
+          if (me) me.textContent = email;
+
+          setAvatar(document.getElementById('user-avatar'), u.avatar_url, email);
+        }catch(_){}
+      })();
+
+      // copy email
+      const copyBtn = document.getElementById('user-email-copy');
+      if(copyBtn){
+        copyBtn.addEventListener('click', async ()=>{
+          const email = String(document.getElementById('user-email')?.textContent || '').trim();
+          if(!email || email === '—') return;
+          try{
+            await navigator.clipboard.writeText(email);
+            copyBtn.classList.add('is-copied');
+            setTimeout(()=>copyBtn.classList.remove('is-copied'), 900);
+          }catch(_){}
+        });
+      }
+
+      document.getElementById('user-logout')?.addEventListener('click', doLogout);
+    }
+
+    async function doLogout(){
+      await fetch('/api/auth/logout', { method:'POST', credentials:'include' }).catch(()=>{});
+      location.href='/public/login.html';
+    }
+
+    function initRightNav(){
+      const wrap = document.getElementById('rightNav');
+      if (!wrap) return;
+
+      wrap.addEventListener('click', (e)=>{
+        const btn = e.target?.closest?.('[data-nav]');
+        if (!btn) return;
+
+        const nav = String(btn.dataset.nav || '');
+        if (!nav) return;
+
+        if (nav === 'chat') return;
+
+        window.location.href = `/public/index.html#${encodeURIComponent(nav)}`;
+      });
+    }
+
+    function initBottomNav(){
+      const nav = document.getElementById('bottomNav');
+      if (!nav) return;
+
+      // active state: chat page
+      nav.querySelectorAll('.bottom-item').forEach(b=>{
+        b.classList.toggle('is-active', b.dataset.nav === 'chat');
+      });
+
+      nav.addEventListener('click', (e)=>{
+        const btn = e.target?.closest?.('[data-nav]');
+        if (!btn) return;
+
+        const where = String(btn.dataset.nav || '');
+        if (!where) return;
+
+        if (where === 'chat') {
+          // открыть последний чат
+          openLastChat();
+          return;
+        }
+        if (where === 'profiles') {
+          // Лиды = список контактов (левая панель)
+          setLeftOpen(true);
+
+          // по желанию: сразу фокус в поиск
+          setTimeout(()=> document.getElementById('searchInput')?.focus(), 50);
+          return;
+        }
+
+      });
+    }
+
+    // ===== Accounts =====
+    function filterKeyLS(){ return 'ndz_chat_filter_acc'; }
+
+    function updateAccStatusUI(){
+      const el = document.getElementById('accStatus');
+      if (!el) return;
+
+      // если чат не выбран — показываем фильтр
+      if (!state.selected){
+        if (!state.filterAccId) { el.textContent = 'Все аккаунты'; return; }
+        const f = (state.accounts||[]).find(a=>Number(a.id)===Number(state.filterAccId));
+        el.textContent = f ? (`${f.status}${f.orphan ? ' (архив)' : ''}`) : '';
+        return;
+      }
+
+      // если чат выбран — показываем статус аккаунта, через который реально отправляем
+      const activeId = Number(state.sendAccId || state.accId || 0);
+      const cur = (state.accounts||[]).find(a=>Number(a.id)===activeId);
+      el.textContent = cur ? (`${cur.status}${cur.orphan ? ' (архив)' : ''} • отправка #${activeId}`) : '';
+
+    }
+
+    function updateComposerByActiveAcc(){
+      if (!state.selected){
+        setComposerReadonly(false);
+        return;
+      }
+      const activeId = Number(state.sendAccId || state.accId || 0);
+      const cur = (state.accounts||[]).find(a => Number(a.id) === activeId);
+      setComposerReadonly(!cur || cur.orphan || cur.status !== 'online');
+    }
+
+    async function loadAccounts(){
+      const sel = document.getElementById('accountSelect');
+      if (!sel) return;
+
+      sel.innerHTML = '';
+
+      const { data } = await axios.get('/api/accounts', { params: { include_orphans: 1 } });
+      state.accounts = data || [];
+
+      // tenantId (для localStorage ключей и IG)
+      try{
+        const me = (await axios.get('/api/me')).data;
+        state.tenantId = Number(me?.user?.tenant_id || 0) || 0;
+
+        // Virtual Instagram account (id = -tenant_id)
+        const ig = (await axios.get('/api/ig/status')).data;
+        if (state.tenantId && ig?.connected){
+          state.accounts.push({
+            id: -state.tenantId,
+            kind: 'ig',
+            label: ig?.username ? ('Instagram @' + ig.username) : 'Instagram',
+            status: (ig?.status || 'online'),
+            orphan: false
+          });
+        }
+      }catch(_){}
+
+      // 1) Добавляем "Все аккаунты"
+      const allOpt = document.createElement('option');
+      allOpt.value = '0';
+      allOpt.textContent = 'Все аккаунты • WA/TG/IG';
+      sel.appendChild(allOpt);
+
+      // 2) Остальные аккаунты
+      const short = (s, n=28)=>{ s = String(s||'').replace(/\s+/g,' ').trim(); return s.length>n ? (s.slice(0,n)+'…') : s; };
+      state.accounts.forEach(acc => {
+        const o = document.createElement('option');
+        o.value = acc.id;
+
+        const k = (acc.kind || 'wa').toLowerCase();
+        const tag = (k === 'tg' || k === 'telegram') ? 'TG' : (k === 'ig' || k === 'instagram' ? 'IG' : 'WA');
+
+        const label = acc.orphan ? 'удалён' : short(acc.label, 32);
+        const st = acc.orphan ? 'архив' : short(acc.status, 16);
+        o.textContent = `#${acc.id} • ${tag} • ${label}${st ? (' • ' + st) : ''}`;
+
+        sel.appendChild(o);
+      });
+
+      // 3) Восстанавливаем фильтр из localStorage (по умолчанию 0)
+      const saved = Number(localStorage.getItem(filterKeyLS()) || '0') || 0;
+      state.filterAccId = saved;
+      sel.value = String(saved);
+
+      updateAccStatusUI();
+      updateComposerByActiveAcc();
+    }
+
+    // ===== Contacts =====
+    async function loadContacts(){
+      const q = document.getElementById('searchInput').value.trim();
+
+      const params = { q, order: 'recent' };
+      if (Number(state.filterAccId) !== 0) params.acc_id = Number(state.filterAccId);
+
+      const { data } = await axios.get('/api/profiles', { params });
+
+      // 1) убираем дубли по телефону (wa) + acc_id
+      const deduped = dedupeContactsByPhone(data || []);
+
+      // 2) нормализуем jid
+      state.contacts = deduped.map(c => ({
+        ...c,
+        jid: jidKey(c.jid)
+      }));
+
+      // 3) нормализуем selected
+      if (state.selected?.jid) {
+        state.selected.jid = jidKey(state.selected.jid);
+      }
+
+      renderContacts();
+    }
+
+    function renderContacts(){
+      const wrap = document.getElementById('contactList');
+      wrap.innerHTML = '';
+
+      // FLIP: запоминаем старые позиции
+      const oldPos = new Map();
+      wrap.querySelectorAll('[data-ckey]').forEach(el=>{
+        oldPos.set(el.dataset.ckey, el.getBoundingClientRect());
+      });
+
+      if (!state.contacts.length){
+        wrap.innerHTML = `<div class="text-sm text-slate-500 p-4">Нет контактов. Появятся после входящих или импорта.</div>`;
+        return;
+      }
+
+      const uniq = new Map();
+      for (const p of (state.contacts || [])) {
+        const k0 = canonJid(p.jid);
+        if (!k0) continue;
+
+        // ВАЖНО: учитываем acc_id, иначе разные аккаунты сольются в один
+        const k = String(p.acc_id || 0) + '|' + k0;
+
+        if (!uniq.has(k)) uniq.set(k, p);
+      }
+
+      const list = Array.from(uniq.values());
+
+      // ===== Sort: unread first (stable) =====
+      const withMeta = list.map((p, idx) => {
+        const uk = unreadKeyOf(p.acc_id, p.jid);
+        const n = Number(state.unread?.[uk] || 0) || 0;
+        return { p, idx, n };
+      });
+
+      withMeta.sort((a, b) => (b.n - a.n) || (a.idx - b.idx));
+
+      // пересобираем list уже отсортированный
+      const sorted = withMeta.map(x => x.p);
+
+      sorted.forEach(p => {
+        const last = (p.summary || p.last_intent || '').trim();
+        const el = document.createElement('button');
+
+        const isActive = state.selected && state.selected.jid === p.jid;
+        el.className = 'contact-row' + (isActive ? ' active' : '');
+
+        const phone = prettyPeer(p.jid);
+
+        el.innerHTML = `
+          <div class="avatar">${avatarHtml(p)}</div>
+          <div class="min-w-0 flex-1">
+            <div class="flex items-center justify-between gap-2">
+              <div class="flex items-center gap-2 min-w-0">
+                ${(() => {
+                  const acc = (state.accounts||[]).find(a => Number(a.id) === Number(p.acc_id || state.accId));
+                  const k = String(acc?.kind || 'wa').toLowerCase();
+                  const src = (k === 'tg' || k === 'telegram') ? 'assets/img/tg.png'
+                            : (k === 'ig' || k === 'instagram') ? 'assets/img/ig.png'
+                            : 'assets/img/wa.png';
+                  const alt = (k === 'tg' || k === 'telegram') ? 'Telegram' : (k === 'ig' || k === 'instagram') ? 'Instagram' : 'WhatsApp';
+                  return '<img class="chan-ic" src="' + src + '" alt="' + alt + '">';
+                })()}
+                <div class="font-semibold text-[13px] truncate">${p.name ? escapeHtml(p.name) : escapeHtml(phone)}</div>
+              </div>
+
+              <div class="flex items-center gap-2">
+                  ${ (() => {
+                      const uk = unreadKeyOf(p.acc_id, p.jid);
+                      const n = Number(state.unread?.[uk] || 0) || 0;
+                      if (!n) return '';
+                      return `<span class="inline-flex items-center justify-center min-w-[18px] h-[18px] px-1 rounded-full text-[11px] font-bold bg-blue-600 text-white">${n}</span>`;
+                  })()}
+                ${stagePill(p.stage)}
+              </div>
+            </div>
+
+            <!-- номер + копировать -->
+            <div class="mt-0.5 flex items-center gap-2 text-xs text-slate-500">
+              <span class="truncate">${escapeHtml(phone)}</span>
+              <button type="button"
+                class="ml-auto btn-ghost btn-icon-only"
+                data-copy-phone="${escapeHtml(phone)}"
+                title="Скопировать номер"
+                aria-label="Скопировать номер">
+                <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" width="16" height="16" fill="none" aria-hidden="true">
+                  <path d="M9 9h10v10H9V9Z" stroke="currentColor" stroke-width="2" />
+                  <path d="M5 15H4a1 1 0 0 1-1-1V4a1 1 0 0 1 1-1h10a1 1 0 0 1 1 1v1" stroke="currentColor" stroke-width="2" />
+                </svg>
+              </button>
+            </div>
+
+            <!-- последнее сообщение/summary -->
+            <div class="text-xs text-slate-500 truncate">${escapeHtml(last || '—')}</div>
+          </div>`;
+
+        el.onclick = () => selectChat(p);
+        el.dataset.ckey = unreadKeyOf(p.acc_id, p.jid);
+        wrap.appendChild(el);
+        // Подгрузить аватар (если есть)
+        ensureAvatarRendered(p, el.querySelector('.avatar'));
+
+        const copyBtn = el.querySelector('[data-copy-phone]');
+        if (copyBtn){
+          copyBtn.addEventListener('click', async (e)=>{
+            e.preventDefault();
+            e.stopPropagation();
+            await copyTextSafe(copyBtn.getAttribute('data-copy-phone'));
+          });
+        }
+
+      });
+
+      // FLIP animate
+      wrap.querySelectorAll('[data-ckey]').forEach(el=>{
+        const key = el.dataset.ckey;
+        const prev = oldPos.get(key);
+        if (!prev) return;
+        const now = el.getBoundingClientRect();
+        const dy = prev.top - now.top;
+        if (Math.abs(dy) < 1) return;
+        el.animate(
+          [{ transform: `translateY(${dy}px)` }, { transform: 'translateY(0)' }],
+          { duration: 180, easing: 'ease-out' }
+        );
+      });
+
+    }
+
+    function openLastChat(){
+      // если уже открыт чат — ничего не делаем
+      if (state.selected) return;
+
+      // берём самый первый контакт (у тебя order=recent, значит это “последний/самый свежий”)
+      const p = (state.contacts || [])[0];
+      if (!p) {
+        // если контактов нет — просто откроем список слева
+        setLeftOpen(true);
+        return;
+      }
+
+      // открываем чат
+      selectChat(p);
+    }
+
+    let __reloadContactsT = null;
+    function scheduleReloadContacts(){
+      clearTimeout(__reloadContactsT);
+      __reloadContactsT = setTimeout(()=> loadContacts().catch(()=>{}), 350);
+    }
+
+    function bumpContactToTop(accId, jid, lastText){
+      if (!jid) return false;
+
+      const A = Number(accId || 0) || 0;
+      const J = jidKey(jid);
+
+      const i = (state.contacts || []).findIndex(x =>
+        Number(x.acc_id || 0) === A && jidKey(x.jid) === J
+      );
+      if (i === -1) return false;
+
+      if (typeof lastText === 'string') {
+        state.contacts[i].summary = lastText.slice(0, 200);
+      }
+
+      const item = state.contacts.splice(i, 1)[0];
+      state.contacts.unshift(item);
+
+      renderContacts();
+      return true;
+    }
+
+    async function selectChat(p){
+      state.selected = p;
+
+      // История чата — по старому acc_id (как лежит в БД)
+      state.accId = Number(p.acc_id || 0) || state.accId;
+
+      // Отправка — через живой WA acc_id того же номера (если чат на старом acc_id)
+      state.sendAccId = resolveSendAccIdForChat(state.accId);
+
+      // 3) UI (теперь функции должны смотреть на sendAccId)
+      updateAccStatusUI();
+      updateComposerByActiveAcc();
+
+      clearUnread(p.acc_id, p.jid);
+      renderContacts();
+
+      // header
+      document.getElementById('chatAvatar').innerHTML = avatarHtml(p);
+      // Подгрузить аватар в шапку
+      ensureAvatarRendered(p, document.getElementById('chatAvatar'));
+      document.getElementById('chatTitle').textContent = p.name || prettyPeer(p.jid);
+      const phoneLine = prettyPeer(p.jid);
+      document.getElementById('chatSubtitle').textContent = (p.city ? (p.city + ' · ') : '') + prettyPeer(p.jid);
+      document.getElementById('stageBadge').innerHTML = stagePill(p.stage);
+
+      renderContacts(); // highlight active
+
+      // history
+      await loadHistory(p);
+
+      setEmptyState(false);
+
+      startPolling();
+
+      // on mobile: close left pane
+      setLeftOpen(false);
+    }
+
+    async function loadHistory(p){
+      const box = document.getElementById('messages');
+      box.innerHTML = '<div class="text-sm text-slate-500">Загрузка истории…</div>';
+      try{
+        // NOTE: если endpoint /api/chats/history отсутствует, будет показан fallback
+        const { data } = await axios.get('/api/chats/history', { params: { acc_id: state.accId, jid: p.jid, limit: 200 } });
+        renderMessages((data && Array.isArray(data) ? data : data.items) || []);
+      }catch(e){
+        box.innerHTML = '<div class="text-sm text-slate-500">История недоступна (нет endpoint). Новые сообщения будут появляться в реальном времени.</div>';
+        renderMessages([]);
+      }
+    }
+
+    function renderMessages(rows){
+      const box = document.getElementById('messages');
+      box.innerHTML = '';
+      state.seenMsgIds = new Set();
+      state.seenTempKeys = new Set();
+
+      (rows || []).sort((a,b)=> (a.ts - b.ts) || ((a.id||0) - (b.id||0)));
+      (rows || []).forEach(r => addMessageDOM(r));
+
+      const last = (rows || []).length ? (rows[rows.length - 1]) : null;
+      state.poll.lastId = Number(last?.id || 0) || 0;
+
+      box.scrollTop = box.scrollHeight;
+    }
+
+    function addMessageDOM(r){
+      const box = document.getElementById('messages');
+
+      // ---- DEDUP ----
+      const mid = Number(r?.id || 0) || 0;
+      if (mid){
+        if (state.seenMsgIds.has(mid)) return;
+        state.seenMsgIds.add(mid);
+      } else {
+        const k = msgKey(r);
+        if (state.seenTempKeys.has(k)) return;
+        state.seenTempKeys.add(k);
+      }
+
+      const isOut = r.type === 'out';
+
+      const wrap = document.createElement('div');
+      wrap.className = `msg-wrap flex ${isOut ? 'justify-end' : 'justify-start'}`;
+
+      wrap.setAttribute('data-type', String(r.type || 'in'));
+      wrap.setAttribute('data-ts', String(Number(r.ts || 0) || 0));
+      wrap.setAttribute('data-text', String(r.message || '').trim());
+      if (!mid) wrap.setAttribute('data-temp', '1');
+
+      // msg_ref for reactions overlay
+      const msgRef = String(r.msg_ref || (mid ? `chat:${mid}` : '')).trim();
+      if (msgRef) wrap.setAttribute('data-msgref', msgRef);
+
+      const bubble = document.createElement('div');
+      bubble.className = `bubble ${isOut ? 'bubble-out' : 'bubble-in'}`;
+
+      // Store reactions on bubble for quick update
+      const reactions_json = String(r.reactions_json || '').trim();
+      if (reactions_json) bubble.setAttribute('data-reactions', reactions_json);
+
+      // --- React hover button (WA-like) ---
+      const reactBtn = document.createElement('button');
+      reactBtn.type = 'button';
+      reactBtn.className = 'react-btn';
+      reactBtn.title = 'Реакция';
+      reactBtn.textContent = '😊';
+      reactBtn.addEventListener('click', (e)=>{
+        e.preventDefault();
+        e.stopPropagation();
+        const picker = ensureReactionPicker();
+        if (!msgRef){
+          // no ref → still show but won't save
+          console.warn('No msg_ref for reaction');
+        }
+        picker.dataset.msgref = msgRef;
+
+        const rect = reactBtn.getBoundingClientRect();
+        picker.style.left = `${Math.max(10, rect.left - 20)}px`;
+        picker.style.top = `${Math.max(10, rect.top - 54)}px`;
+        picker.style.display = 'flex';
+      });
+
+      // Media
+      if (r.media_file) {
+        const url = '/' + String(r.media_file).replace(/^\/+/, '');
+        const uLower = url.toLowerCase();
+        const isAudio = (r.media_kind === 'audio') || /\.(webm|ogg|opus|mp3|m4a|wav)($|\?)/.test(uLower);
+
+        if (isAudio) {
+          const dur = r.duration_sec ? ` · ${formatDuration(r.duration_sec)}` : '';
+          bubble.innerHTML += `
+            <div class="flex items-center gap-2 mb-2">
+              <svg class="ic" viewBox="0 0 24 24" aria-hidden="true"><use href="#i-mic"></use></svg>
+              <div class="text-[12px] font-semibold">Голосовое${dur}</div>
+            </div>
+            <audio controls preload="metadata" src="${url}" class="w-64 max-w-full"></audio>
+          `;
+          if (r.message) bubble.innerHTML += `<div class="mt-2">${escapeHtml(r.message)}</div>`;
+
+        } else if (r.media_kind === 'sticker') {
+          // WA sticker (webp) - show like WA
+          bubble.innerHTML += `<img src="${url}" class="mb-2 max-h-48 max-w-[240px]" style="object-fit:contain" />`;
+          if (r.message) bubble.innerHTML += `<div class="mt-2">${escapeHtml(r.message)}</div>`;
+
+        } else if (r.media_kind === 'gif') {
+          // WA-like GIF playback: loop muted autoplay
+          bubble.innerHTML += `
+            <video src="${url}" class="rounded-xl mb-2 max-h-64" autoplay loop muted playsinline></video>
+          `;
+          if (r.message) bubble.innerHTML += `<div class="mt-2">${escapeHtml(r.message)}</div>`;
+
+        } else if (r.media_kind === 'image') {
+          bubble.innerHTML += `<img src="${url}" class="rounded-xl mb-2 max-h-64" />`;
+          if (r.message) bubble.innerHTML += `<div class="mt-2">${escapeHtml(r.message)}</div>`;
+
+        } else if (r.media_kind === 'sticker') {
+          // ✅ СТИКЕР: показываем без скругления, меньший размер
+          bubble.innerHTML += `<img src="${url}" class="mb-2" style="max-width: 150px; max-height: 150px;" />`;
+          if (r.message) bubble.innerHTML += `<div class="mt-2">${escapeHtml(r.message)}</div>`;
+
+        } else if (r.media_kind === 'video') {
+          bubble.innerHTML += `<video src="${url}" class="rounded-xl mb-2 max-h-64" controls playsinline></video>`;
+          if (r.message) bubble.innerHTML += `<div class="mt-2">${escapeHtml(r.message)}</div>`;
+
+        } else {
+          // Document/file card (PDF/DOCX/XLSX/...)
+          const name = String(r.media_name || '').trim() || decodeURIComponent(url.split('/').pop() || 'Файл');
+          const mime = String(r.media_mime || '').trim();
+          const size = formatBytes(r.media_size);
+          const { ico, kind } = fileLabelByName(name, mime, uLower);
+
+          bubble.innerHTML += `
+            <div class="file-card">
+              <div class="file-ico">${escapeHtml(ico)}</div>
+              <div class="file-meta">
+                <div class="file-name" title="${escapeHtml(name)}">${escapeHtml(name)}</div>
+                <div class="file-sub">${escapeHtml(kind)}${size ? ' · ' + escapeHtml(size) : ''}</div>
+              </div>
+              <a class="file-open" href="${url}" target="_blank" rel="noreferrer">Открыть</a>
+            </div>
+          `;
+          if (r.message) bubble.innerHTML += `<div class="mt-2">${escapeHtml(r.message)}</div>`;
+        }
+      } else {
+        const t = String(r.message || '').trim();
+        // Никогда не показываем "неподдерживаемый" — максимум нейтральный плейсхолдер
+        const bad = /неподдерживаем|unsupported|^📩\s*Сообщение:/i;
+        bubble.textContent = (!t || bad.test(t)) ? '📩 Сообщение' : t;
+      }
+
+      // Render reaction bar (if any)
+      renderReactionBar(bubble, reactions_json);
+
+      // Meta (time/tokens/model)
+      const meta = document.createElement('div');
+      meta.className = 'msg-meta';
+
+      const dt = new Date((r.ts || Date.now()) * 1000).toLocaleString();
+      const pt = Number(r.prompt_tokens || 0);
+      const ct = Number(r.completion_tokens || 0);
+      const tt = Number(r.total_tokens || (pt + ct));
+      const model = (r.model || '').trim();
+
+      let metaText = dt;
+      if (tt > 0) {
+        metaText += ` · ${tt} токенов`;
+        if (pt || ct) metaText += ` (prompt ${pt}, ответ ${ct})`;
+      }
+      if (model) metaText += ` · ${model}`;
+      meta.textContent = metaText;
+
+      bubble.appendChild(meta);
+
+      // Attach nodes
+      wrap.appendChild(reactBtn);
+      wrap.appendChild(bubble);
+      box.appendChild(wrap);
+    }
+
+    function scrollDown(){
+      const box = document.getElementById('messages');
+      box.scrollTop = box.scrollHeight;
+    }
+
+    function msgKey(m){
+      const type = String(m?.type || 'in');
+      const ts = Number(m?.ts || 0) || 0;
+      const text = String(m?.message || '').trim().slice(0, 200);
+      const mk = String(m?.media_kind || '');
+      const mf = String(m?.media_file || '');
+      return `${type}|${ts}|${text}|${mk}|${mf}`;
+    }
+
+    function removeTempDuplicate(realRow){
+      // удаляем временный пузырь, если уже пришла запись из БД
+      const type = String(realRow?.type || '');
+      const ts = Number(realRow?.ts || 0) || 0;
+      const text = String(realRow?.message || '').trim();
+      if (!ts) return;
+
+      const box = document.getElementById('messages');
+      if (!box) return;
+
+      const nodes = box.querySelectorAll('[data-temp="1"]');
+      for (const n of nodes){
+        const nType = n.getAttribute('data-type') || '';
+        const nTs = Number(n.getAttribute('data-ts') || 0) || 0;
+        const nText = (n.getAttribute('data-text') || '').trim();
+
+        // одинаковый тип+текст и время рядом (±6 сек)
+        if (nType === type && nText === text && Math.abs(nTs - ts) <= 6){
+          n.remove();
+          return;
+        }
+      }
+    }
+
+    function unreadStorageKey(){
+      // один storage на tenant, чтобы работало для "Все аккаунты"
+      return `ndz_unread_t${Number(state.tenantId||0) || 0}`;
+    }
+    function unreadKeyOf(accId, jid){
+      return `${Number(accId||0) || 0}|${jidKey(jid)}`;
+    }
+    function loadUnread(){
+      try{ state.unread = JSON.parse(localStorage.getItem(unreadStorageKey()) || '{}') || {}; }
+      catch(_){ state.unread = {}; }
+    }
+    function saveUnread(){
+      try{ localStorage.setItem(unreadStorageKey(), JSON.stringify(state.unread || {})); }catch(_){}
+    }
+    function incUnread(accId, jid){
+      const k = unreadKeyOf(accId, jid);
+      if(!k || k.endsWith('|')) return;
+      state.unread[k] = (Number(state.unread[k]||0) || 0) + 1;
+      saveUnread();
+    }
+    function clearUnread(accId, jid){
+      const k = unreadKeyOf(accId, jid);
+      if(!k || k.endsWith('|')) return;
+      delete state.unread[k];
+      saveUnread();
+    }
+    function stopPolling(){
+      if (state.poll?.timer) clearInterval(state.poll.timer);
+      state.poll.timer = null;
+    }
+
+    async function pollOnce(){
+      if (!state.selected || !state.accId) return;
+
+      const key = `${state.accId}|${state.selected.jid}`;
+      if (state.poll.key !== key) {
+        state.poll.key = key;
+        state.poll.lastId = 0;
+      }
+
+      try {
+        const { data } = await axios.get('/api/chats/history', {
+          params: { acc_id: state.accId, jid: jidKey(state.selected.jid), limit: 60 }
+        });
+
+        const rows = Array.isArray(data) ? data : (data?.items || []);
+        if (!rows.length) return;
+
+        // берём только то, чего ещё нет в UI
+        const newOnes = rows.filter(r => Number(r.id || 0) > (Number(state.poll.lastId) || 0));
+        if (!newOnes.length) return;
+
+        newOnes.forEach(r => {
+          removeTempDuplicate(r); // убрать временный дубль (optimistic/socket)
+          addMessageDOM(r);       // добавить “настоящий” из БД (с id)
+        });
+        state.poll.lastId = Number(newOnes[newOnes.length - 1].id || state.poll.lastId) || state.poll.lastId;
+
+        scrollDown();
+      } catch(_) {}
+    }
+
+    function startPolling(){
+      stopPolling();
+      state.poll.timer = setInterval(() => {
+        // чтобы не жечь лишнее, если вкладка не активна
+        if (document.hidden) return;
+        pollOnce();
+      }, 2000);
+    }
+
+    // ===== Sending =====
+    async function sendText(){
+      if (!state.selected || !state.accId) return;
+      const ta = document.getElementById('msgInput');
+      const txt = ta.value.trim();
+      if (!txt) return;
+
+      const jidSend = jidKey(state.selected.jid);
+      await axios.post('/api/send', { acc_id: (state.sendAccId || state.accId), jid: jidSend, text: txt });
+      
+      // ⭐ ЗВУК при отправке (ВСТАВЬ ЭТО)
+      try {
+        const sound = new Audio('/public/assets/sounds/sent.mp3');
+        sound.volume = 0.3;
+        sound.play().catch(() => {});
+      } catch(e) {}
+
+      ta.value = '';
+      fitTextarea();
+
+      // optimistic echo
+      addMessageDOM({ type:'out', ts: Math.floor(Date.now()/1000), message: txt });
+      bumpContactToTop(state.accId, state.selected.jid, txt);
+      scrollDown();
+    }
+
+    // ===== New chat modal (WhatsApp) =====
+    function ensureNewChatModal(){
+      if (document.getElementById('newChatModal')) return;
+
+      // CSS (в стиле сайта — аккуратная карточка)
+      if (!document.getElementById('newChatModalCss')){
+        const st = document.createElement('style');
+        st.id = 'newChatModalCss';
+        st.textContent = `
+          .modal.hidden{ display:none; }
+          .modal{
+            position:fixed; inset:0;
+            background:rgba(15,23,42,.45);
+            display:flex; align-items:center; justify-content:center;
+            z-index:9999; padding:16px;
+          }
+          .modal-card{
+            width:min(520px, calc(100vw - 24px));
+            background:#fff;
+            border:1px solid rgba(2,6,23,.08);
+            border-radius:16px;
+            box-shadow:0 30px 70px rgba(2,6,23,.25);
+            padding:14px;
+          }
+          .modal-head{ display:flex; align-items:center; justify-content:space-between; gap:10px; margin-bottom:10px; }
+          .modal-title{ font-weight:700; font-size:15px; }
+          .modal-sub{ font-size:12px; opacity:.7; margin-top:2px; }
+          .modal-actions{ display:flex; justify-content:flex-end; gap:10px; margin-top:12px; }
+          .modal-grid{ display:grid; gap:10px; }
+          .field-textarea{ min-height:90px; resize:vertical; }
+        `;
+        document.head.appendChild(st);
+      }
+
+      // HTML
+      document.body.insertAdjacentHTML('beforeend', `
+        <div id="newChatModal" class="modal hidden" role="dialog" aria-modal="true">
+          <div class="modal-card">
+            <div class="modal-head">
+              <div>
+                <div class="modal-title">Начать чат (WhatsApp)</div>
+                <div class="modal-sub">Введи номер и первое сообщение</div>
+              </div>
+              <button id="newChatCancelX" class="icon-btn" title="Закрыть">
+                <svg viewBox="0 0 24 24" aria-hidden="true"><use href="#i-close"/></svg>
+              </button>
+            </div>
+
+            <div class="modal-grid">
+              <div>
+                <div style="font-size:12px;opacity:.7;margin-bottom:6px;">Аккаунт отправителя</div>
+                <select id="newChatAcc" class="field"></select>
+              </div>
+
+              <div>
+                <div style="font-size:12px;opacity:.7;margin-bottom:6px;">Номер телефона</div>
+                <input id="newChatPhone" class="field" placeholder="+7 707 123 45 67">
+              </div>
+
+              <div>
+                <div style="font-size:12px;opacity:.7;margin-bottom:6px;">Первое сообщение</div>
+                <textarea id="newChatMsg" class="field field-textarea" placeholder="Например: Салам, можно уточнить...?"></textarea>
+              </div>
+            </div>
+
+            <div class="modal-actions">
+              <button id="newChatCancel" class="btn btn-ghost">Отмена</button>
+              <button id="newChatSend" class="btn btn-primary">Отправить</button>
+            </div>
+          </div>
+        </div>
+      `);
+
+      const modal = document.getElementById('newChatModal');
+
+      // close on backdrop
+      modal.addEventListener('click', (e)=>{
+        if (e.target === modal) closeNewChatModal();
+      });
+
+      // close
+      document.getElementById('newChatCancel').addEventListener('click', closeNewChatModal);
+      document.getElementById('newChatCancelX').addEventListener('click', closeNewChatModal);
+
+      // submit
+      document.getElementById('newChatSend').addEventListener('click', submitNewChat);
+
+      // ESC
+      document.addEventListener('keydown', (e)=>{
+        if(e.key === 'Escape') closeNewChatModal();
+      });
+    }
+
+    function closeNewChatModal(){
+      const m = document.getElementById('newChatModal');
+      if (m) m.classList.add('hidden');
+    }
+
+    function normalizePhoneDigits(raw){
+      let d = String(raw || '').replace(/\D+/g,'');
+      // RU/KZ: 8XXXXXXXXXX -> 7XXXXXXXXXX
+      if (d.length === 11 && d.startsWith('8')) d = '7' + d.slice(1);
+      return d;
+    }
+
+    function guessIsWA(acc){
+      const k = String(acc?.kind || acc?.type || acc?.channel || acc?.platform || '').toLowerCase();
+      if (k === 'wa' || k === 'whatsapp' || k.includes('wa')) return true;
+      // запасной вариант: если похоже на номер
+      const label = String(acc?.label || acc?.name || acc?.title || '').trim();
+      return /^\+?\d/.test(label);
+    }
+
+    async function openNewChatModal(){
+      ensureNewChatModal();
+
+      // если у тебя есть loadAccounts() — подхватим, иначе откроем как есть
+      try{
+        if ((!state.accounts || !state.accounts.length) && typeof loadAccounts === 'function'){
+          await loadAccounts();
+        }
+      }catch(_){}
+
+      const sel = document.getElementById('newChatAcc');
+      const allAccs = (state.accounts || []);
+      const waAccs  = allAccs.filter(guessIsWA);
+
+      const list = waAccs.length ? waAccs : allAccs;
+
+      sel.innerHTML = '';
+      for (const a of list){
+        const id = String(a.id || a.acc_id || a.accId || '');
+        if (!id) continue;
+        const opt = document.createElement('option');
+        opt.value = id;
+        opt.textContent = (a.title || a.name || a.phone || a.label || ('acc #' + id)).toString();
+        sel.appendChild(opt);
+      }
+
+      // по умолчанию текущий accId, иначе первый
+      const cur = String(state.accId || '');
+      if (cur && [...sel.options].some(o=>o.value === cur)) sel.value = cur;
+      else if (sel.options.length) sel.value = sel.options[0].value;
+
+      document.getElementById('newChatPhone').value = '';
+      document.getElementById('newChatMsg').value = '';
+
+      document.getElementById('newChatModal').classList.remove('hidden');
+      setTimeout(()=> document.getElementById('newChatPhone')?.focus(), 50);
+    }
+
+    async function submitNewChat(){
+      const accId = Number(document.getElementById('newChatAcc')?.value || 0);
+      const phone = normalizePhoneDigits(document.getElementById('newChatPhone')?.value || '');
+      const text  = String(document.getElementById('newChatMsg')?.value || '').trim();
+
+      if (!accId) return alert('Выбери аккаунт отправителя');
+      if (!phone || phone.length < 10) return alert('Неверный номер телефона');
+      if (!text) return alert('Напиши первое сообщение');
+
+      const jid = phone + '@s.whatsapp.net';
+
+      try{
+        await fetchJSON('/api/send', { method:'POST', body:{ acc_id: accId, jid, text }});
+      }catch(e){
+        console.error(e);
+        return alert('Не удалось отправить. Проверь что аккаунт WhatsApp ONLINE и номер существует в WhatsApp.');
+      }
+
+      closeNewChatModal();
+
+      // Переключим аккаунт в UI (если селект есть) и обновим список чатов
+      const accountSelect = document.getElementById('accountSelect');
+      if (accountSelect){
+        accountSelect.value = String(accId);
+        accountSelect.dispatchEvent(new Event('change'));
+      }else{
+        // запасной вариант
+        if (typeof loadContacts === 'function') await loadContacts();
+      }
+
+      // удобство: в поиск подставим номер
+      const s = document.getElementById('searchInput');
+      if (s) s.value = '+' + phone;
+    }
+
+    async function uploadAndSend(files, mode='media'){
+      if (!state.selected || !state.accId || !files?.length) return;
+
+      for (const file of files){
+        const fd = new FormData();
+        fd.append('file', file);
+
+        const up = await axios.post('/api/upload', fd, { headers: { 'Content-Type': 'multipart/form-data' } });
+        if (!up.data?.ok) continue;
+
+        const rel = up.data.file; // 'uploads/...'
+        const kind = up.data.kind; // 'image'|'video'|'pdf'|'file'
+
+        const mime = up.data.mime || '';
+        const size = Number(up.data.size || 0) || 0;
+        const name = String(up.data.name || file.name || 'file');
+
+        let sendKind = kind || '';
+        const lowerName = name.toLowerCase();
+
+        if (mode === 'gif' || mime === 'image/gif' || lowerName.endsWith('.gif')) sendKind = 'gif';
+        else if (mode === 'sticker' || mime === 'image/webp' || lowerName.endsWith('.webp')) sendKind = 'sticker';
+        else if (kind === 'pdf' || mime === 'application/pdf' || lowerName.endsWith('.pdf')) sendKind = 'pdf';
+        else if (kind === 'image' || mime.startsWith('image/')) sendKind = 'image';
+        else if (kind === 'video' || mime.startsWith('video/')) sendKind = 'video';
+        else if (kind === 'audio' || mime.startsWith('audio/')) sendKind = 'audio';
+        else sendKind = 'document';
+
+        // /api/send supports text + image/video (pdf -> file)
+        await axios.post('/api/send', {
+          acc_id: (state.sendAccId || state.accId),
+          jid: state.selected.jid,
+          media_file: rel,
+          media_kind: sendKind,
+          media_name: name,
+          media_mime: mime,
+          media_size: size
+        });
+
+        // optimistic echo
+        addMessageDOM({
+          type:'out',
+          ts: Math.floor(Date.now()/1000),
+          media_file: rel,
+          media_kind: sendKind,
+          media_name: name,
+          media_mime: mime,
+          media_size: size,
+          message: ''
+        });
+        scrollDown();
+      }
+    }
+
+    // Audio (WhatsApp-like UI). Отправка делается как файл через /api/upload + /api/send.
+    // Если на бэке появится отдельный endpoint для voice-note (ptt), можно заменить uploadAndSendVoice.
+    state.voice = { stream:null, timer:null, startAt:0, cancelled:false, duration:0 };
+
+    function setRecordingUI(on){
+      const row = document.getElementById('composerRow');
+      const bar = document.getElementById('recordBar');
+      if (!row || !bar) return;
+
+      row.classList.toggle('hidden', !!on);
+      bar.classList.toggle('hidden', !on);
+
+      if (on){
+        document.getElementById('msgInput').disabled = true;
+        document.getElementById('attachBtn').disabled = true;
+        document.getElementById('sendBtn').disabled = true;
+        document.getElementById('micBtn').disabled = true;
+      } else {
+        // restore based on current account status/orphan
+        const cur = (state.accounts||[]).find(a=>a.id==state.accId);
+        setComposerReadonly(!cur || cur.orphan || cur.status !== 'online');
+      }
+    }
+
+function tickRecTimer(){
+  const el = document.getElementById('recTimer');
+  if (!el) return;
+  const sec = (Date.now() - state.voice.startAt) / 1000;
+  el.textContent = formatDuration(sec);
+}
+
+async function ensureRecorder(){
+  if (state.mediaRecorder) return;
+
+  const stream = await navigator.mediaDevices.getUserMedia({ audio: true });
+  state.voice.stream = stream;
+
+  const rec = new MediaRecorder(stream);
+  state.audioChunks = [];
+
+  rec.ondataavailable = e => { if (e.data && e.data.size) state.audioChunks.push(e.data); };
+
+  rec.onstop = async () => {
+    // stop mic stream
+    try{ state.voice.stream?.getTracks?.().forEach(t => t.stop()); }catch(_){}
+    state.voice.stream = null;
+
+    const cancelled = state.voice.cancelled;
+    const duration = state.voice.duration;
+
+    // reset UI
+    setRecordingUI(false);
+    clearInterval(state.voice.timer);
+    state.voice.timer = null;
+
+    // discard
+    if (cancelled) {
+      state.audioChunks = [];
+      state.mediaRecorder = null;
+      return;
+    }
+
+    const blob = new Blob(state.audioChunks, { type: 'audio/webm' });
+    state.audioChunks = [];
+    state.mediaRecorder = null;
+
+    const file = new File([blob], 'voice.webm', { type: 'audio/webm' });
+    await uploadAndSendVoice(file, duration);
+  };
+
+  state.mediaRecorder = rec;
+}
+
+async function startVoiceRecord(){
+  if (!state.selected || !state.accId) return;
+  await ensureRecorder();
+
+  if (state.mediaRecorder.state === 'recording') return;
+
+  state.voice.cancelled = false;
+  state.voice.startAt = Date.now();
+  state.voice.duration = 0;
+
+  setRecordingUI(true);
+  tickRecTimer();
+  state.voice.timer = setInterval(tickRecTimer, 250);
+
+  state.mediaRecorder.start();
+  
+  // ⭐ ЗВУК начала записи (ВСТАВЬ ЭТО)
+  try {
+    const sound = new Audio('/public/assets/sounds/record_start.mp3');
+    sound.volume = 0.4;
+    sound.play().catch(() => {});
+  } catch(e) {}
+}
+
+async function stopVoiceRecord({cancel=false} = {}){
+  if (!state.mediaRecorder || state.mediaRecorder.state !== 'recording') return;
+
+  state.voice.duration = (Date.now() - state.voice.startAt) / 1000;
+  state.voice.cancelled = !!cancel;
+
+  try{ state.mediaRecorder.stop(); } catch(_){}
+}
+
+async function uploadAndSendVoice(file, durationSec){
+  if (!state.selected || !state.accId || !file) {
+    console.error('❌ Voice: Missing data', {selected: !!state.selected, accId: state.accId, file: !!file});
+    return;
+  }
+
+  console.log('🎤 Uploading voice:', file.name, file.size, 'bytes');
+
+  const fd = new FormData();
+  fd.append('file', file);
+
+  try {
+    const up = await axios.post('/api/upload', fd, { headers: { 'Content-Type': 'multipart/form-data' } });
+    console.log('📤 Upload response:', up.data);
+    
+    if (!up.data?.ok) {
+      console.error('❌ Upload failed:', up.data);
+      alert('Ошибка загрузки голосового сообщения');
+      return;
+    }
+
+  const rel = up.data.file; // 'uploads/...'
+  // Отмечаем как audio (в UI и в истории)
+  await axios.post('/api/send', {
+    acc_id: (state.sendAccId || state.accId),
+    jid: state.selected.jid,
+    media_file: rel,
+    media_kind: 'audio'
+  });
+
+  // ⭐ ЗВУК успешной отправки голосового (ВСТАВЬ ЭТО)
+  try {
+    const sound = new Audio('/public/assets/sounds/sent.mp3');
+    sound.volume = 0.3;
+    sound.play().catch(() => {});
+  } catch(e) {}
+
+  addMessageDOM({
+    type:'out',
+    ts: Math.floor(Date.now()/1000),
+    media_file: rel,
+    media_kind: 'audio',
+    duration_sec: durationSec
+  });
+  scrollDown();
+} catch(err) {
+    console.error('❌ Voice upload error:', err);
+    alert('Ошибка: ' + (err.response?.data?.error || err.message));
+  }
+}
+
+
+    // ===== Notifications (sound + Web Notification) =====
+    const NOTIF_SOUND_SRC = '/public/assets/sounds/notifications.mp3';  // ← новый звук
+    let __audioUnlocked = false;
+
+    function initNotifAudio(){
+      if (__notifAudio) return;
+      __notifAudio = new Audio(NOTIF_SOUND_SRC);
+      __notifAudio.preload = 'auto';
+      __notifAudio.volume = 1.0;
+    }
+
+    function unlockAudioOnce(){
+      if (__audioUnlocked) return;
+      __audioUnlocked = true;
+      initNotifAudio();
+      // iOS/Android требует жест пользователя
+      __notifAudio.play().then(()=>{
+        __notifAudio.pause();
+        __notifAudio.currentTime = 0;
+      }).catch(()=>{});
+    }
+    window.addEventListener('pointerdown', unlockAudioOnce, { once:true, passive:true });
+
+    function requestNotifPermissionOnce(){
+      if (!('Notification' in window)) return;
+      if (Notification.permission !== 'default') return;
+      Notification.requestPermission().catch(()=>{});
+    }
+    window.addEventListener('pointerdown', requestNotifPermissionOnce, { once:true, passive:true });
+
+    function playNotifSound(){
+      initNotifAudio();
+      if (!__audioUnlocked) return;
+      try{
+        __notifAudio.currentTime = 0;
+        __notifAudio.play().catch(()=>{});
+      }catch(_){}
+    }
+
+    function showWebNotif(title, body){
+      if (!('Notification' in window)) return;
+      if (Notification.permission !== 'granted') return;
+      try{
+        const n = new Notification(title, {
+          body: body || '',
+          silent: true, // звук отдельно нашим mp3
+          // можешь поменять icon на свой
+          icon: 'assets/img/wa.png'
+        });
+        setTimeout(()=>{ try{ n.close(); }catch(_){} }, 5000);
+      }catch(_){}
+    }
+
+    function notifyIncoming(evt){
+      const title = (evt?.name || evt?.from_name || '').trim() || 'Новое сообщение';
+      const text  = (evt?.text || '').trim() || (evt?.media_kind ? `[${evt.media_kind}]` : '');
+      // звук — и на десктопе, и на мобилке (если вкладка/приложение не в активном чате)
+      playNotifSound();
+
+      // системное уведомление — только когда вкладка скрыта / свернута (как WhatsApp Web)
+      if (document.hidden) showWebNotif(title, text);
+
+      // легкий toast внутри страницы (у тебя уже есть showToast)
+      if (typeof showToast === 'function'){
+        showToast(title + (text ? (': ' + text) : ''), 'info');
+      }
+    }
+
+    // ===== Realtime via Socket.IO =====
+    function initSocket(){
+      state.socket = io('/', { withCredentials: true });
+
+      state.socket.on('newchat', (evt)=>{
+
+        // Нормализуем jid из сокета, иначе будет "невидимость" сообщений и дубли
+        if (evt?.jid) evt.jid = jidKey(evt.jid);
+        if (state?.selected?.jid) state.selected.jid = jidKey(state.selected.jid);
+
+        const passesFilter = (Number(state.filterAccId) === 0) || (Number(evt.acc_id) === Number(state.filterAccId));
+        const isOpen = (state.selected && sameJid(evt.jid, state.selected.jid) && Number(evt.acc_id) === Number(state.accId));
+
+        if (evt?.jid && (passesFilter || isOpen)) {
+          const ok = bumpContactToTop(evt.acc_id, evt.jid, evt.text || evt.media_kind || '');
+          if (!ok && passesFilter) scheduleReloadContacts();
+
+          if (!isOpen && passesFilter) {
+            incUnread(evt.acc_id, evt.jid);
+            renderContacts();
+            notifyIncoming(evt);
+          }
+        }
+
+        if (state.selected && sameJid(evt.jid, state.selected.jid) && evt.acc_id === state.accId) {
+          
+          removeTempDuplicate({
+            type: evt.type || 'in',
+            ts: evt.ts || Math.floor(Date.now()/1000),
+            message: evt.text || ''
+          });
+
+          addMessageDOM({
+            // если бек не прислал type/ts — будет fallback
+            type: evt.type || 'in',
+            ts: evt.ts || Math.floor(Date.now()/1000),
+            message: evt.text||'',
+            media_file: evt.media_file||'',
+            media_kind: evt.media_kind||''
+          });
+          scrollDown();
+        }
+
+        // update name in contact list
+        const i = state.contacts.findIndex(p =>
+          Number(p.acc_id||0) === Number(evt.acc_id||0) && jidKey(p.jid) === jidKey(evt.jid)
+        );
+
+        if (i !== -1) {
+          const params = { q: evt.jid, limit: 10 };
+          if (Number(evt.acc_id) > 0) params.acc_id = Number(evt.acc_id);
+
+          axios.get('/api/profiles', { params })
+
+            .then(({data})=>{
+              const found = (data||[]).find(r => r.jid === evt.jid);
+              if (found && found.name && found.name !== state.contacts[i].name) {
+                state.contacts[i].name = found.name;
+                renderContacts();
+
+                if (state.selected && state.selected.jid === evt.jid) {
+                  document.getElementById('chatAvatar').innerHTML = avatarFromName(found.name||evt.jid);
+                  document.getElementById('chatTitle').textContent = found.name || prettyPeer(evt.jid);
+                }
+              }
+            }).catch(()=>{});
+        }
+      });
+
+      // UI typing from server
+      state.socket.on('ui:typing', (p)=>{
+        try {
+          if (!state.selected) return;
+          if (Number(p.acc_id) !== Number(state.accId)) return;
+          if (!sameJid(String(p.jid||''), String(state.selected.jid||''))) return;
+
+          const box = document.getElementById('typingLine');
+          if (box) box.classList.toggle('hidden', !p.on);
+        } catch(e) {}
+      });
+
+      // --- Reactions realtime (WA/TG/IG visual) ---
+      state.socket.on('reaction:update', (p)=>{
+        try{
+          if (!state.selected) return;
+
+          const sameAcc = Number(p?.acc_id) === Number(state.accId);
+          const sameChat = sameJid(String(p?.jid || ''), String(state.selected?.jid || ''));
+          if (!sameAcc || !sameChat) return;
+
+          const msgRef = String(p?.msg_ref || '').trim();
+          const rx = String(p?.reactions_json || '').trim();
+          if (!msgRef) return;
+
+          const el = document.querySelector(`[data-msgref="${cssEsc(msgRef)}"]`);
+          if (!el) return;
+
+          const bubble = el.querySelector('.bubble');
+          if (!bubble) return;
+
+          bubble.setAttribute('data-reactions', rx);
+          renderReactionBar(bubble, rx);
+        }catch(e){
+          console.warn('reaction:update failed', e?.message || e);
+        }
+      });
+
+      state.socket.on('acc:list', ()=> loadAccounts());
+    }
+
+    function setEmptyState(on){
+      const empty = document.getElementById('chatEmpty');
+      if (empty) empty.style.display = on ? 'flex' : 'none';
+
+      const head = document.getElementById('chatHeader');
+      if (head) head.style.display = on ? 'none' : 'flex';
+
+      const bar = document.getElementById('composerBar');
+      if (bar) bar.style.display = on ? 'none' : 'block';
+    }
+
+// ===== New chat (send first message) =====
+function normalizePhoneInput(s){
+  let v = String(s||'').trim();
+  if (!v) return '';
+  // оставляем + только в начале, остальное — цифры
+  v = v.replace(/\s+/g,'');
+  if (v.startsWith('+')) v = '+' + v.slice(1).replace(/\D/g,'');
+  else v = v.replace(/\D/g,'');
+  return v.replace(/^\+/, ''); // для /api/send можно без +
+}
+
+function getDefaultWaAccId(){
+  const cur = (state.accounts||[]).find(a => Number(a.id) === Number(state.accId));
+  const curK = String(cur?.kind || '').toLowerCase();
+  const curIsWa = (curK === 'wa' || curK === 'whatsapp');
+
+  if (cur && curIsWa && cur.status === 'online' && !cur.orphan) return cur.id;
+
+  const firstOnline = (state.accounts||[]).find(a=>{
+    const k = String(a.kind||'').toLowerCase();
+    return (k==='wa' || k==='whatsapp') && a.status==='online' && !a.orphan;
+  });
+
+  return firstOnline ? firstOnline.id : (cur ? cur.id : null);
+}
+
+function openNewChatModal(){
+  const modal = document.getElementById('newChatModal');
+  if (!modal) return;
+
+  const sel = document.getElementById('newChatAcc');
+  if (sel){
+    sel.innerHTML = '';
+    const wa = (state.accounts||[]).filter(a=>{
+      const k = String(a.kind||'').toLowerCase();
+      return (k==='wa' || k==='whatsapp') && !a.orphan;
+    });
+
+    wa.forEach(a=>{
+      const o = document.createElement('option');
+      o.value = String(a.id);
+      o.textContent = `#${a.id} • ${a.label || 'WhatsApp'} • ${a.status}${a.orphan ? ' (архив)' : ''}`;
+      if (String(a.status||'') !== 'online') o.disabled = true;
+      sel.appendChild(o);
+    });
+
+    const def = getDefaultWaAccId();
+    if (def !== null) sel.value = String(def);
+  }
+
+  modal.classList.remove('hidden');
+  setTimeout(()=> document.getElementById('newChatPhone')?.focus(), 20);
+}
+
+function closeNewChatModal(){
+  document.getElementById('newChatModal')?.classList.add('hidden');
+}
+
+async function submitNewChat(){
+  const accId = Number(document.getElementById('newChatAcc')?.value || 0);
+  const phone = normalizePhoneInput(document.getElementById('newChatPhone')?.value || '');
+  const text  = String(document.getElementById('newChatText')?.value || '').trim();
+
+  if (!accId){
+    alert('Выберите WhatsApp аккаунт (online)');
+    return;
+  }
+  if (!phone || phone.length < 7){
+    alert('Введите номер телефона');
+    return;
+  }
+  if (!text){
+    alert('Введите первое сообщение');
+    return;
+  }
+
+  const btn = document.getElementById('newChatSend');
+  if (btn) btn.disabled = true;
+
+  try{
+    await axios.post('/api/send', { acc_id: accId, jid: phone, text });
+
+    closeNewChatModal();
+
+    // чтобы сразу продолжить диалог — переключимся на этот WA аккаунт и обновим список
+    const accSel = document.getElementById('accountSelect');
+    if (accSel && [...accSel.options].some(o=>String(o.value)===String(accId))) accSel.value = String(accId);
+    state.accId = accId;
+
+    const q = document.getElementById('searchInput');
+    if (q) q.value = phone;
+
+    await loadContacts();
+
+    // попробуем авто-открыть чат
+    const found = (state.contacts||[]).find(p => String(p.phone||'').replace(/\D/g,'').endsWith(phone));
+    if (found) selectChat(found);
+
+  }catch(e){
+    alert('Не удалось отправить: ' + (e?.response?.data?.error || e?.message || e));
+  }finally{
+    if (btn) btn.disabled = false;
+  }
+}
+
+    // ===== Mobile: correct viewport height (iOS address bar) =====
+    function setVhVar(){
+      const vh = window.innerHeight * 0.01;
+      document.documentElement.style.setProperty('--vh', `${vh}px`);
+    }
+    setVhVar();
+    window.addEventListener('resize', setVhVar);
+    window.addEventListener('orientationchange', setVhVar);
+
+    // ===== Wire UI =====
+    document.getElementById('burger')?.addEventListener('click', ()=> setLeftOpen(true));
+    document.getElementById('backdrop')?.addEventListener('click', ()=> setLeftOpen(false));
+    document.getElementById('backBtn')?.addEventListener('click', ()=> setLeftOpen(true));
+
+    document.getElementById('accountSelect').addEventListener('change', async (e)=>{
+      state.filterAccId = Number(e.target.value || 0) || 0;
+      localStorage.setItem(filterKeyLS(), String(state.filterAccId));
+      updateAccStatusUI();
+      await loadContacts();
+      setLeftOpen(true);
+    });
+
+
+    document.getElementById('refreshBtn').addEventListener('click', (e)=>{
+  // SHIFT+клик оставим как "обновить", обычный клик — "написать первым"
+  if (e.shiftKey) return loadContacts();
+  openNewChatModal();
+});
+
+document.getElementById('newChatCancel')?.addEventListener('click', closeNewChatModal);
+document.getElementById('newChatCancelX')?.addEventListener('click', closeNewChatModal);
+document.getElementById('newChatSend')?.addEventListener('click', submitNewChat);
+
+document.getElementById('newChatModal')?.addEventListener('click', (e)=>{
+  if (e.target?.dataset?.close) closeNewChatModal();
+});
+
+window.addEventListener('keydown', (e)=>{
+  const m = document.getElementById('newChatModal');
+  if (e.key === 'Escape' && m && !m.classList.contains('hidden')) closeNewChatModal();
+});
+
+
+    document.getElementById('searchInput').addEventListener('input', () => { clearTimeout(window.__t); window.__t=setTimeout(loadContacts, 250); });
+
+    document.getElementById('sendBtn').addEventListener('click', sendText);
+    
+    const attachBtn = document.getElementById('attachBtn');
+    const fileInput = document.getElementById('fileInput');
+    const attachMenu = document.getElementById('attachMenu');
+
+    function hideAttachMenu(){ attachMenu.classList.add('hidden'); }
+    function toggleAttachMenu(){ attachMenu.classList.toggle('hidden'); }
+
+    function pickFiles(mode){
+      fileInput.dataset.mode = mode;
+
+      if (mode === 'gif') fileInput.accept = 'image/gif';
+      else if (mode === 'sticker') fileInput.accept = 'image/webp';
+      else if (mode === 'any') fileInput.accept = '*/*';
+      else if (mode === 'document') fileInput.accept = '.pdf,.doc,.docx,.xls,.xlsx,.ppt,.pptx,.txt,.csv,.zip,.rar,.7z';
+      else fileInput.accept = 'image/*,video/*,audio/*,.pdf';
+
+      hideAttachMenu();
+      fileInput.click();
+    }
+
+    attachBtn.addEventListener('click', (e)=>{
+      e.preventDefault();
+      e.stopPropagation();
+      toggleAttachMenu();
+    });
+
+    attachMenu.querySelectorAll('[data-mode]').forEach(btn=>{
+      btn.addEventListener('click', (e)=>{
+        e.preventDefault();
+        e.stopPropagation();
+        pickFiles(btn.dataset.mode);
+      });
+    });
+
+    document.addEventListener('click', (e)=>{
+      if (!attachMenu.classList.contains('hidden')){
+        const wrap = attachMenu.closest('.attach-wrap');
+        if (wrap && !wrap.contains(e.target)) hideAttachMenu();
+      }
+    });
+
+    fileInput.addEventListener('change', (e)=>{
+      const mode = fileInput.dataset.mode || 'media';
+      uploadAndSend(e.target.files, mode);
+      fileInput.value = '';
+    });
+
+    document.getElementById('micBtn').addEventListener('click', startVoiceRecord);
+
+    document.getElementById('recStop').addEventListener('click', ()=> stopVoiceRecord({cancel:false}));
+    document.getElementById('recCancel').addEventListener('click', ()=> stopVoiceRecord({cancel:true}));
+
+    const msgInput = document.getElementById('msgInput');
+    msgInput.addEventListener('input', fitTextarea);
+    msgInput.addEventListener('keydown', (e)=>{
+      if(e.key==='Enter' && !e.shiftKey){
+        e.preventDefault();
+        sendText();
+      }
+    });
+
+    window.addEventListener('resize', ()=> setLeftOpen(false));
+
+    // ===== Chat background themes =====
+    const CHAT_BG_KEY = 'nedzat_chat_bg_v1';
+
+    const CHAT_BG_OPTIONS = {
+      'default': { url: 'assets/img/default-chat.svg', size: 'auto', repeat: 'repeat' },
+      'black-and-white-chat': { url: 'assets/img/black-and-white-chat.jpg', size: 'cover', repeat: 'no-repeat' },
+      'metallic-aesthetic-chat': { url: 'assets/img/metallic-aesthetic-chat.jpg', size: 'cover', repeat: 'no-repeat' },
+      'porsche-911-carrera-chat': { url: 'assets/img/porsche-911-carrera-chat.jpg', size: 'cover', repeat: 'no-repeat' },
+      'mont-blanc-massif-chat': { url: 'assets/img/mont-blanc-massif-chat.jpg', size: 'cover', repeat: 'no-repeat' },
+      'hazrat-sultan-chat': { url: 'assets/img/hazrat-sultan-chat.jpg', size: 'cover', repeat: 'no-repeat' }
+    };
+
+    function applyChatBg(id){
+      const opt = CHAT_BG_OPTIONS[id] || CHAT_BG_OPTIONS['default'];
+      const msg = document.getElementById('messages');
+      if (!msg) return;
+
+      msg.setAttribute('data-bg', id);
+
+      // железобетонно: inline style (работает всегда)
+      msg.style.backgroundImage = `url("${opt.url}")`;
+      msg.style.backgroundSize = opt.size || 'cover';
+      msg.style.backgroundRepeat = opt.repeat || 'no-repeat';
+      msg.style.backgroundPosition = 'center';
+
+      // и оставим CSS variables, если где-то используются
+      msg.style.setProperty('--chat-bg-img', `url("${opt.url}")`);
+      msg.style.setProperty('--chat-bg-size', opt.size || 'cover');
+      msg.style.setProperty('--chat-bg-repeat', opt.repeat || 'no-repeat');
+
+      try{ localStorage.setItem(CHAT_BG_KEY, id); }catch(_){}
+
+      const menu = document.getElementById('themeMenu');
+      if (menu){
+        menu.querySelectorAll('.theme-item').forEach(b=>{
+          b.classList.toggle('active', b.dataset.bg === id);
+        });
+      }
+    }
+
+    function initChatBgPicker(){
+      const btn = document.getElementById('themeBtn');
+      const menu = document.getElementById('themeMenu');
+      const wrap = btn?.closest('.theme-wrap');
+      if (!btn || !menu || !wrap) return;
+
+      function hide(){ menu.classList.add('hidden'); }
+      function toggle(){ menu.classList.toggle('hidden'); }
+
+      btn.addEventListener('click', (e)=>{
+        e.preventDefault();
+        e.stopPropagation();
+        toggle();
+      });
+
+      menu.addEventListener('click', (e)=>{
+        const item = e.target?.closest?.('.theme-item');
+        if (!item) return;
+        e.preventDefault();
+        e.stopPropagation();
+        const id = String(item.dataset.bg || 'default');
+        applyChatBg(id);
+        hide();
+      });
+
+      document.addEventListener('click', (e)=>{
+        if (menu.classList.contains('hidden')) return;
+        if (wrap.contains(e.target)) return;
+        hide();
+      });
+
+      document.addEventListener('keydown', (e)=>{
+        if (e.key === 'Escape') hide();
+      });
+
+      let saved = 'default';
+      try{ saved = localStorage.getItem(CHAT_BG_KEY) || 'default'; }catch(_){}
+      applyChatBg(saved);
+    }
+
+    // ===== Hard disable zoom (iOS gesture / pinch) =====
+    document.addEventListener('gesturestart', (e)=> e.preventDefault(), { passive:false });
+    document.addEventListener('gesturechange', (e)=> e.preventDefault(), { passive:false });
+    document.addEventListener('gestureend', (e)=> e.preventDefault(), { passive:false });
+
+    document.addEventListener('touchstart', (e)=>{
+      if (e.touches && e.touches.length > 1) e.preventDefault();
+    }, { passive:false });
+
+    // ===== PWA service worker =====
+    if ('serviceWorker' in navigator) {
+      window.addEventListener('load', () => {
+        navigator.serviceWorker.register('/public/sw.js').catch(()=>{});
+      });
+    }
+
+    // ===== Boot =====
+    (async function(){
+
+      initRightNav();
+      initBottomNav();
+      initUserMenu();
+      loadBrand();
+      loadSatuHeader();
+      setInterval(loadSatuHeader, 60000);
+
+      initSocket();
+      await loadAccounts();
+      loadUnread();
+      await loadContacts();
+      setEmptyState(true);
+      initChatBgPicker();
+      fitTextarea();
+      // Mobile: open last chat like WhatsApp
+      if (!isDesktop()){
+        openLastChat();
+        // если не получилось (нет контактов) — откроем список
+        if (!state.selected) setLeftOpen(true);
+      } else {
+        setLeftOpen(true);
+      }
+    })();
+  </script>
+
+<script>
+(()=> {
+  const URL = '/api/analytics/collect';
+
+  function send(payload){
+    const data = Object.assign({
+      type: 'pageview',
+      path: location.pathname + location.search + location.hash,
+      ref: document.referrer || ''
+    }, payload || {});
+
+    try{
+      if (navigator.sendBeacon){
+        const blob = new Blob([JSON.stringify(data)], {type:'application/json'});
+        navigator.sendBeacon(URL, blob);
+        return;
+      }
+    }catch(_){}
+
+    fetch(URL, {
+      method:'POST',
+      headers:{'Content-Type':'application/json'},
+      credentials:'include',
+      keepalive:true,
+      body: JSON.stringify(data)
+    }).catch(()=>{});
+  }
+
+  // pageview
+  send({type:'pageview'});
+
+  // online + duration
+  setInterval(()=>send({type:'ping'}), 15000);
+})();
+</script>
+
+<script>
+// ===== SERVICE WORKER REGISTRATION + PUSH =====
+(async () => {
+  if (!('serviceWorker' in navigator)) return;
+
+  try {
+    // Регистрируем Service Worker
+    const reg = await navigator.serviceWorker.register('/public/sw.js', {
+      scope: '/public/'
+    });
+    console.log('✅ SW registered:', reg.scope);
+
+    // Запрашиваем разрешение на уведомления
+    if ('Notification' in window && Notification.permission === 'default') {
+      const perm = await Notification.requestPermission();
+      console.log('🔔 Notification permission:', perm);
+    }
+
+    // Подписываемся на Push (если нужно)
+    if ('PushManager' in window && Notification.permission === 'granted') {
+      try {
+        const subscription = await reg.pushManager.subscribe({
+          userVisibleOnly: true,
+          applicationServerKey: urlBase64ToUint8Array('BLXu3VPQe70Jd6wm3TOy9WGVbh3YDSA3T1BNY2GvYrwYJZrGGFkmusTTw3sbBgCFmi3jeDVo-3Lnt4tRwBsi_Jw') // ← Замени!
+        });
+        console.log('📬 Push subscription:', JSON.stringify(subscription));
+        
+        // Отправь subscription на сервер для сохранения
+        await fetch('/api/push/subscribe', {
+          method: 'POST',
+          headers: {'Content-Type': 'application/json'},
+          credentials: 'include',
+          body: JSON.stringify(subscription)
+        });
+      } catch(e) {
+        console.warn('Push subscribe failed:', e);
+      }
+    }
+
+  } catch (err) {
+    console.error('SW registration failed:', err);
+  }
+
+  function urlBase64ToUint8Array(base64String) {
+    const padding = '='.repeat((4 - base64String.length % 4) % 4);
+    const base64 = (base64String + padding).replace(/-/g, '+').replace(/_/g, '/');
+    const rawData = atob(base64);
+    const outputArray = new Uint8Array(rawData.length);
+    for (let i = 0; i < rawData.length; ++i) {
+      outputArray[i] = rawData.charCodeAt(i);
+    }
+    return outputArray;
+  }
+})();
+</script>
+
+</body>
+</html>

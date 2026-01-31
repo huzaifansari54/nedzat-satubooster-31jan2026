@@ -1,0 +1,26 @@
+# Node
+node_modules/
+
+# Secrets
+.env
+.env.*
+
+# Logs / temp
+*.log
+tmp/
+temp/
+
+# Uploads (если там файлы клиентов - лучше не пушить)
+uploads/
+tmp_uploads/
+
+# SQLite (исключаем БД и WAL/SHM - они огромные и могут содержать данные)
+db.sqlite
+db.sqlite-*
+data.sqlite
+data.sqlite-*
+
+# Core dumps / big files
+core
+core.*
+tokens_backup_old/

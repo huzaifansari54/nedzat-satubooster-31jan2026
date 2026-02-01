@@ -1,0 +1,771 @@
+﻿<!doctype html>
+<html lang="ru">
+<head>
+  <meta charset="utf-8"/>
+  <meta name="viewport" content="width=device-width, initial-scale=1, maximum-scale=1, user-scalable=no, viewport-fit=cover" />
+  <title>NeDzat | Профиль</title>
+  <link rel="preconnect" href="https://cdn.tailwindcss.com" crossorigin>
+  <link rel="icon" type="image/x-icon" href="assets/favicon.ico">
+  <script> tailwind.config = { theme: { extend: { colors: { brand:'#0a84ff', ink:'#0b0b0c', line:'#e6e8eb', soft:'#f6f7f9', ok:'#22c55e', warn:'#f59e0b', bad:'#ef4444' }, boxShadow:{ subtle:'0 1px 1px rgba(0,0,0,.05)', card:'0 6px 20px rgba(3,7,18,.06)' }, borderRadius:{ xl:'14px', '2xl':'18px' } } } }; </script>
+  <script src="https://cdn.tailwindcss.com"></script>
+  <style>
+    html,body{height:100%}
+    /* ===== Mobile: no zoom gestures + no horizontal drift ===== */
+    html, body{
+      overflow-x: hidden;
+      touch-action: manipulation;
+    }
+    main{ min-width:0; }
+
+    body{font:16px/1.45 -apple-system,BlinkMacSystemFont,Inter,system-ui,Segoe UI,Roboto,Arial,sans-serif;background:#f6f7f9;color:#0b0b0c}
+    .card{background:#fff;border:1px solid #e6e8eb;border-radius:14px;box-shadow:var(--card,0 1px 1px rgba(0,0,0,.04))}
+    .field{height:38px;border:1px solid #e6e8eb;border-radius:10px;padding:0 10px;background:#fff;width:100%;font-size:13px}
+    .btn{height:36px;padding:0 12px;border-radius:10px;background:#0a84ff;color:#fff;font-size:13px}
+    .btn-ghost{height:36px;padding:0 10px;border:1px solid #e6e8eb;border-radius:10px;background:#fff;font-size:13px}
+    .chan-nav{ display:inline-flex; align-items:center; gap:8px; }
+    .chan-btn{ height:36px; padding:0 12px; border-radius:999px; display:inline-flex; align-items:center; gap:8px; text-decoration:none; font-size:13px; font-weight:600; border:1px solid #e6e8eb; background:transparent; color:#0f172a; transition: background .12s ease, filter .12s ease, border-color .12s ease; }
+    .chan-btn svg{ width:16px; height:16px; flex:0 0 16px; }
+    .chan-text{ display:none; }
+    @media (min-width: 640px){ .chan-text{ display:inline; } }
+    .chan-btn--wa{ border-color: rgba(34,197,94,.55); color:#16a34a; }
+    .chan-btn--wa.is-active{ background: rgba(34,197,94,.12); }
+    .chan-btn--ig{ border-color: rgba(221,42,123,.45); color: #111827; }
+    .chan-btn--ig.is-active{ background: rgba(221,42,123,.10); }
+    .chan-btn--ig .ig-ic{ color:#111827; filter: saturate(1.15); }
+    .chan-btn:active{ filter: brightness(1.12); }
+    .chan-btn:hover{ background: rgba(15,23,42,.04); }
+    .chan-btn--wa:hover{ background: rgba(34,197,94,.08); }
+    .chan-btn--ig:hover{ background: rgba(99,102,241,.06); }
+    .chan-btn--tt{ border-color: rgba(15,23,42,.22); color: #111827; }
+    .chan-btn--tt.is-active{ background: rgba(15,23,42,.06); }
+    .chan-btn--tt:hover{ background: rgba(15,23,42,.04); }
+    .chan-btn--tt:active{ filter: brightness(1.12); } /* как у остальных */
+    .chan-btn--tt .tt-ic{ filter: saturate(1.1); }
+    /* SatuCoin top-up button (как в index.html) */
+    .chan-btn--sc{ border-color: rgba(10,132,255,.45); color:#0a84ff; }
+    .chan-btn--sc:hover{ background: rgba(10,132,255,.08); }
+    .chan-btn--sc:active{ filter: brightness(1.12); }
+    .btn-danger{height:36px;padding:0 10px;border:1px solid rgba(239,68,68,.35);border-radius:10px;background:#fff;color:#ef4444;font-size:13px}
+    .label{font-size:11px;color:#6b7280}
+    .burger-btn{ height:36px;width:40px; display:inline-flex;align-items:center;justify-content:center; border:1px solid #e6e8eb;border-radius:12px;background:#fff; box-shadow:var(--card,0 1px 1px rgba(0,0,0,04)); }
+    .burger-btn:active{ transform:translateY(1px); }
+    .burger-ic{ width:22px;height:22px; color:#0b0b0c; }
+    .burger-ic path{ stroke:currentColor; stroke-width:2.8; stroke-linecap:round; }
+    .app{display:grid;grid-template-columns:1fr;min-height:100vh}
+    :root{ --sidebar-w:240px; }
+    .sidebar{position:fixed;inset:0 auto 0 0;width:var(--sidebar-w);background:#fff;border-right:1px solid #e6e8eb;transform:translateX(-100%);transition:transform .2s ease;z-index:40; overflow-y:auto;}
+    .sidebar.show{transform:translateX(0)}
+    .sidebar-head{ position: sticky; top: 0; z-index: 45; background: rgba(255,255,255,.92); backdrop-filter: saturate(120%) blur(8px); border-bottom: 1px solid #e6e8eb; }
+    .logo-snow-wrap{ position:relative; overflow:hidden; border-radius:12px; }
+    .logo-snow{ position:absolute; inset:0; width:100%; height:100%; pointer-events:none; z-index:5; opacity:.75; }
+    .logo-snow-wrap #brand-logo,
+    .logo-snow-wrap #brand-title{ position:relative; z-index:2; }
+    .sidebar .item{display:flex;gap:10px;align-items:center;padding:6px 11px;border-radius:10px;color:#111827}
+    .sidebar .item.active{background:#eef5ff}
+    .sidebar nav{padding:12px}
+    .nav-title{font-size:11px;letter-spacing:.06em;text-transform:uppercase;color:#94a3b8;padding:8px 10px 6px}
+    .nav-divider{height:1px;background:#e6e8eb;margin:10px 10px}
+    .nav-icon{width:18px;height:18px;color:#64748b;flex:0 0 18px}
+    .nav-icon, .nav-icon *{ stroke-width:2.6; }
+    .nav-label{font-size:13px}
+    .topbar{position:sticky;top:0;z-index:30;background:rgba(255,255,255,.92);backdrop-filter:saturate(120%) blur(8px);border-bottom:1px solid #e6e8eb}
+
+    /* ===== Topbar responsiveness ===== */
+    .topbar{ padding-top: env(safe-area-inset-top); }
+    .topbar .tb-row{ min-height:52px; padding:8px 0; gap:12px; }
+    .topbar .tb-left{ min-width:0; }
+    .topbar .tb-title{ white-space:nowrap; overflow:hidden; text-overflow:ellipsis; max-width:42vw; }
+    .topbar .tb-right{ min-width:0; }
+
+    @media (max-width: 520px){
+      .topbar .tb-row{ flex-wrap:wrap; justify-content:flex-start; }
+      .topbar .tb-right{ width:100%; justify-content:space-between; }
+      .chan-nav{ max-width:100%; overflow-x:auto; -webkit-overflow-scrolling:touch; scrollbar-width:none; }
+      .chan-nav::-webkit-scrollbar{ display:none; }
+      .satu-badge{ padding:6px 8px; gap:6px; }
+    }
+
+    @media (min-width: 1024px){ .app{grid-template-columns:var(--sidebar-w) 1fr} .sidebar{position:sticky;top:0;transform:none} }
+    .backdrop{position:fixed;inset:0;background:rgba(0,0,0,.4);display:none;z-index:30;}
+    .backdrop.show{display:block}
+    .field:focus{ outline:none; border-color: rgba(10,132,255,.55); box-shadow: 0 0 0 3px rgba(10,132,255,.18); }
+    .field::placeholder{ color:#94a3b8; }
+    .btn, .btn-ghost, .btn-danger{ font-weight:700; transition: transform .12s ease, filter .12s ease, background .12s ease, box-shadow .12s ease; }
+    .btn:hover{ filter: brightness(.96); }
+    .btn-ghost:hover{ background:#f1f5f9; }
+    .btn-danger:hover{ background:#fff5f5; }
+    button:focus-visible{ outline:none; box-shadow: 0 0 0 3px rgba(10,132,255,.22); }
+    .satu-badge{display:inline-flex;align-items:center;gap:8px;padding:6px 10px;border-radius:999px;background:rgba(10,132,255,.10);color:#0a84ff;font-size:12px;line-height:1;white-space:nowrap;user-select:none}
+    .satu-coin-label{ font-weight:700; color:#0a84ff; }
+    .satu-coin-value{ font-weight:700; color:#0a84ff; }
+    .user-btn{height:36px;width:36px;border-radius:999px;background:rgba(10,132,255,.10);display:inline-flex;align-items:center;justify-content:center}
+    .user-btn:active{transform:translateY(1px)}
+    .user-avatar{height:30px;width:30px;border-radius:999px;display:inline-flex;align-items:center;justify-content:center;font-weight:900;color:#0a84ff;background:rgba(255,255,255,.9);overflow:hidden}
+    .user-avatar img{width:100%;height:100%;display:block;object-fit:cover;border-radius:999px}
+    .user-pop{position:absolute;right:0;top:44px;width:220px;background:#fff;border:1px solid #e6e8eb;border-radius:14px;box-shadow:0 14px 40px rgba(2,6,23,.12);overflow:hidden;z-index:60}
+    .user-pop.hidden{display:none}
+    .user-pop-head{padding:10px 12px;border-bottom:1px solid #e6e8eb;background:#fbfdff}
+    .user-pop-email{font-size:12px;font-weight:800;color:#0f172a;overflow:hidden;text-overflow:ellipsis;white-space:nowrap}
+    .user-pop-email-row{ display:flex; align-items:center; gap:8px; min-width:0; }
+    .user-pop-email{ flex:1 1 auto; min-width:0;          /* важно для ellipsis во flex */ overflow:hidden; text-overflow:ellipsis; white-space:nowrap; }
+    .user-pop-copy{ height:28px; width:28px; flex:0 0 auto; display:inline-flex; align-items:center; justify-content:center; border:1px solid #e6e8eb; border-radius:10px; background:#fff; color:#64748b; }
+    .user-pop-copy:hover{ background:#f6f7f9; }
+    .user-pop-copy:active{ transform:translateY(1px); }
+    .user-pop-copy.is-copied{ color:#0a84ff; border-color: rgba(10,132,255,.35); }
+    .user-pop-item{width:100%;display:flex;align-items:center;gap:10px;padding:10px 12px;font-size:13px;background:#fff;color:#0f172a}
+    .user-pop-item:hover{background:#f6f7f9}
+    .user-pop-item.danger{color:#ef4444}
+    .user-ic{width:18px;height:18px}
+    .user-ic path{stroke:currentColor;stroke-width:2.2;stroke-linecap:round;stroke-linejoin:round;fill:none}
+    .note{font-size:12px;color:#64748b}
+    .ok{color:#16a34a}
+    .bad{color:#ef4444}
+    @media (max-width: 640px){ input, select, textarea { font-size: 16px !important; } }
+  </style>
+</head>
+
+<body>
+<div class="app">
+  <!-- Sidebar -->
+
+    <aside id="sidebar" class="sidebar">
+    <div class="sidebar-head">
+      <div class="h-[52px] px-4 flex items-center gap-2">
+          <div class="flex items-center gap-2 min-w-0 logo-snow-wrap">
+            <canvas class="logo-snow" aria-hidden="true"></canvas>
+            <img id="brand-logo" class="h-10 w-auto hidden" alt="Logo">
+            <div id="brand-title" class="text-[15px] font-semibold truncate">NeDzat</div>
+          </div>
+      </div>
+    </div>
+
+    <nav class="p-3">
+      <div class="nav-title">Основное</div>
+
+      <a href="index.html" class="item w-full text-left">
+        <svg class="nav-icon" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-linecap="round" stroke-linejoin="round">
+          <path d="M3 10.5L12 3l9 7.5"></path>
+          <path d="M5 10v10a1 1 0 0 0 1 1h4v-7h4v7h4a1 1 0 0 0 1-1V10"></path>
+        </svg>
+        <span class="nav-label">Панель</span>
+      </a>
+
+      <a href="profile.html" class="item w-full text-left active" aria-current="page">
+        <svg class="nav-icon" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+          <path d="M12 12a4 4 0 1 0-4-4 4 4 0 0 0 4 4Z"></path>
+          <path d="M4 20c1.6-3 4.5-5 8-5s6.4 2 8 5"></path>
+        </svg>
+        <span class="nav-label">Профиль</span>
+      </a>
+
+      <a href="https://wa.link/00mfq1" class="item w-full text-left" aria-current="page">
+        <svg class="nav-icon" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+          <path d="M16 21v-2a4 4 0 0 0-4-4H5a4 4 0 0 0-4 4v2"></path>
+          <circle cx="8.5" cy="7" r="4"></circle>
+          <line x1="18" y1="8" x2="23" y2="13"></line>
+          <line x1="23" y1="8" x2="18" y2="13"></line>
+        </svg>
+        <span class="nav-label">Удалит аккаунт</span>
+      </a>
+
+    </nav>
+  </aside>
+
+  <div id="backdrop" class="backdrop lg:hidden"></div>
+
+  <!-- Main -->
+  <main class="min-h-screen flex flex-col">
+  <header class="topbar">
+    <div class="max-w-screen-2xl mx-auto px-3 md:px-5">
+      <div class="tb-row flex items-center justify-between">
+        <div class="tb-left flex items-center gap-2">
+          <button id="burger" class="lg:hidden burger-btn" aria-label="Открыть меню" aria-expanded="false">
+            <svg class="burger-ic" viewBox="0 0 24 24" fill="none" aria-hidden="true">
+              <path d="M4 7H20" />
+              <path d="M4 12H20" />
+              <path d="M4 17H20" />
+            </svg>
+          </button>
+          <div class="tb-title text-[15px] font-semibold" id="title">Профиль</div>
+        </div>
+        <div class="tb-right flex items-center gap-2">
+
+          <!-- Channel switch -->
+          <nav class="chan-nav" aria-label="Каналы">
+            <!-- WhatsApp (текущая страница) -->
+            <a class="chan-btn chan-btn--wa" href="/public/index.html">
+              <svg viewBox="0 0 16 16" aria-hidden="true">
+                <path fill="currentColor" d="M13.601 2.326A7.85 7.85 0 0 0 7.994 0C3.627 0 .068 3.558.064 7.926c0 1.399.366 2.76 1.057 3.965L0 16l4.204-1.102a7.9 7.9 0 0 0 3.79.965h.004c4.368 0 7.926-3.558 7.93-7.93A7.9 7.9 0 0 0 13.6 2.326zM7.994 14.521a6.6 6.6 0 0 1-3.356-.92l-.24-.144-2.494.654.666-2.433-.156-.251a6.56 6.56 0 0 1-1.007-3.505c0-3.626 2.957-6.584 6.591-6.584a6.56 6.56 0 0 1 4.66 1.931 6.56 6.56 0 0 1 1.928 4.66c-.004 3.639-2.961 6.592-6.592 6.592m3.615-4.934c-.197-.099-1.17-.578-1.353-.646-.182-.065-.315-.099-.445.099-.133.197-.513.646-.627.775-.114.133-.232.148-.43.05-.197-.1-.836-.308-1.592-.985-.59-.525-.985-1.175-1.103-1.372-.114-.198-.011-.304.088-.403.087-.088.197-.232.296-.346.1-.114.133-.198.198-.33.065-.134.034-.248-.015-.347-.05-.099-.445-1.076-.612-1.47-.16-.389-.323-.335-.445-.34-.114-.007-.247-.007-.38-.007a.73.73 0 0 0-.529.247c-.182.198-.691.677-.691 1.654s.71 1.916.81 2.049c.098.133 1.394 2.132 3.383 2.992.47.205.84.326 1.129.418.475.152.904.129 1.246.08.38-.058 1.171-.48 1.338-.943.164-.464.164-.86.114-.943-.049-.084-.182-.133-.38-.232"/>
+              </svg>
+              <span class="chan-text">WhatsApp <span style="color: #000000;">/</span> <span style="color: #0088cc; font-weight: 700;">Telegram</span></span>
+            </a>
+
+            <!-- Instagram -->
+            <a class="chan-btn chan-btn--ig" href="/instagram/">
+              <svg viewBox="0 0 16 16" aria-hidden="true">
+                <defs>
+                  <linearGradient id="igGrad1" x1="0" y1="0" x2="1" y2="1">
+                    <stop offset="0" stop-color="#f58529"/>
+                    <stop offset=".4" stop-color="#dd2a7b"/>
+                    <stop offset=".7" stop-color="#8134af"/>
+                    <stop offset="1" stop-color="#515bd4"/>
+                  </linearGradient>
+                </defs>
+                <path fill="url(#igGrad1)" d="M8 0C5.829 0 5.556.01 4.703.048 3.85.088 3.269.222 2.76.42a3.9 3.9 0 0 0-1.417.923A3.9 3.9 0 0 0 .42 2.76C.222 3.268.087 3.85.048 4.7.01 5.555 0 5.827 0 8.001c0 2.172.01 2.444.048 3.297.04.852.174 1.433.372 1.942.205.526.478.972.923 1.417.444.445.89.719 1.416.923.51.198 1.09.333 1.942.372C5.555 15.99 5.827 16 8 16s2.444-.01 3.298-.048c.851-.04 1.434-.174 1.943-.372a3.9 3.9 0 0 0 1.416-.923c.445-.445.718-.891.923-1.417.197-.509.332-1.09.372-1.942C15.99 10.445 16 10.173 16 8s-.01-2.445-.048-3.299c-.04-.851-.175-1.433-.372-1.941a3.9 3.9 0 0 0-.923-1.417A3.9 3.9 0 0 0 13.24.42c-.51-.198-1.092-.333-1.943-.372C10.443.01 10.172 0 7.998 0zm-.717 1.442h.718c2.136 0 2.389.007 3.232.046.78.035 1.204.166 1.486.275.373.145.64.319.92.599s.453.546.598.92c.11.281.24.705.275 1.485.039.843.047 1.096.047 3.231s-.008 2.389-.047 3.232c-.035.78-.166 1.203-.275 1.485a2.5 2.5 0 0 1-.599.919c-.28.28-.546.453-.92.598-.28.11-.704.24-1.485.276-.843.038-1.096.047-3.232.047s-2.39-.009-3.233-.047c-.78-.036-1.203-.166-1.485-.276a2.5 2.5 0 0 1-.92-.598 2.5 2.5 0 0 1-.6-.92c-.109-.281-.24-.705-.275-1.485-.038-.843-.046-1.096-.046-3.233s.008-2.388.046-3.231c.036-.78.166-1.204.276-1.486.145-.373.319-.64.599-.92s.546-.453.92-.598c.282-.11.705-.24 1.485-.276.738-.034 1.024-.044 2.515-.045zm4.988 1.328a.96.96 0 1 0 0 1.92.96.96 0 0 0 0-1.92m-4.27 1.122a4.109 4.109 0 1 0 0 8.217 4.109 4.109 0 0 0 0-8.217m0 1.441a2.667 2.667 0 1 1 0 5.334 2.667 2.667 0 0 1 0-5.334"/>
+              </svg>
+              <span class="chan-text">Instagram</span>
+            </a>
+
+            <!-- TikTok -->
+            <a class="chan-btn chan-btn--tt" href="/tiktok/">
+              <svg viewBox="0 0 16 16" aria-hidden="true">
+                <path fill="currentColor" d="M9 0h1.98c.144.715.54 1.617 1.235 2.512C12.895 3.389 13.797 4 15 4v2c-1.753 0-3.07-.814-4-1.829V11a5 5 0 1 1-5-5v2a3 3 0 1 0 3 3z"/>
+              </svg>
+              <span class="chan-text">TikTok</span>
+            </a>
+          </nav>
+          
+          <!-- SatuCoin -->
+          <div id="satu-pill" class="satu-badge" title="Баланс SatuCoin">
+            <span class="satu-coin-ic" aria-hidden="true">
+            <svg viewBox="0 0 24 24" width="18" height="18" fill="none" aria-hidden="true">
+              <defs>
+                <linearGradient id="scg" x1="2" y1="2" x2="22" y2="22">
+                  <stop stop-color="#0a84ff"/>
+                  <stop offset="1" stop-color="#3b82f6"/>
+                </linearGradient>
+              </defs>
+
+              <!-- outer coin -->
+              <circle cx="12" cy="12" r="8.2" stroke="url(#scg)" stroke-width="1.8"/>
+              <!-- inner rim -->
+              <circle cx="12" cy="12" r="5.7" stroke="url(#scg)" stroke-width="1.4" opacity="0.7"/>
+              <!-- small highlight -->
+              <path d="M9 9.2c.9-1 2-1.5 3-1.6" stroke="url(#scg)" stroke-width="1.6" stroke-linecap="round" opacity="0.7"/>
+            </svg>
+            </span>
+            <span class="satu-coin-label">SatuCoin</span>
+            <span class="satu-coin-value" id="satu-balance">—</span>
+            <span class="satu-coin-approx" id="satu-approx" hidden></span>
+          </div>
+
+          <!-- Пополнить SatuCoin -->
+          <a
+            id="satu-topup"
+            class="chan-btn chan-btn--sc"
+            href="https://wa.me/77079652832?text=%D0%A1%D3%99%D0%BB%D0%B5%D0%BC%D0%B5%D1%82%D1%81%D1%96%D0%B7%D0%B1%D0%B5%21%20SatuCoin%20%D1%82%D0%BE%D0%BB%D1%82%D1%8B%D1%80%D2%93%D1%8B%D0%BC%20%D0%BA%D0%B5%D0%BB%D0%B5%D0%B4%D1%96"
+            target="_blank"
+            rel="noopener"
+            title="Пополнить SatuCoin"
+          >
+            <svg viewBox="0 0 24 24" fill="none" aria-hidden="true">
+              <path d="M12 5v14M5 12h14" stroke="currentColor" stroke-width="2.4" stroke-linecap="round"/>
+            </svg>
+            <span class="chan-text">Пополнить</span>
+          </a>
+
+          <!-- Аккаунт -->
+          <div class="relative">
+            <button id="user-btn" class="user-btn" type="button" aria-label="Аккаунт" aria-expanded="false">
+              <span id="user-avatar" class="user-avatar">U</span>
+            </button>
+
+            <div id="user-pop" class="user-pop hidden" role="menu" aria-label="Меню аккаунта">
+              <div class="user-pop-head">
+                <div class="user-pop-email-row">
+                  <div class="user-pop-email" id="user-email" title="—">—</div>
+
+                  <button type="button" class="user-pop-copy" id="user-email-copy"
+                          aria-label="Копировать почту" title="Копировать">
+                    <svg viewBox="0 0 24 24" class="user-ic" fill="none" aria-hidden="true">
+                      <path d="M9 9h10v10H9z"></path>
+                      <path d="M5 15H4a2 2 0 0 1-2-2V4a2 2 0 0 1 2-2h9a2 2 0 0 1 2 2v1"></path>
+                    </svg>
+                  </button>
+                </div>
+              </div>
+
+              <a class="user-pop-item" href="profile.html" id="user-profile" role="menuitem">
+                <svg viewBox="0 0 24 24" class="user-ic" fill="none" aria-hidden="true">
+                  <path d="M12 12a4 4 0 1 0-4-4 4 4 0 0 0 4 4Z" />
+                  <path d="M4 20c1.6-3 4.5-5 8-5s6.4 2 8 5" />
+                </svg>
+                <span>Профиль</span>
+              </a>
+
+              <button class="user-pop-item danger" type="button" id="user-logout" role="menuitem">
+                <svg viewBox="0 0 24 24" class="user-ic" fill="none" aria-hidden="true">
+                  <path d="M10 7V6a2 2 0 0 1 2-2h6a2 2 0 0 1 2 2v12a2 2 0 0 1-2 2h-6a2 2 0 0 1-2-2v-1" />
+                  <path d="M4 12h10" />
+                  <path d="M7 9l-3 3 3 3" />
+                </svg>
+                <span>Выйти</span>
+              </button>
+            </div>
+          </div>
+
+          <!-- оставляем id=me (теперь скрыт), чтобы не ломать текущий JS -->
+          <div id="me" class="hidden"></div>
+        </div>
+      </div>
+    </div>
+  </header>
+
+    <section class="max-w-screen-2xl mx-auto w-full px-3 md:px-5 py-5">
+      <div class="grid grid-cols-1 lg:grid-cols-3 gap-4">
+
+        <!-- Avatar card -->
+        <div class="card p-4">
+          <div class="text-sm font-semibold">Аватар</div>
+          <div class="mt-3 flex items-center gap-3">
+            <div id="p-avatar" class="user-avatar" style="height:64px;width:64px;font-size:20px;">U</div>
+            <div class="min-w-0">
+              <div class="text-sm font-semibold truncate" id="p-email">—</div>
+              <div class="note" id="p-verified">—</div>
+              <div class="note" id="p-plan">Тариф: —</div>
+            </div>
+          </div>
+
+          <div class="mt-4">
+            <div class="label mb-1">Загрузить новую аватарку</div>
+            <input id="avatarFile" class="field" type="file" accept="image/*" style="height:44px;padding:10px" />
+            <button class="btn mt-2 w-full" id="btnAvatar" type="button">Загрузить</button>
+            <div class="note mt-2">Картинка будет отображаться в круглом аватаре в хедере.</div>
+            <div class="note mt-2" id="msgAvatar"></div>
+          </div>
+        </div>
+
+        <!-- Email card -->
+        <div class="card p-4">
+          <div class="text-sm font-semibold">Почта</div>
+          <div class="mt-3">
+            <div class="label mb-1">Новая почта</div>
+            <input id="emailInput" class="field" type="email" placeholder="example@mail.com" autocomplete="email" />
+            <button class="btn mt-2 w-full" id="btnEmail" type="button">Сохранить почту</button>
+            <div class="note mt-2" id="msgEmail"></div>
+          </div>
+        </div>
+
+        <!-- Password card -->
+        <div class="card p-4">
+          <div class="text-sm font-semibold">Пароль</div>
+          <div class="mt-3">
+            <div class="label mb-1">Новый пароль</div>
+            <input id="pass1" class="field" type="password" placeholder="Минимум 8 символов" autocomplete="new-password" />
+            <div class="label mb-1 mt-2">Повторите пароль</div>
+            <input id="pass2" class="field" type="password" placeholder="Повторите пароль" autocomplete="new-password" />
+            <button class="btn mt-2 w-full" id="btnPass" type="button">Сменить пароль</button>
+            <div class="note mt-2" id="msgPass"></div>
+            <button class="btn-ghost mt-2 w-full" id="btnResetLink" type="button">
+              Отправить ссылку для сброса на почту
+            </button>
+            <div class="note mt-2" id="msgResetLink"></div>
+
+          </div>
+        </div>
+
+      </div>
+    </section>
+  </main>
+</div>
+
+<script>
+  const $ = (s)=>document.querySelector(s);
+
+  // sidebar
+  (function(){
+    const sidebar = document.getElementById('sidebar');
+    const backdrop = document.getElementById('backdrop');
+    const burger = document.getElementById('burger');
+
+    const open = ()=>{ sidebar.classList.add('show'); backdrop.classList.add('show'); burger?.setAttribute('aria-expanded','true'); };
+    const close = ()=>{ sidebar.classList.remove('show'); backdrop.classList.remove('show'); burger?.setAttribute('aria-expanded','false'); };
+
+    burger?.addEventListener('click', ()=> sidebar.classList.contains('show') ? close() : open());
+    backdrop?.addEventListener('click', close);
+
+  })();
+
+  function setNote(el, text, ok){
+    if(!el) return;
+    el.textContent = text || '';
+    el.classList.remove('ok','bad');
+    if(text) el.classList.add(ok ? 'ok' : 'bad');
+  }
+
+  function setAvatar(el, avatarUrl, email){
+    if(!el) return;
+    const first = (String(email||'').trim()[0] || 'U').toUpperCase();
+    el.innerHTML = '';
+    if(avatarUrl){
+      const img = document.createElement('img');
+      const u = String(avatarUrl || '').trim();
+      const src =
+        u.startsWith('http://') || u.startsWith('https://') || u.startsWith('data:') || u.startsWith('/')
+          ? u
+          : ('/' + u);
+      img.src = src;
+      img.alt = 'avatar';
+      img.onerror = ()=>{ el.textContent = first; };
+      el.appendChild(img);
+    }else{
+      el.textContent = first;
+    }
+  }
+
+  async function loadBrand(){
+    try{
+      const r = await fetch('/api/brand', { credentials:'include' });
+      if(!r.ok) return;
+      const data = await r.json().catch(()=>null);
+      const url = String(data?.logo_url || '').trim();
+
+      const img = document.getElementById('brand-logo');
+      const title = document.getElementById('brand-title');
+
+      if (img && title) {
+        if (url) {
+          img.src = url + '?v=' + Date.now();
+          img.classList.remove('hidden');
+          title.classList.add('hidden');
+        } else {
+          img.classList.add('hidden');
+          title.classList.remove('hidden');
+        }
+      }
+    }catch(_){}
+  }
+
+  function initLogoSnow(){
+  if (window.__logoSnowInit) return;
+  window.__logoSnowInit = true;
+
+  if (window.matchMedia && window.matchMedia('(prefers-reduced-motion: reduce)').matches) return;
+
+  const rnd = (a,b)=>a + Math.random()*(b-a);
+
+  document.querySelectorAll('canvas.logo-snow').forEach((c)=>{
+    if (c.dataset.snowBound) return;
+    c.dataset.snowBound = '1';
+
+    const parent = c.parentElement;
+    if (!parent) return;
+
+    const ctx = c.getContext('2d');
+    let w=0,h=0,dpr=1, flakes=[];
+    let raf=0;
+    let last = performance.now();
+
+    function resize(){
+      const r = parent.getBoundingClientRect();
+      if (!r.width || !r.height) return;
+
+      dpr = Math.min(2, window.devicePixelRatio || 1);
+      w = Math.floor(r.width * dpr);
+      h = Math.floor(r.height * dpr);
+
+      c.width = w; c.height = h;
+
+      const count = Math.min(42, Math.max(18, Math.round((r.width*r.height)/900)));
+      flakes = Array.from({length: count}, ()=>({
+        x: rnd(0,w),
+        y: rnd(0,h),
+        r: rnd(1.2*dpr, 2.6*dpr),
+        v: rnd(18*dpr, 40*dpr),
+        drift: rnd(-14*dpr, 14*dpr),
+        phi: rnd(0, Math.PI*2),
+      }));
+    }
+
+    resize();
+    if ('ResizeObserver' in window){
+      const ro = new ResizeObserver(()=>resize());
+      ro.observe(parent);
+    } else {
+      window.addEventListener('resize', resize, { passive:true });
+    }
+
+    function tick(now){
+      const dt = Math.min(0.05, (now-last)/1000);
+      last = now;
+
+      if (!w || !h){ raf = requestAnimationFrame(tick); return; }
+
+      ctx.clearRect(0,0,w,h);
+
+      // чтобы было видно даже на белом фоне:
+      ctx.save();
+      ctx.fillStyle = 'rgba(255,255,255,0.95)';
+      ctx.shadowColor = 'rgba(15,23,42,0.20)';
+      ctx.shadowBlur = 2*dpr;
+
+      for (const f of flakes){
+        f.y += f.v * dt;
+        f.x += (Math.sin(now/700 + f.phi) * f.drift) * dt;
+
+        if (f.y > h + 6*dpr){ f.y = -6*dpr; f.x = rnd(0,w); }
+        if (f.x < -10*dpr) f.x = w + 10*dpr;
+        if (f.x > w + 10*dpr) f.x = -10*dpr;
+
+        ctx.beginPath();
+        ctx.arc(f.x, f.y, f.r, 0, Math.PI*2);
+        ctx.fill();
+      }
+      ctx.restore();
+
+      raf = requestAnimationFrame(tick);
+    }
+
+    raf = requestAnimationFrame(tick);
+
+    document.addEventListener('visibilitychange', ()=>{
+      if (document.hidden) cancelAnimationFrame(raf);
+      else { last = performance.now(); raf = requestAnimationFrame(tick); }
+    });
+  });
+}
+
+    async function loadSatuHeader() {
+      const pill = document.getElementById('satu-pill');
+      if (!pill) return;
+
+      const balEl = document.getElementById('satu-balance');
+      const apxEl = document.getElementById('satu-approx');
+
+      try {
+        const res = await fetch('/api/satu/balance', { credentials: 'include' });
+        if (!res.ok) {
+          if (balEl) balEl.textContent = '—';
+          if (apxEl) { apxEl.hidden = true; apxEl.textContent = ''; }
+          else pill.textContent = 'SatuCoin: —';
+          return;
+        }
+
+        const data = await res.json();
+        const bal = Number(data.balance || 0);
+        const approx = Number.isFinite(data.approx_chats) ? data.approx_chats : null;
+
+        if (balEl) balEl.textContent = String(bal);
+        else pill.textContent = `SatuCoin: ${bal}`;
+
+        if (apxEl) {
+          if (approx !== null) {
+            apxEl.hidden = false;
+            apxEl.textContent = `≈ ${approx} лид`;
+          } else {
+            apxEl.hidden = true;
+            apxEl.textContent = '';
+          }
+        }
+      } catch (e) {
+        console.error('loadSatuHeader error', e);
+        if (balEl) balEl.textContent = '—';
+        if (apxEl) { apxEl.hidden = true; apxEl.textContent = ''; }
+        else pill.textContent = 'SatuCoin: —';
+      }
+    }
+
+  function initUserMenu(){
+    const btn = document.getElementById('user-btn');
+    const pop = document.getElementById('user-pop');
+    if(!btn || !pop) return;
+    if(btn.dataset.bound) return;
+    btn.dataset.bound = '1';
+
+    const close = ()=>{ pop.classList.add('hidden'); btn.setAttribute('aria-expanded','false'); };
+    const open = ()=>{ pop.classList.remove('hidden'); btn.setAttribute('aria-expanded','true'); };
+    const toggle = ()=> pop.classList.contains('hidden') ? open() : close();
+
+    btn.addEventListener('click', (e)=>{ e.stopPropagation(); toggle(); });
+    pop.addEventListener('click', (e)=> e.stopPropagation());
+    document.addEventListener('click', (e)=>{ if(!pop.contains(e.target) && !btn.contains(e.target)) close(); });
+    document.addEventListener('keydown', (e)=>{ if(e.key==='Escape') close(); });
+
+    document.getElementById('user-logout')?.addEventListener('click', doLogout);
+  }
+
+  async function doLogout(){
+    await fetch('/api/auth/logout', { method:'POST', credentials:'include' }).catch(()=>{});
+    location.href='/public/login.html';
+  }
+
+  async function loadProfile(){
+    setNote(document.getElementById('msgEmail'), '');
+    setNote(document.getElementById('msgPass'), '');
+    setNote(document.getElementById('msgAvatar'), '');
+
+    const r = await fetch('/api/profile', { credentials:'include' });
+    if(!r.ok){
+      // если не авторизован — на логин
+      location.href='/public/login.html';
+      return;
+    }
+    const u = await r.json();
+
+    const email = u.email || '';
+    document.getElementById('user-email').textContent = email || '—';
+    document.getElementById('user-email').title = email || '';
+    document.getElementById('me').textContent = email;
+
+    document.getElementById('p-email').textContent = email || '—';
+    document.getElementById('emailInput').value = email || '';
+
+    const verified = Number(u.email_verified || 0) === 1;
+    document.getElementById('p-verified').textContent = verified ? 'Почта подтверждена' : 'Почта не подтверждена';
+
+    const ent = await fetch('/api/me/entitlements', { credentials:'include' })
+      .then(r=>r.ok ? r.json() : null)
+      .catch(()=>null);
+
+    const txt = ent?.plan?.name
+      ? `Тариф: ${ent.plan.name}${ent.plan.price_kzt!=null ? ` • ${ent.plan.price_kzt} ₸` : ''}`
+      : 'Тариф: —';
+
+    document.getElementById('p-plan').textContent = txt;
+
+    setAvatar(document.getElementById('user-avatar'), u.avatar_url, email);
+    setAvatar(document.getElementById('p-avatar'), u.avatar_url, email);
+
+    initUserMenu();
+  }
+
+  async function saveEmail(){
+    const msg = document.getElementById('msgEmail');
+    const email = String(document.getElementById('emailInput').value || '').trim().toLowerCase();
+    if(!email) return setNote(msg, 'Введите почту', false);
+
+    try{
+      const r = await fetch('/api/profile/email', {
+        method:'POST',
+        credentials:'include',
+        headers:{'Content-Type':'application/json'},
+        body: JSON.stringify({ email })
+      });
+      const data = await r.json().catch(()=> ({}));
+      if(!r.ok) return setNote(msg, data.error || 'Ошибка сохранения', false);
+      setNote(msg, data.message || 'Почта обновлена', true);
+      await loadProfile();
+    }catch{
+      setNote(msg, 'Сеть/сервер недоступен', false);
+    }
+  }
+
+  async function savePassword(){
+    const msg = document.getElementById('msgPass');
+    const p1 = String(document.getElementById('pass1').value || '');
+    const p2 = String(document.getElementById('pass2').value || '');
+
+    if(p1.length < 8) return setNote(msg, 'Пароль минимум 8 символов', false);
+    if(p1 !== p2) return setNote(msg, 'Пароли не совпадают', false);
+
+    try{
+      const r = await fetch('/api/profile/password', {
+        method:'POST',
+        credentials:'include',
+        headers:{'Content-Type':'application/json'},
+        body: JSON.stringify({ password: p1 })
+      });
+      const data = await r.json().catch(()=> ({}));
+      if(!r.ok) return setNote(msg, data.error || 'Ошибка смены пароля', false);
+      setNote(msg, data.message || 'Пароль обновлён', true);
+      document.getElementById('pass1').value='';
+      document.getElementById('pass2').value='';
+    }catch{
+      setNote(msg, 'Сеть/сервер недоступен', false);
+    }
+  }
+
+  async function sendResetLink(){
+    const msg = document.getElementById('msgResetLink');
+    const email = String(document.getElementById('emailInput')?.value || '').trim().toLowerCase();
+    if(!email) return setNote(msg, 'Почта не задана', false);
+
+    try{
+      const r = await fetch('/api/auth/forgot_password', {
+        method:'POST',
+        credentials:'include',
+        headers:{'Content-Type':'application/json'},
+        body: JSON.stringify({ email })
+      });
+      const data = await r.json().catch(()=> ({}));
+
+      if(r.status === 429 && data?.retry_in){
+        return setNote(msg, `Подождите ${data.retry_in} сек.`, false);
+      }
+
+      setNote(msg, 'Если email существует — ссылка отправлена. Проверьте Входящие/Спам.', true);
+    }catch{
+      setNote(msg, 'Сеть/сервер недоступен', false);
+    }
+  }
+
+  async function uploadAvatar(){
+    const msg = document.getElementById('msgAvatar');
+    const f = document.getElementById('avatarFile').files?.[0];
+    if(!f) return setNote(msg, 'Выберите картинку', false);
+
+    const fd = new FormData();
+    fd.append('avatar', f);
+
+    try{
+      const r = await fetch('/api/profile/avatar', {
+        method:'POST',
+        credentials:'include',
+        body: fd
+      });
+      const data = await r.json().catch(()=> ({}));
+      if(!r.ok) return setNote(msg, data.error || 'Ошибка загрузки', false);
+      setNote(msg, data.message || 'Аватар обновлён', true);
+      await loadProfile();
+    }catch{
+      setNote(msg, 'Сеть/сервер недоступен', false);
+    }
+  }
+  document.getElementById('btnEmail')?.addEventListener('click', saveEmail);
+  document.getElementById('btnPass')?.addEventListener('click', savePassword);
+  document.getElementById('btnResetLink')?.addEventListener('click', sendResetLink);
+  document.getElementById('btnAvatar')?.addEventListener('click', uploadAvatar);
+  initLogoSnow();
+  loadBrand();
+  loadSatuHeader();
+  loadProfile();
+</script>
+
+<script>
+(()=> {
+  const URL = '/api/analytics/collect';
+
+  function send(payload){
+    const data = Object.assign({
+      type: 'pageview',
+      path: location.pathname + location.search + location.hash,
+      ref: document.referrer || ''
+    }, payload || {});
+
+    try{
+      if (navigator.sendBeacon){
+        const blob = new Blob([JSON.stringify(data)], {type:'application/json'});
+        navigator.sendBeacon(URL, blob);
+        return;
+      }
+    }catch(_){}
+
+    fetch(URL, {
+      method:'POST',
+      headers:{'Content-Type':'application/json'},
+      credentials:'include',
+      keepalive:true,
+      body: JSON.stringify(data)
+    }).catch(()=>{});
+  }
+
+  // pageview
+  send({type:'pageview'});
+
+  // online + duration
+  setInterval(()=>send({type:'ping'}), 15000);
+})();
+</script>
+
+</body>
+</html>

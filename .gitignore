@@ -1,3 +1,40 @@
-﻿.env
+﻿# Environment variables
+.env
 .env.*
 !.env.example
+
+# Dependencies
+node_modules/
+
+# Logs
+logs/*.log
+*.log
+npm-debug.log*
+
+# Database
+*.sqlite-shm
+*.sqlite-wal
+
+# OS files
+.DS_Store
+Thumbs.db
+
+# IDE
+.vscode/
+.idea/
+*.swp
+*.swo
+*~
+
+# Build output
+dist/
+build/
+
+# Test coverage
+coverage/
+.nyc_output/
+
+# Temporary files
+tmp/
+temp/
+*.tmp

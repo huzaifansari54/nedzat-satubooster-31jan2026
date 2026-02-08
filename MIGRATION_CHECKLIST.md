@@ -83,11 +83,13 @@ Track your progress as you refactor from `index.js` to the new modular structure
 - [x] Create main export `src/services/instagram/index.js`
 - [ ] Test Instagram integration (TODO: Integration testing)
 
-### Gupshup Services
-- [ ] Extract partner auth to `src/services/gupshup/auth.js`
-- [ ] Extract app manager to `src/services/gupshup/app-manager.js`
-- [ ] Extract webhook to `src/services/gupshup/webhook.js`
-- [ ] Test Gupshup integration
+### Gupshup Services ✅ COMPLETED (Feb 8, 2026)
+- [x] Extract partner auth to `src/services/gupshup/auth.js`
+- [x] Extract app manager to `src/services/gupshup/app-manager.js`
+- [x] Extract message sender to `src/services/gupshup/message-sender.js`
+- [x] Extract webhook to `src/services/gupshup/webhook.js`
+- [x] Create main export `src/services/gupshup/index.js`
+- [ ] Test Gupshup integration (TODO: Integration testing)
 
 ### Campaign Services ✅ COMPLETED (Feb 6, 2026)
 - [x] Extract campaign manager to `src/services/campaigns/campaign-manager.js`

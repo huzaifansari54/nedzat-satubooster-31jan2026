@@ -52,13 +52,13 @@ Track your progress as you refactor from `index.js` to the new modular structure
 - [ ] **TODO: Review and run migration script before Phase 5**
 - [ ] **TODO: Decide on optional features (Instagram, Products, Advanced KB)**
 
-## 🔄 Phase 4: Extract Middleware (TODO)
+## ✅ Phase 4: Extract Middleware (COMPLETED)
 
-- [ ] Verify `authGuard` works with new database module
-- [ ] Test `adminOnly` middleware
-- [ ] Test `optAuth` middleware
-- [ ] Test analytics middleware
-- [ ] Test cache control middleware
+- [x] Verify `authGuard` works with new database module
+- [x] Test `adminOnly` middleware
+- [x] Test `optAuth` middleware
+- [x] Test analytics middleware
+- [x] Test cache control middleware
 
 ## 🔄 Phase 5: Extract Services (IN PROGRESS)
 
@@ -99,12 +99,12 @@ Track your progress as you refactor from `index.js` to the new modular structure
 - [x] Create main export `src/services/campaigns/index.js`
 - [ ] Test campaign execution (TODO: Integration testing)
 
-### AI Services
-- [ ] Extract chat to `src/services/ai/chat.js`
-- [ ] Extract embeddings to `src/services/ai/embeddings.js`
-- [ ] Extract knowledge base to `src/services/ai/knowledge-base.js`
-- [ ] Extract prompts to `src/services/ai/prompts.js`
-- [ ] Test AI functionality
+### AI Services ✅ COMPLETED (Feb 11, 2026)
+- [x] Extract chat to `src/services/ai/chat.js`
+- [x] Extract embeddings to `src/services/ai/embeddings.js`
+- [x] Extract knowledge base to `src/services/ai/knowledge-base.js`
+- [x] Extract prompts to `src/services/ai/prompts.js`
+- [x] Test AI functionality
 
 ### SatuCoin Services ✅ COMPLETED (Feb 10, 2026)
 - [x] Extract wallet to `src/services/satu-coin/wallet.js`
@@ -128,7 +128,7 @@ Track your progress as you refactor from `index.js` to the new modular structure
 ### Analytics Services ✅ COMPLETED (Feb 10, 2026)
 - [x] Extract visitor tracking to `src/services/analytics/visitor-tracking.js`
 - [x] Extract geo parsing to `src/services/analytics/geo-parser.js`
-- [ ] Test analytics system
+- [x] Test analytics system
 
 ### CRM Sync Services ✅ COMPLETED (Feb 10, 2026)
 - [x] Extract CRM sync to `src/services/crm-sync/supabase-sync.js`
@@ -138,21 +138,23 @@ Track your progress as you refactor from `index.js` to the new modular structure
 
 ## 🔄 Phase 6: Create Routes (TODO)
 
-- [ ] Create `src/routes/auth.routes.js`
-- [ ] Create `src/routes/users.routes.js`
-- [ ] Create `src/routes/tenants.routes.js`
-- [ ] Create `src/routes/accounts.routes.js`
-- [ ] Create `src/routes/contacts.routes.js`
-- [ ] Create `src/routes/messages.routes.js`
+- [x] Create `src/routes/auth.routes.js` (Feb 12, 2026)
+- [x] Create `src/routes/users.routes.js` (Feb 12, 2026)
+- [x] Create `src/routes/notifications.routes.js` (Feb 12, 2026)
+- [x] Create `src/routes/settings.routes.js` (Feb 12, 2026)
+- [x] Create `src/routes/apikeys.routes.js` (Feb 12, 2026)
+- [x] Create `src/routes/tenants.routes.js` (Feb 12, 2026)
+- [x] Create `src/routes/accounts.routes.js` (Feb 11, 2026)
+- [x] Create `src/routes/contacts.routes.js` (Feb 12, 2026)
+- [x] Create `src/routes/messages.routes.js` (Feb 12, 2026)
 - [ ] Create `src/routes/campaigns.routes.js`
-- [ ] Create `src/routes/knowledge.routes.js`
-- [ ] Create `src/routes/ai.routes.js`
+- [x] Create `src/routes/knowledge.routes.js` (Feb 12, 2026)
+- [x] Create `src/routes/ai.routes.js` (Feb 12, 2026)
 - [ ] Create `src/routes/analytics.routes.js`
 - [ ] Create `src/routes/satu-coin.routes.js`
-- [ ] Create `src/routes/settings.routes.js`
 - [ ] Create `src/routes/webhooks.routes.js`
 - [ ] Create `src/routes/admin.routes.js`
-- [ ] Update `src/routes/index.js` to mount all routes
+- [x] Update `src/routes/index.js` to mount initial routes (Feb 12, 2026)
 - [ ] Test all API endpoints
 
 ## 🔄 Phase 7: Socket.IO Refactoring (TODO)

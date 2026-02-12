@@ -202,15 +202,7 @@ async function getSetting(key, tenantId) {
     return row ? row.value : null;
 }
 
-/**
- * Seed default data for new tenant
- * @param {number} tenantId - Tenant ID
- * @returns {Promise<void>}
- */
-async function seedDefaultsForTenant(tenantId) {
-    // TODO: Implement default seeding logic
-    console.log(`[GOOGLE_OAUTH] Seeding defaults for tenant ${tenantId}`);
-}
+const { seedDefaultsForTenant } = require('../../database/seeds/defaults');
 
 module.exports = {
     getAuthorizationUrl,

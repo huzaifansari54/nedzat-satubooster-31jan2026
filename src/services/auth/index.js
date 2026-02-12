@@ -39,5 +39,8 @@ module.exports = {
     // Cookie Helpers
     setAuthCookie: cookieHelpers.setAuthCookie,
     setTempCookie: cookieHelpers.setTempCookie,
-    clearAuthCookie: cookieHelpers.clearAuthCookie
+    clearAuthCookie: cookieHelpers.clearAuthCookie,
+
+    // Token Helpers
+    generateJWT: emailAuth.generateJWT
 };

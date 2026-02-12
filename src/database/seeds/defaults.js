@@ -1,7 +1,3 @@
-// src/database/seeds/defaults.js
-// Default settings and data for new tenants
-// -------------------------------------------------
-
 const { run } = require('../index');
 
 /**
@@ -10,66 +6,78 @@ const { run } = require('../index');
  */
 async function seedDefaultsForTenant(tenantId) {
     const defaults = [
-        // AI Settings
-        { key: 'ai_model', value: 'gpt-4o-mini' },
-        { key: 'ai_temperature', value: '0.7' },
-        { key: 'ai_max_tokens', value: '500' },
-        { key: 'ai_system_prompt', value: 'Вы - полезный ассистент для бизнеса.' },
-
-        // Registration Settings
-        { key: 'open_signup', value: '1' },
-        { key: 'open_signup_role', value: 'user' },
-
-        // Moderation Settings
-        { key: 'moderation_enabled', value: '0' },
-
-        // SatuCoin Settings
-        { key: 'satu_price_per_lead', value: '30' },
-
-        // TTS (Text-to-Speech) Settings
-        { key: 'tts_enabled', value: '0' },
-        { key: 'tts_voice', value: 'nova' },
-        { key: 'tts_smart_mode', value: '1' },
-
-        // Notification Settings
-        { key: 'telegram_bot_token', value: '' },
-        { key: 'telegram_chat_id', value: '' },
-        { key: 'notify_new_lead', value: '1' },
-        { key: 'notify_payment_received', value: '1' },
-
-        // Campaign Settings
-        { key: 'campaign_delay_ms', value: '1500' },
-        { key: 'campaign_batch_size', value: '50' },
-
-        // Knowledge Base Settings
-        { key: 'kb_enabled', value: '1' },
-        { key: 'kb_similarity_threshold', value: '0.7' },
-
-        // Brand Settings
-        { key: 'brand_name', value: 'NeDzat' },
-        { key: 'brand_primary_color', value: '#0ea5e9' },
-
-        // Auto-reply Settings
-        { key: 'auto_reply_enabled', value: '1' },
-        { key: 'auto_reply_delay_ms', value: '1500' },
-
-        // Contact Settings
-        { key: 'auto_save_contacts', value: '1' },
-
-        // Media Settings
-        { key: 'media_auto_download', value: '1' },
-        { key: 'media_max_size_mb', value: '25' }
+        ['system_prompt', 'Ты вежливый WhatsApp-ассистент. Отвечай кратко, дружелюбно и по делу.'],
+        ['delay_sec', '2'],
+        ['stopword', 'стоп'],
+        ['startword', 'включить'],
+        ['block_time_min', '60'],
+        ['followup_enabled', '1'],
+        ['followup_steps', '[]'],
+        ['ctx_messages', '12'],
+        ['summary_every_n', '8'],
+        ['work_enabled', '0'],
+        ['work_tz', 'Asia/Almaty'],
+        ['work_rules', '[]'],
+        ['lang_auto', '1'],
+        ['slots_enabled', '1'],
+        ['blacklist_phrases', '["не пишите","удалите номер","stop","отпишитесь"]'],
+        ['whitelist_phrases', '["подробнее","давайте","интересно","хочу","купить"]'],
+        ['moderation_enabled', '1'],
+        ['moderation_badwords', '["оскорб","брань","18+","политика"]'],
+        ['escalate_after_out_no_reply', '3'],
+        ['escalation_webhook', ''],
+        ['telegram_token', ''],
+        ['telegram_chat', ''],
+        ['telegram_events', '["booked","human_needed","no_reply_after_many_out"]'],
+        ['default_model', 'gpt-4o'],
+        ['default_temperature', '0.7'],
+        ['default_max_tokens', '200'],
+        ['fu_gate_enabled', '1'],
+        ['fu_done_phrases', '["записал","записала","забронировал","забронировала","оплатил","оплатила","внес предоплату","подтверждаю","подтвердил","оформил","оформлено","готово","приеду","пришла оплата","услуга оказана"]'],
+        ['fu_no_follow_phrases', '["не интересно","неактуально","не нужно","откажусь","передумал","больше не пишите","удалите номер","стоп","stop"]'],
+        ['open_signup', '1'],
+        ['open_signup_role', 'user'],
+        ['crm_enabled', '1'],
+        ['crm_endpoint', ''],
+        ['crm_company_id', ''],
+        ['crm_api_key', ''],
+        ['crm_msg_endpoint', ''],
+        ['public_base_url', ''],
+        ['tts_enabled', '0'],
+        ['tts_mode', 'both'],
+        ['tts_model', 'gpt-4o-mini-tts'],
+        ['tts_voice', 'alloy'],
+        ['tts_lang', ''],
+        ['tts_rate', '1.0'],
+        ['tts_pitch', '0'],
+        ['ig_system_prompt', 'Ты вежливый Instagram-ассистент. Отвечай кратко, дружелюбно и по делу.'],
+        ['ig_delay_sec', '2'],
+        ['ig_stopword', ''],
+        ['ig_startword', ''],
+        ['ig_block_time_min', '0'],
+        ['ig_allow_direct', '1'],
+        ['ig_allow_comments', '1'],
+        ['ig_allow_comment_dm', '0'],
+        ['ig_allow_story_mentions', '1'],
+        ['ig_allow_post_mentions', '1'],
+        ['ig_stoplist', ''],
+        ['ig_ctx_messages', '18'],
+        ['first_message_enabled', '0'],
+        ['first_message_delay_sec', '2'],
+        ['first_message_text', ''],
+        ['first_message_media_file', ''],
+        ['first_message_media_kind', '']
     ];
 
-    for (const setting of defaults) {
+    for (const [key, value] of defaults) {
         try {
             await run(
                 `INSERT INTO settings(tenant_id, key, value) VALUES(?, ?, ?)
                  ON CONFLICT(tenant_id, key) DO NOTHING`,
-                [tenantId, setting.key, setting.value]
+                [tenantId, key, value]
             );
         } catch (e) {
-            console.warn(`[SEED] Failed to insert setting ${setting.key}:`, e?.message || e);
+            console.warn(`[SEED] Failed to insert setting ${key}:`, e?.message || e);
         }
     }
 
@@ -77,7 +85,7 @@ async function seedDefaultsForTenant(tenantId) {
     try {
         await run(
             `INSERT INTO satu_wallets(tenant_id, balance, updated_at) VALUES(?, ?, ?)
-             ON CONFLICT(tenant_id) DO NOTHING`,
+             ON CONFLICT(tenant_id) DO UPDATE SET updated_at = excluded.updated_at`,
             [tenantId, 0, Date.now()]
         );
     } catch (e) {
@@ -87,37 +95,6 @@ async function seedDefaultsForTenant(tenantId) {
     console.log(`[SEED] Seeded defaults for tenant ${tenantId}`);
 }
 
-/**
- * Get a setting value for a tenant
- * @param {string} key - Setting key
- * @param {number} tenantId - Tenant ID
- * @returns {Promise<string|null>} Setting value or null
- */
-async function getSetting(key, tenantId) {
-    const { get } = require('../index');
-    const row = await get(
-        `SELECT value FROM settings WHERE tenant_id=? AND key=?`,
-        [tenantId, key]
-    );
-    return row ? row.value : null;
-}
-
-/**
- * Set a setting value for a tenant
- * @param {string} key - Setting key
- * @param {string} value - Setting value
- * @param {number} tenantId - Tenant ID
- */
-async function setSetting(key, value, tenantId) {
-    await run(
-        `INSERT INTO settings(tenant_id, key, value) VALUES(?, ?, ?)
-         ON CONFLICT(tenant_id, key) DO UPDATE SET value=excluded.value`,
-        [tenantId, key, value]
-    );
-}
-
 module.exports = {
-    seedDefaultsForTenant,
-    getSetting,
-    setSetting
+    seedDefaultsForTenant
 };

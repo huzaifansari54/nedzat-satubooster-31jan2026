@@ -144,20 +144,29 @@ async function getSetting(key, tenantId) {
     return row ? row.value : null;
 }
 
+const { seedDefaultsForTenant } = require('../../database/seeds/defaults');
+
 /**
- * Seed default data for new tenant
- * @param {number} tenantId - Tenant ID
- * @returns {Promise<void>}
+ * Generate JWT token for user
+ * @param {Object} user - User object
+ * @returns {string} JWT token
  */
-async function seedDefaultsForTenant(tenantId) {
-    // This function should be implemented based on your default data requirements
-    // For now, it's a placeholder
-    // TODO: Implement default seeding logic
-    console.log(`[AUTH] Seeding defaults for tenant ${tenantId}`);
+function generateJWT(user) {
+    return jwt.sign(
+        {
+            uid: user.id || user.uid,
+            tid: user.tenant_id || user.tid,
+            role: user.role,
+            email: user.email
+        },
+        config.jwtSecret,
+        { expiresIn: '30d' }
+    );
 }
 
 module.exports = {
     registerWithEmail,
     loginWithEmail,
-    isAutoVerifiedEmail
+    isAutoVerifiedEmail,
+    generateJWT
 };

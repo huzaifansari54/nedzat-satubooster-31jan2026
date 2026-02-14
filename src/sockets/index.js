@@ -1,12 +1,14 @@
 // src/sockets/index.js — Socket.IO Setup
 // -------------------------------------------------
 const { Server } = require('socket.io');
+const jwt = require('jsonwebtoken');
+const config = require('../config');
 const { getCorsOrigins } = require('../config/cors');
 
-// TODO: Import socket handlers as they are created
-// const chatSocket = require('./chat.socket');
-// const campaignSocket = require('./campaign.socket');
-// const notificationSocket = require('./notification.socket');
+// Import socket handlers
+const chatSocket = require('./chat.socket');
+const campaignSocket = require('./campaign.socket');
+const notificationSocket = require('./notification.socket');
 
 let io = null;
 
@@ -21,13 +23,53 @@ function setupSocketIO(server) {
         }
     });
 
-    io.on('connection', (socket) => {
-        console.log(`[SOCKET] Client connected: ${socket.id}`);
+    // Authentication middleware
+    io.use((socket, next) => {
+        try {
+            // Check auth token in handshake (auth object, headers, or cookies)
+            let tok = socket.handshake.auth?.token ||
+                socket.handshake.headers?.authorization?.replace(/^Bearer\s+/i, '');
 
-        // TODO: Setup socket event handlers
-        // chatSocket(io, socket);
-        // campaignSocket(io, socket);
-        // notificationSocket(io, socket);
+            if (!tok) {
+                const cookie = socket.request.headers.cookie || '';
+                // Simple regex to extract token from cookie string
+                const match = cookie.match(/(?:^|.*;\s*)token\s*=\s*([^;]*).*$/);
+                if (match) tok = match[1];
+            }
+
+            if (!tok) {
+                return next(new Error('unauthorized'));
+            }
+
+            const decoded = jwt.verify(tok, config.jwtSecret);
+            socket.user = {
+                id: decoded.uid,
+                tenant_id: decoded.tid,
+                role: decoded.role,
+                email: decoded.email
+            };
+
+            next();
+        } catch (err) {
+            console.error('[SOCKET] Auth error:', err.message);
+            next(new Error('unauthorized'));
+        }
+    });
+
+    io.on('connection', (socket) => {
+        const tid = socket.user.tenant_id;
+        const uid = socket.user.id;
+
+        console.log(`[SOCKET] Client connected: ${socket.id} (User: ${uid}, Tenant: ${tid})`);
+
+        // Join tenant and user rooms for targeted broadcasts
+        socket.join(`tenant_${tid}`);
+        socket.join(`user_${uid}`);
+
+        // Setup modular socket event handlers
+        chatSocket(io, socket);
+        campaignSocket(io, socket);
+        notificationSocket(io, socket);
 
         socket.on('disconnect', () => {
             console.log(`[SOCKET] Client disconnected: ${socket.id}`);

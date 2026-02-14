@@ -147,22 +147,24 @@ Track your progress as you refactor from `index.js` to the new modular structure
 - [x] Create `src/routes/accounts.routes.js` (Feb 11, 2026)
 - [x] Create `src/routes/contacts.routes.js` (Feb 12, 2026)
 - [x] Create `src/routes/messages.routes.js` (Feb 12, 2026)
-- [ ] Create `src/routes/campaigns.routes.js`
+- [x] Create `src/routes/campaigns.routes.js` (Feb 14, 2026)
 - [x] Create `src/routes/knowledge.routes.js` (Feb 12, 2026)
 - [x] Create `src/routes/ai.routes.js` (Feb 12, 2026)
-- [ ] Create `src/routes/analytics.routes.js`
-- [ ] Create `src/routes/satu-coin.routes.js`
-- [ ] Create `src/routes/webhooks.routes.js`
-- [ ] Create `src/routes/admin.routes.js`
+- [x] Create `src/routes/analytics.routes.js` (Feb 14, 2026)
+- [x] Create `src/routes/satu-coin.routes.js` (Feb 14, 2026)
+- [x] Create `src/routes/webhooks.routes.js` (Feb 14, 2026)
+- [x] Create `src/routes/admin.routes.js` (Feb 14, 2026)
 - [x] Update `src/routes/index.js` to mount initial routes (Feb 12, 2026)
 - [ ] Test all API endpoints
 
 ## 🔄 Phase 7: Socket.IO Refactoring (TODO)
 
-- [ ] Extract chat socket to `src/sockets/chat.socket.js`
-- [ ] Extract campaign socket to `src/sockets/campaign.socket.js`
-- [ ] Extract notification socket to `src/sockets/notification.socket.js`
-- [ ] Update `src/sockets/index.js`
+- [x] Extract socket setup to `src/sockets/index.js` (Feb 14, 2026)
+- [x] Extract chat socket to `src/sockets/chat.socket.js` (Feb 14, 2026)
+- [x] Extract campaign socket to `src/sockets/campaign.socket.js` (Feb 14, 2026)
+- [x] Extract notification socket to `src/sockets/notification.socket.js` (Feb 14, 2026)
+- [x] Create shared emitters in `src/sockets/emitters.js` (Feb 14, 2026)
+- [ ] Update services/routes to use modular emitters
 - [ ] Test real-time functionality
 
 ## 🔄 Phase 8: Move Static Files (TODO)

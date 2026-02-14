@@ -15,6 +15,11 @@ const contactsRoutes = require('./contacts.routes');
 const messagesRoutes = require('./messages.routes');
 const knowledgeRoutes = require('./knowledge.routes');
 const aiRoutes = require('./ai.routes');
+const campaignsRoutes = require('./campaigns.routes');
+const analyticsRoutes = require('./analytics.routes');
+const satuCoinRoutes = require('./satu-coin.routes');
+const webhooksRoutes = require('./webhooks.routes');
+const adminRoutes = require('./admin.routes');
 
 // Health check endpoint
 router.get('/health', (req, res) => {
@@ -37,6 +42,11 @@ router.use('/contacts', contactsRoutes);
 router.use('/messages', messagesRoutes);
 router.use('/knowledge', knowledgeRoutes);
 router.use('/ai', aiRoutes);
+router.use('/campaigns', campaignsRoutes);
+router.use('/analytics', analyticsRoutes);
+router.use('/satu-coin', satuCoinRoutes);
+router.use('/webhooks', webhooksRoutes);
+router.use('/admin', adminRoutes);
 router.use('/', usersRoutes); // Mounts /me, /profile, etc. at root of API
 
 module.exports = router;

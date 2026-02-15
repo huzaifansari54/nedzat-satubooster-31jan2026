@@ -84,12 +84,21 @@ function setupSocketIO(server) {
  */
 function getIO() {
     if (!io) {
-        throw new Error('Socket.IO not initialized. Call setupSocketIO first.');
+        throw new Error('Socket.IO not initialized. Call setupSocketIO or setIO first.');
     }
+    return io;
+}
+
+/**
+ * Manually set Socket.IO instance (for legacy bridge)
+ */
+function setIO(instance) {
+    io = instance;
     return io;
 }
 
 module.exports = {
     setupSocketIO,
-    getIO
+    getIO,
+    setIO
 };

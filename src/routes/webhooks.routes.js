@@ -4,6 +4,7 @@ const whatsapp = require('../services/whatsapp');
 const instagram = require('../services/instagram');
 const gupshup = require('../services/gupshup');
 const db = require('../database');
+const { logger } = require('../utils');
 
 // ===================================================================
 // WEBHOOK ROUTES
@@ -24,14 +25,14 @@ router.get('/whatsapp', (req, res) => {
         const VERIFY_TOKEN = process.env.WABA_VERIFY_TOKEN || 'your-verify-token';
 
         if (mode === 'subscribe' && token === VERIFY_TOKEN) {
-            console.log('[WEBHOOK] WhatsApp webhook verified');
+            logger.info('[WEBHOOK] WhatsApp webhook verified');
             res.status(200).send(challenge);
         } else {
-            console.warn('[WEBHOOK] WhatsApp webhook verification failed');
+            logger.warn({ mode, token }, '[WEBHOOK] WhatsApp webhook verification failed');
             res.sendStatus(403);
         }
     } catch (err) {
-        console.error('[WEBHOOK] WhatsApp verification error:', err.message);
+        logger.error({ err }, '[WEBHOOK] WhatsApp verification error');
         res.sendStatus(500);
     }
 });
@@ -52,7 +53,7 @@ router.post('/whatsapp', async (req, res) => {
         setImmediate(async () => {
             try {
                 if (!body.entry || !Array.isArray(body.entry)) {
-                    console.warn('[WEBHOOK] Invalid WhatsApp webhook payload');
+                    logger.warn({ body }, '[WEBHOOK] Invalid WhatsApp webhook payload');
                     return;
                 }
 
@@ -73,7 +74,7 @@ router.post('/whatsapp', async (req, res) => {
                         );
 
                         if (!account) {
-                            console.warn(`[WEBHOOK] No account found for phone_number_id: ${phoneNumberId}`);
+                            logger.warn({ phoneNumberId }, '[WEBHOOK] No account found for WABA phone_number_id');
                             continue;
                         }
 
@@ -87,9 +88,9 @@ router.post('/whatsapp', async (req, res) => {
                                         accId: account.id,
                                         ...parsed
                                     });
-                                    console.log(`[WEBHOOK] WhatsApp message saved: ${message.id}`);
+                                    logger.info({ messageId: message.id, accId: account.id }, '[WEBHOOK] WhatsApp message processed');
                                 } catch (err) {
-                                    console.error('[WEBHOOK] Error processing WhatsApp message:', err.message);
+                                    logger.error({ err, messageId: message.id }, '[WEBHOOK] Error processing WhatsApp message');
                                 }
                             }
                         }
@@ -104,20 +105,20 @@ router.post('/whatsapp', async (req, res) => {
                                         accId: account.id,
                                         ...parsed
                                     });
-                                    console.log(`[WEBHOOK] WhatsApp status updated: ${status.id} -> ${status.status}`);
+                                    logger.info({ statusId: status.id, status: status.status }, '[WEBHOOK] WhatsApp status updated');
                                 } catch (err) {
-                                    console.error('[WEBHOOK] Error processing WhatsApp status:', err.message);
+                                    logger.error({ err, statusId: status.id }, '[WEBHOOK] Error processing WhatsApp status update');
                                 }
                             }
                         }
                     }
                 }
             } catch (err) {
-                console.error('[WEBHOOK] WhatsApp processing error:', err.message);
+                logger.error({ err }, '[WEBHOOK] WhatsApp async processing exception');
             }
         });
     } catch (err) {
-        console.error('[WEBHOOK] WhatsApp webhook error:', err.message);
+        logger.error({ err }, '[WEBHOOK] WhatsApp webhook entry error');
         res.sendStatus(500);
     }
 });
@@ -132,12 +133,14 @@ router.get('/instagram', (req, res) => {
         const result = instagram.handleWebhookVerification(req.query);
 
         if (result.verified) {
+            logger.info('[WEBHOOK] Instagram webhook verified');
             res.status(200).send(result.challenge);
         } else {
+            logger.warn({ query: req.query }, '[WEBHOOK] Instagram verification failed');
             res.sendStatus(403);
         }
     } catch (err) {
-        console.error('[WEBHOOK] Instagram verification error:', err.message);
+        logger.error({ err }, '[WEBHOOK] Instagram verification exception');
         res.sendStatus(500);
     }
 });
@@ -161,7 +164,7 @@ router.post('/instagram', async (req, res) => {
             );
 
             if (!isValid) {
-                console.warn('[WEBHOOK] Instagram signature verification failed');
+                logger.warn({ signature }, '[WEBHOOK] Instagram signature verification failed');
                 return res.sendStatus(403);
             }
         }
@@ -173,12 +176,13 @@ router.post('/instagram', async (req, res) => {
         setImmediate(async () => {
             try {
                 await instagram.processWebhookPayload(req.body);
+                logger.debug('[WEBHOOK] Instagram payload processed');
             } catch (err) {
-                console.error('[WEBHOOK] Instagram processing error:', err.message);
+                logger.error({ err }, '[WEBHOOK] Instagram payload processing exception');
             }
         });
     } catch (err) {
-        console.error('[WEBHOOK] Instagram webhook error:', err.message);
+        logger.error({ err }, '[WEBHOOK] Instagram webhook outer exception');
         res.sendStatus(500);
     }
 });
@@ -198,7 +202,7 @@ router.post('/gupshup', async (req, res) => {
             try {
                 const handleIncoming = async (message) => {
                     // Handler for incoming messages from Gupshup
-                    console.log('[WEBHOOK] Gupshup incoming message:', message.id);
+                    logger.info({ messageId: message.id }, '[WEBHOOK] Gupshup incoming message');
 
                     // Auto-bind phone_number_id if needed
                     await gupshup.autoBindPhoneNumberId(message);
@@ -206,7 +210,7 @@ router.post('/gupshup', async (req, res) => {
                     // Get account by gupshup_app_id or phone_number_id
                     const phoneNumberId = message.metadata?.phone_number_id;
                     if (!phoneNumberId) {
-                        console.warn('[WEBHOOK] No phone_number_id in Gupshup message');
+                        logger.warn({ messageId: message.id }, '[WEBHOOK] No phone_number_id in Gupshup message');
                         return;
                     }
 
@@ -216,7 +220,7 @@ router.post('/gupshup', async (req, res) => {
                     );
 
                     if (!account) {
-                        console.warn(`[WEBHOOK] No account found for Gupshup phone_number_id: ${phoneNumberId}`);
+                        logger.warn({ phoneNumberId }, '[WEBHOOK] No account found for Gupshup phone_number_id');
                         return;
                     }
 
@@ -231,7 +235,7 @@ router.post('/gupshup', async (req, res) => {
 
                 const handleStatus = async (status) => {
                     // Handler for status updates from Gupshup
-                    console.log('[WEBHOOK] Gupshup status update:', status.id, '->', status.status);
+                    logger.info({ statusId: status.id, status: status.status }, '[WEBHOOK] Gupshup status update');
 
                     // Find account by message ID
                     const message = await db.get(
@@ -240,7 +244,7 @@ router.post('/gupshup', async (req, res) => {
                     );
 
                     if (!message) {
-                        console.warn(`[WEBHOOK] No message found for Gupshup status: ${status.id}`);
+                        logger.warn({ statusId: status.id }, '[WEBHOOK] No message record found for Gupshup status update');
                         return;
                     }
 
@@ -255,11 +259,11 @@ router.post('/gupshup', async (req, res) => {
 
                 await gupshup.processWebhook(req.body, handleIncoming, handleStatus);
             } catch (err) {
-                console.error('[WEBHOOK] Gupshup processing error:', err.message);
+                logger.error({ err }, '[WEBHOOK] Gupshup async process exception');
             }
         });
     } catch (err) {
-        console.error('[WEBHOOK] Gupshup webhook error:', err.message);
+        logger.error({ err }, '[WEBHOOK] Gupshup webhook entry exception');
         res.sendStatus(500);
     }
 });
@@ -271,11 +275,11 @@ router.post('/gupshup', async (req, res) => {
  */
 router.post('/test', (req, res) => {
     try {
-        console.log('[WEBHOOK] Test webhook received:', {
+        logger.info({
             headers: req.headers,
             body: req.body,
             query: req.query
-        });
+        }, '[WEBHOOK] Test webhook received');
 
         res.json({
             ok: true,
@@ -288,7 +292,7 @@ router.post('/test', (req, res) => {
             }
         });
     } catch (err) {
-        console.error('[WEBHOOK] Test webhook error:', err.message);
+        logger.error({ err }, '[WEBHOOK] Test webhook exception');
         res.status(500).json({ ok: false, error: 'server error' });
     }
 });

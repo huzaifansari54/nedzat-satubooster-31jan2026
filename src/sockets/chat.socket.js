@@ -1,6 +1,7 @@
 // src/sockets/chat.socket.js — Chat Socket Handlers
 // -------------------------------------------------
 const db = require('../database');
+const { logger } = require('../utils');
 
 /**
  * Handle chat-related socket events
@@ -15,7 +16,7 @@ module.exports = async function chatSocket(io, socket) {
         const accounts = await listAccountsByTenant(tid);
         socket.emit('acc:list', accounts);
     } catch (err) {
-        console.error('[SOCKET][CHAT] Failed to send acc:list:', err.message);
+        logger.error({ err, tenantId: tid, socketId: socket.id }, '[SOCKET][CHAT] Failed to send acc:list');
     }
 
     // In the future, add more chat-specific events here

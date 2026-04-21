@@ -4,6 +4,7 @@ const db = require('../database');
 const { authGuard } = require('../middleware/auth');
 const campaigns = require('../services/campaigns');
 const whatsapp = require('../services/whatsapp');
+const { logger } = require('../utils');
 
 // ===================================================================
 // CAMPAIGN ROUTES
@@ -41,7 +42,7 @@ router.get('/', authGuard, async (req, res) => {
             campaigns: campaignList
         });
     } catch (err) {
-        console.error('[CAMPAIGNS] GET error:', err.message);
+        logger.error({ err }, '[CAMPAIGNS] GET error');
         res.status(500).json({ ok: false, error: 'server error' });
     }
 });
@@ -105,7 +106,7 @@ router.post('/', authGuard, async (req, res) => {
             message: 'Campaign created successfully'
         });
     } catch (err) {
-        console.error('[CAMPAIGNS] POST error:', err.message);
+        logger.error({ err }, '[CAMPAIGNS] POST error');
         res.status(500).json({ ok: false, error: 'server error' });
     }
 });
@@ -134,7 +135,7 @@ router.get('/:id', authGuard, async (req, res) => {
             campaign
         });
     } catch (err) {
-        console.error('[CAMPAIGNS] GET/:id error:', err.message);
+        logger.error({ err, campaignId: req.params.id }, '[CAMPAIGNS] GET/:id error');
         res.status(500).json({ ok: false, error: 'server error' });
     }
 });
@@ -191,7 +192,7 @@ router.put('/:id', authGuard, async (req, res) => {
             message: 'Campaign updated successfully'
         });
     } catch (err) {
-        console.error('[CAMPAIGNS] PUT error:', err.message);
+        logger.error({ err, campaignId: req.params.id }, '[CAMPAIGNS] PUT error');
         res.status(500).json({ ok: false, error: 'server error' });
     }
 });
@@ -220,7 +221,7 @@ router.delete('/:id', authGuard, async (req, res) => {
             message: 'Campaign deleted successfully'
         });
     } catch (err) {
-        console.error('[CAMPAIGNS] DELETE error:', err.message);
+        logger.error({ err, campaignId: req.params.id }, '[CAMPAIGNS] DELETE error');
 
         if (err.message.includes('running campaign')) {
             return res.status(400).json({ ok: false, error: err.message });
@@ -262,7 +263,7 @@ router.get('/:id/targets', authGuard, async (req, res) => {
             targets
         });
     } catch (err) {
-        console.error('[CAMPAIGNS] GET/:id/targets error:', err.message);
+        logger.error({ err, campaignId: req.params.id }, '[CAMPAIGNS] GET/:id/targets error');
         res.status(500).json({ ok: false, error: 'server error' });
     }
 });
@@ -303,7 +304,7 @@ router.post('/:id/targets', authGuard, async (req, res) => {
             message: `${addedCount} target(s) added successfully`
         });
     } catch (err) {
-        console.error('[CAMPAIGNS] POST/:id/targets error:', err.message);
+        logger.error({ err, campaignId: req.params.id }, '[CAMPAIGNS] POST/:id/targets error');
         res.status(500).json({ ok: false, error: 'server error' });
     }
 });
@@ -338,7 +339,7 @@ router.delete('/:id/targets/:jid', authGuard, async (req, res) => {
             message: 'Target removed successfully'
         });
     } catch (err) {
-        console.error('[CAMPAIGNS] DELETE/:id/targets/:jid error:', err.message);
+        logger.error({ err, campaignId: req.params.id, jid: req.params.jid }, '[CAMPAIGNS] DELETE/:id/targets/:jid error');
         res.status(500).json({ ok: false, error: 'server error' });
     }
 });
@@ -369,7 +370,7 @@ router.get('/:id/counts', authGuard, async (req, res) => {
             counts
         });
     } catch (err) {
-        console.error('[CAMPAIGNS] GET/:id/counts error:', err.message);
+        logger.error({ err, campaignId: req.params.id }, '[CAMPAIGNS] GET/:id/counts error');
         res.status(500).json({ ok: false, error: 'server error' });
     }
 });
@@ -409,7 +410,7 @@ router.post('/:id/start', authGuard, async (req, res) => {
             message: 'Campaign started successfully'
         });
     } catch (err) {
-        console.error('[CAMPAIGNS] POST/:id/start error:', err.message);
+        logger.error({ err, campaignId: req.params.id }, '[CAMPAIGNS] POST/:id/start error');
         res.status(500).json({ ok: false, error: 'server error' });
     }
 });
@@ -440,7 +441,7 @@ router.post('/:id/pause', authGuard, async (req, res) => {
             message: 'Campaign paused successfully'
         });
     } catch (err) {
-        console.error('[CAMPAIGNS] POST/:id/pause error:', err.message);
+        logger.error({ err, campaignId: req.params.id }, '[CAMPAIGNS] POST/:id/pause error');
         res.status(500).json({ ok: false, error: 'server error' });
     }
 });
@@ -471,7 +472,7 @@ router.get('/:id/stats', authGuard, async (req, res) => {
             stats
         });
     } catch (err) {
-        console.error('[CAMPAIGNS] GET/:id/stats error:', err.message);
+        logger.error({ err, campaignId: req.params.id }, '[CAMPAIGNS] GET/:id/stats error');
         res.status(500).json({ ok: false, error: 'server error' });
     }
 });
@@ -504,7 +505,7 @@ router.get('/:id/responses', authGuard, async (req, res) => {
             responses
         });
     } catch (err) {
-        console.error('[CAMPAIGNS] GET/:id/responses error:', err.message);
+        logger.error({ err, campaignId: req.params.id }, '[CAMPAIGNS] GET/:id/responses error');
         res.status(500).json({ ok: false, error: 'server error' });
     }
 });
@@ -535,7 +536,7 @@ router.get('/:id/timeline', authGuard, async (req, res) => {
             timeline
         });
     } catch (err) {
-        console.error('[CAMPAIGNS] GET/:id/timeline error:', err.message);
+        logger.error({ err, campaignId: req.params.id }, '[CAMPAIGNS] GET/:id/timeline error');
         res.status(500).json({ ok: false, error: 'server error' });
     }
 });
@@ -566,7 +567,7 @@ router.get('/:id/failed', authGuard, async (req, res) => {
             failed: failedTargets
         });
     } catch (err) {
-        console.error('[CAMPAIGNS] GET/:id/failed error:', err.message);
+        logger.error({ err, campaignId: req.params.id }, '[CAMPAIGNS] GET/:id/failed error');
         res.status(500).json({ ok: false, error: 'server error' });
     }
 });
@@ -599,7 +600,7 @@ router.get('/:id/top-responders', authGuard, async (req, res) => {
             topResponders
         });
     } catch (err) {
-        console.error('[CAMPAIGNS] GET/:id/top-responders error:', err.message);
+        logger.error({ err, campaignId: req.params.id }, '[CAMPAIGNS] GET/:id/top-responders error');
         res.status(500).json({ ok: false, error: 'server error' });
     }
 });
@@ -619,7 +620,7 @@ router.get('/summary/all', authGuard, async (req, res) => {
             summary
         });
     } catch (err) {
-        console.error('[CAMPAIGNS] GET/summary/all error:', err.message);
+        logger.error({ err }, '[CAMPAIGNS] GET/summary/all error');
         res.status(500).json({ ok: false, error: 'server error' });
     }
 });
@@ -671,7 +672,7 @@ router.post('/:id/schedule', authGuard, async (req, res) => {
             message: 'Campaign scheduled successfully'
         });
     } catch (err) {
-        console.error('[CAMPAIGNS] POST/:id/schedule error:', err.message);
+        logger.error({ err, campaignId: req.params.id }, '[CAMPAIGNS] POST/:id/schedule error');
         res.status(500).json({ ok: false, error: 'server error' });
     }
 });
@@ -702,7 +703,7 @@ router.get('/:id/schedule', authGuard, async (req, res) => {
             schedule: scheduleInfo
         });
     } catch (err) {
-        console.error('[CAMPAIGNS] GET/:id/schedule error:', err.message);
+        logger.error({ err, campaignId: req.params.id }, '[CAMPAIGNS] GET/:id/schedule error');
         res.status(500).json({ ok: false, error: 'server error' });
     }
 });
@@ -733,7 +734,7 @@ router.delete('/:id/schedule', authGuard, async (req, res) => {
             message: 'Schedule cancelled successfully'
         });
     } catch (err) {
-        console.error('[CAMPAIGNS] DELETE/:id/schedule error:', err.message);
+        logger.error({ err, campaignId: req.params.id }, '[CAMPAIGNS] DELETE/:id/schedule error');
         res.status(500).json({ ok: false, error: 'server error' });
     }
 });
@@ -753,7 +754,7 @@ router.get('/scheduled/list', authGuard, async (req, res) => {
             campaigns: scheduledCampaigns
         });
     } catch (err) {
-        console.error('[CAMPAIGNS] GET/scheduled/list error:', err.message);
+        logger.error({ err }, '[CAMPAIGNS] GET/scheduled/list error');
         res.status(500).json({ ok: false, error: 'server error' });
     }
 });
@@ -784,7 +785,7 @@ router.get('/:id/export', authGuard, async (req, res) => {
             data: exportData
         });
     } catch (err) {
-        console.error('[CAMPAIGNS] GET/:id/export error:', err.message);
+        logger.error({ err, campaignId: req.params.id }, '[CAMPAIGNS] GET/:id/export error');
         res.status(500).json({ ok: false, error: 'server error' });
     }
 });

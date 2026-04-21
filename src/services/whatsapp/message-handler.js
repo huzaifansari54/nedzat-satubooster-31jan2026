@@ -6,6 +6,7 @@
 
 const db = require('../../database');
 const { nowSec } = require('../../utils/time');
+const { logger } = require('../../utils');
 
 /**
  * Parse incoming WhatsApp webhook message
@@ -102,7 +103,7 @@ function parseIncomingMessage(webhookData) {
             rawMessage: message
         };
     } catch (error) {
-        console.error('[MessageHandler] Parse error:', error);
+        logger.error({ err: error, webhookData }, '[MessageHandler] Parse error');
         return null;
     }
 }
@@ -133,7 +134,7 @@ function parseMessageStatus(webhookData) {
             errors: status?.errors || []
         };
     } catch (error) {
-        console.error('[MessageHandler] Parse status error:', error);
+        logger.error({ err: error, webhookData }, '[MessageHandler] Parse status error');
         return null;
     }
 }

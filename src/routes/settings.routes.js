@@ -2,6 +2,7 @@ const express = require('express');
 const router = express.Router();
 const db = require('../database');
 const { authGuard, adminOnly } = require('../middleware/auth');
+const { logger } = require('../utils');
 
 /**
  * @route GET /api/settings
@@ -21,7 +22,7 @@ router.get('/', authGuard, async (req, res) => {
 
         res.json({ ok: true, settings });
     } catch (err) {
-        console.error('[SETTINGS] GET error:', err.message);
+        logger.error({ err }, '[SETTINGS] GET error');
         res.status(500).json({ ok: false, error: 'server error' });
     }
 });
@@ -44,7 +45,7 @@ router.get('/:key', authGuard, async (req, res) => {
             value: row ? row.value : null
         });
     } catch (err) {
-        console.error('[SETTINGS] GET key error:', err.message);
+        logger.error({ err, key: req.params.key }, '[SETTINGS] GET key error');
         res.status(500).json({ ok: false, error: 'server error' });
     }
 });
@@ -70,7 +71,7 @@ router.post('/', authGuard, async (req, res) => {
 
         res.json({ ok: true });
     } catch (err) {
-        console.error('[SETTINGS] POST error:', err.message);
+        logger.error({ err }, '[SETTINGS] POST error');
         res.status(500).json({ ok: false, error: 'server error' });
     }
 });
@@ -96,7 +97,7 @@ router.put('/:key', authGuard, async (req, res) => {
 
         res.json({ ok: true, key, value });
     } catch (err) {
-        console.error('[SETTINGS] PUT error:', err.message);
+        logger.error({ err, key: req.params.key }, '[SETTINGS] PUT error');
         res.status(500).json({ ok: false, error: 'server error' });
     }
 });
@@ -116,7 +117,7 @@ router.delete('/:key', authGuard, adminOnly, async (req, res) => {
 
         res.json({ ok: true });
     } catch (err) {
-        console.error('[SETTINGS] DELETE error:', err.message);
+        logger.error({ err, key: req.params.key }, '[SETTINGS] DELETE error');
         res.status(500).json({ ok: false, error: 'server error' });
     }
 });
@@ -139,7 +140,7 @@ router.get('/global/:key', authGuard, adminOnly, async (req, res) => {
             value: row ? row.value : null
         });
     } catch (err) {
-        console.error('[SETTINGS] GET global error:', err.message);
+        logger.error({ err, key: req.params.key }, '[SETTINGS] GET global error');
         res.status(500).json({ ok: false, error: 'server error' });
     }
 });
@@ -165,7 +166,7 @@ router.put('/global/:key', authGuard, adminOnly, async (req, res) => {
 
         res.json({ ok: true, key, value });
     } catch (err) {
-        console.error('[SETTINGS] PUT global error:', err.message);
+        logger.error({ err, key: req.params.key }, '[SETTINGS] PUT global error');
         res.status(500).json({ ok: false, error: 'server error' });
     }
 });

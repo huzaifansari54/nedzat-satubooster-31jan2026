@@ -289,4 +289,66 @@ router.get('/:id/qr', authGuard, async (req, res) => {
     }
 });
 
+const { startAccount, logoutAccount } = require('../services/whatsapp');
+
+/**
+ * @route POST /api/accounts/:id/start
+ * @desc Start WhatsApp/Telegram account process
+ */
+router.post('/:id/start', authGuard, async (req, res) => {
+    try {
+        const { id } = req.params;
+        const tenant_id = req.user.tenant_id;
+
+        const account = await db.get(
+            'SELECT id, kind FROM accounts WHERE id=? AND tenant_id=?',
+            [id, tenant_id]
+        );
+
+        if (!account) {
+            return res.status(404).json({ ok: false, error: 'account not found' });
+        }
+
+        if (account.kind === 'wa') {
+            await startAccount(id);
+        } else if (account.kind === 'tg') {
+            // TODO: startTelegramAccount(id);
+        }
+
+        res.json({ ok: true, message: 'Account start initiated' });
+    } catch (err) {
+        console.error('[ACCOUNTS] START error:', err.message);
+        res.status(500).json({ ok: false, error: 'server error' });
+    }
+});
+
+/**
+ * @route POST /api/accounts/:id/logout
+ * @desc Logout WhatsApp account (cleanup session)
+ */
+router.post('/:id/logout', authGuard, async (req, res) => {
+    try {
+        const { id } = req.params;
+        const tenant_id = req.user.tenant_id;
+
+        const account = await db.get(
+            'SELECT id, kind FROM accounts WHERE id=? AND tenant_id=?',
+            [id, tenant_id]
+        );
+
+        if (!account) {
+            return res.status(404).json({ ok: false, error: 'account not found' });
+        }
+
+        if (account.kind === 'wa') {
+            await logoutAccount(id);
+        }
+
+        res.json({ ok: true, message: 'Logout successful' });
+    } catch (err) {
+        console.error('[ACCOUNTS] LOGOUT error:', err.message);
+        res.status(500).json({ ok: false, error: 'server error' });
+    }
+});
+
 module.exports = router;

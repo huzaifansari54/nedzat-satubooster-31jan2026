@@ -2,6 +2,7 @@ const express = require('express');
 const router = express.Router();
 const db = require('../database');
 const { authGuard, adminOnly } = require('../middleware/auth');
+const { logger } = require('../utils');
 const path = require('path');
 const multer = require('multer');
 const fs = require('fs');
@@ -71,7 +72,7 @@ router.get('/me', authGuard, async (req, res) => {
             }
         });
     } catch (err) {
-        console.error('[USER] /me error:', err.message);
+        logger.error({ err }, '[USER] Route error');
         res.status(500).json({ ok: false, error: 'server error' });
     }
 });

@@ -1,12 +1,19 @@
 // src/middleware/error-handler.js — Global Error Handler
 // -------------------------------------------------
 
+const { logger } = require('../utils');
+
 /**
  * Global error handling middleware
  * Must be registered last in the middleware chain
  */
 function errorHandler(err, req, res, next) {
-    console.error('[ERROR]', err?.stack || err);
+    logger.error({
+        err,
+        url: req.url,
+        method: req.method,
+        user: req.user?.id
+    }, '[ERROR] Unhandled exception occurred');
 
     // Handle specific error types
     if (err.code === 'SIGNUP_DISABLED') {

@@ -4,6 +4,7 @@ const { Server } = require('socket.io');
 const jwt = require('jsonwebtoken');
 const config = require('../config');
 const { getCorsOrigins } = require('../config/cors');
+const { logger } = require('../utils');
 
 // Import socket handlers
 const chatSocket = require('./chat.socket');
@@ -51,7 +52,7 @@ function setupSocketIO(server) {
 
             next();
         } catch (err) {
-            console.error('[SOCKET] Auth error:', err.message);
+            logger.error({ err, handshake: socket.handshake }, '[SOCKET] Auth error');
             next(new Error('unauthorized'));
         }
     });
@@ -60,7 +61,7 @@ function setupSocketIO(server) {
         const tid = socket.user.tenant_id;
         const uid = socket.user.id;
 
-        console.log(`[SOCKET] Client connected: ${socket.id} (User: ${uid}, Tenant: ${tid})`);
+        logger.info({ socketId: socket.id, uid, tid }, '[SOCKET] Client connected');
 
         // Join tenant and user rooms for targeted broadcasts
         socket.join(`tenant_${tid}`);
@@ -72,7 +73,7 @@ function setupSocketIO(server) {
         notificationSocket(io, socket);
 
         socket.on('disconnect', () => {
-            console.log(`[SOCKET] Client disconnected: ${socket.id}`);
+            logger.info({ socketId: socket.id, uid, tid }, '[SOCKET] Client disconnected');
         });
     });
 

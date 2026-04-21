@@ -6,6 +6,7 @@
 const WABAClient = require('./waba-client');
 const messageHandler = require('./message-handler');
 const mediaHandler = require('./media-handler');
+const baileysClient = require('./baileys-client');
 
 /**
  * Create a WABA client instance
@@ -35,6 +36,13 @@ module.exports = {
     WABAClient,
     createWABAClient,
     getWABAClientForAccount,
+
+    // Baileys Client
+    startAccount: baileysClient.startAccount,
+    stopAccount: baileysClient.stopAccount,
+    logoutAccount: baileysClient.logoutAccount,
+    getSocket: baileysClient.getSocket,
+    setAccStatus: baileysClient.setAccStatus,
 
     // Message Handler
     parseIncomingMessage: messageHandler.parseIncomingMessage,

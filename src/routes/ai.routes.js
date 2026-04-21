@@ -2,6 +2,7 @@ const express = require('express');
 const router = express.Router();
 const db = require('../database');
 const { authGuard, adminOnly } = require('../middleware/auth');
+const { logger } = require('../utils');
 
 // Helper function to parse time ranges
 function rangeToWindow(range) {
@@ -374,7 +375,7 @@ router.get('/usage/daily', authGuard, adminOnly, async (req, res) => {
             }))
         });
     } catch (err) {
-        console.error('[AI] GET /usage/daily error:', err.message);
+        logger.error({ err }, '[AI] Route error');
         res.status(500).json({ ok: false, error: 'server error' });
     }
 });

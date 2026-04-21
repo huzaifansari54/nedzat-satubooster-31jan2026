@@ -4,6 +4,7 @@
  */
 
 const OpenAI = require('openai');
+const { logger } = require('../../utils');
 
 /**
  * Generate chat completion using OpenAI
@@ -68,7 +69,7 @@ async function generateChatCompletion(apiKey, params) {
             finishReason: response.choices?.[0]?.finish_reason
         };
     } catch (error) {
-        console.error('[AI][CHAT] Completion failed:', error?.message || error);
+        logger.error({ err: error, model, messages: params.messages }, '[AI][CHAT] Completion failed');
         throw error;
     }
 }
@@ -140,7 +141,7 @@ async function generateChatCompletionStream(apiKey, params) {
             finishReason
         };
     } catch (error) {
-        console.error('[AI][CHAT] Streaming failed:', error?.message || error);
+        logger.error({ err: error, model, messages: params.messages }, '[AI][CHAT] Streaming failed');
         throw error;
     }
 }

@@ -9,6 +9,7 @@ module.exports = {
     ...require('./file'),
     ...require('./sleep'),
     ...require('./fetch'),
-    ...require('./validators')
+    ...require('./validators'),
+    logger: require('./logger')
 };
 

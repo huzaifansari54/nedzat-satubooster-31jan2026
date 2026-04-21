@@ -2,6 +2,7 @@ const express = require('express');
 const router = express.Router();
 const db = require('../database');
 const { authGuard, adminOnly } = require('../middleware/auth');
+const { logger } = require('../utils');
 
 /**
  * @route GET /api/tenants
@@ -37,7 +38,7 @@ router.get('/', authGuard, async (req, res) => {
             created_at: tenant.created_at
         });
     } catch (err) {
-        console.error('[TENANTS] GET error:', err.message);
+        logger.error({ err }, '[TENANTS] GET error');
         res.status(500).json({ ok: false, error: 'server error' });
     }
 });
@@ -86,7 +87,7 @@ router.put('/', authGuard, async (req, res) => {
             tenant_name: trimmedName
         });
     } catch (err) {
-        console.error('[TENANTS] PUT error:', err.message);
+        logger.error({ err }, '[TENANTS] PUT error');
         res.status(500).json({ ok: false, error: 'server error' });
     }
 });
@@ -125,7 +126,7 @@ router.get('/stats', authGuard, async (req, res) => {
             }
         });
     } catch (err) {
-        console.error('[TENANTS] GET /stats error:', err.message);
+        logger.error({ err }, '[TENANTS] GET /stats error');
         res.status(500).json({ ok: false, error: 'server error' });
     }
 });
@@ -160,7 +161,7 @@ router.get('/all', authGuard, adminOnly, async (req, res) => {
             tenants: tenantsWithCounts
         });
     } catch (err) {
-        console.error('[TENANTS] GET /all error:', err.message);
+        logger.error({ err }, '[TENANTS] GET /all error');
         res.status(500).json({ ok: false, error: 'server error' });
     }
 });

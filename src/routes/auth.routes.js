@@ -1,9 +1,10 @@
 const express = require('express');
 const router = express.Router();
-const authService = require('../services/auth');
-const { authGuard } = require('../middleware/auth');
 const config = require('../config');
 const crypto = require('crypto');
+const authService = require('../services/auth');
+const { authGuard } = require('../middleware/auth');
+const { logger } = require('../utils');
 
 /**
  * @route POST /api/auth/bootstrap
@@ -32,9 +33,10 @@ router.post('/signup', authGuard, async (req, res) => {
 
     try {
         await authService.registerWithEmail({ email, password, role });
+        logger.info({ email, role, adminId: req.user.id }, '[AUTH] Manual signup successful');
         res.json({ ok: true });
     } catch (err) {
-        console.error('[AUTH] Signup error:', err.message);
+        logger.error({ err, email }, '[AUTH] Signup error');
         res.status(500).json({ ok: false, error: err.message || 'server error' });
     }
 });
@@ -55,13 +57,15 @@ router.post('/login', async (req, res) => {
         // Check if verified
         const isVerified = Number(user.email_verified || 0) === 1;
         if (!isVerified) {
+            logger.warn({ email, userId: user.id }, '[AUTH] Login blocked: Email not verified');
             return res.status(403).json({ ok: false, error: 'email not verified' });
         }
 
         authService.setAuthCookie(res, req, token);
+        logger.info({ userId: user.id, email }, '[AUTH] User logged in');
         res.json({ ok: true });
     } catch (err) {
-        console.error('[AUTH] Login error:', err.message);
+        logger.error({ err, email }, '[AUTH] Login error');
         res.status(401).json({ ok: false, error: err.message || 'invalid credentials' });
     }
 });
@@ -77,9 +81,10 @@ router.get('/google/start', (req, res) => {
 
         const redirectUri = `${config.publicBaseUrl}/api/auth/google/callback`;
         const url = authService.getGoogleAuthUrl(redirectUri, state);
+        logger.info('[AUTH] Starting Google OAuth flow');
         res.redirect(url);
     } catch (err) {
-        console.error('[AUTH] Google start error:', err.message);
+        logger.error({ err }, '[AUTH] Google start error');
         res.status(500).send('Google OAuth configuration error');
     }
 });
@@ -91,12 +96,16 @@ router.get('/google/start', (req, res) => {
 router.get('/google/callback', async (req, res) => {
     try {
         const { code, state, error } = req.query || {};
-        if (error) return res.redirect('/login.html?oauth_error=google');
+        if (error) {
+            logger.warn({ error }, '[AUTH] Google callback error from Meta');
+            return res.redirect('/login.html?oauth_error=google');
+        }
 
         const expected = req.cookies?.oauth_state_google;
         res.clearCookie('oauth_state_google', { path: '/' });
 
         if (!code || !state || !expected || String(state) !== String(expected)) {
+            logger.warn('[AUTH] Google state mismatch or missing parameters');
             return res.redirect('/login.html?oauth_error=google_state');
         }
 
@@ -105,9 +114,10 @@ router.get('/google/callback', async (req, res) => {
         const { user, token } = await authService.findOrCreateGoogleUser(googleUser);
 
         authService.setAuthCookie(res, req, token);
+        logger.info({ userId: user.id }, '[AUTH] Google login successful');
         res.redirect('/?r=' + Date.now());
     } catch (err) {
-        console.error('[AUTH] Google callback error:', err.message);
+        logger.error({ err }, '[AUTH] Google callback exception');
         const errorType = err.code === 'SIGNUP_DISABLED' ? 'signup_disabled' : 'google_fail';
         res.redirect(`/login.html?oauth_error=${errorType}`);
     }
@@ -137,9 +147,10 @@ router.get('/apple/start', (req, res) => {
             nonce
         });
 
+        logger.info('[AUTH] Starting Apple OAuth flow');
         res.redirect(`https://appleid.apple.com/auth/authorize?${qs.toString()}`);
     } catch (err) {
-        console.error('[AUTH] Apple start error:', err.message);
+        logger.error({ err }, '[AUTH] Apple start error');
         res.status(500).send('Apple OAuth configuration error');
     }
 });
@@ -159,6 +170,7 @@ const handleAppleCallback = async (req, res) => {
         res.clearCookie('oauth_nonce_apple', { path: '/' });
 
         if (!code || !state || !expected || state !== String(expected)) {
+            logger.warn('[AUTH] Apple state mismatch or missing parameters');
             return res.redirect('/login.html?oauth_error=apple_state');
         }
 
@@ -178,9 +190,10 @@ const handleAppleCallback = async (req, res) => {
         const { user, token } = await authService.findOrCreateAppleUser(userInfo, userForm);
 
         authService.setAuthCookie(res, req, token);
+        logger.info({ userId: user.id }, '[AUTH] Apple login successful');
         res.redirect('/?r=' + Date.now());
     } catch (err) {
-        console.error('[AUTH] Apple callback error:', err.message);
+        logger.error({ err }, '[AUTH] Apple callback error');
         const errorType = err.code === 'SIGNUP_DISABLED' ? 'signup_disabled' : 'apple_fail';
         res.redirect(`/login.html?oauth_error=${errorType}`);
     }
@@ -223,9 +236,10 @@ router.get('/verify', async (req, res) => {
 
     try {
         await authService.verifyEmailToken(token);
+        logger.info({ token }, '[AUTH] Email verified successfully');
         res.redirect('/?verified=1');
     } catch (err) {
-        console.error('[AUTH] Verify error:', err.message);
+        logger.error({ err, token }, '[AUTH] Verify error');
         res.status(400).send('Invalid or expired token');
     }
 });
@@ -240,12 +254,13 @@ router.post('/resend_verify', async (req, res) => {
 
     try {
         const result = await authService.resendVerificationEmail(email);
+        logger.info({ email }, '[AUTH] Verification email resent');
         res.json(result);
     } catch (err) {
         if (err.code === 'cooldown') {
             return res.status(429).json({ ok: false, error: 'cooldown', retry_in: err.retry_in });
         }
-        console.error('[AUTH] Resend verify error:', err.message);
+        logger.error({ err, email }, '[AUTH] Resend verify error');
         res.status(500).json({ ok: false, error: 'server error' });
     }
 });
@@ -283,9 +298,10 @@ router.post('/reset_password', async (req, res) => {
 
     try {
         await authService.resetPassword({ token, password });
+        logger.info({ token }, '[AUTH] Password reset successful');
         res.json({ ok: true });
     } catch (err) {
-        console.error('[AUTH] Reset password error:', err.message);
+        logger.error({ err, token }, '[AUTH] Reset password error');
         res.status(400).json({ ok: false, error: err.message || 'invalid or expired token' });
     }
 });
@@ -305,6 +321,7 @@ router.post('/register_public', async (req, res) => {
 
         // Set auth cookie
         authService.setAuthCookie(res, req, token);
+        logger.info({ userId: user.id, email }, '[AUTH] Public registration successful');
 
         if (emailVerified) {
             return res.json({ ok: true, auto_verified: true });
@@ -314,7 +331,7 @@ router.post('/register_public', async (req, res) => {
         try {
             await authService.sendVerificationEmail(email);
         } catch (mailErr) {
-            console.warn('[AUTH] Registration verification email failed:', mailErr.message);
+            logger.warn({ err: mailErr, email }, '[AUTH] Registration verification email failed');
         }
 
         res.json({ ok: true });
@@ -325,7 +342,7 @@ router.post('/register_public', async (req, res) => {
         if (err.message === 'Email already registered') {
             return res.status(409).json({ ok: false, error: 'email already exists' });
         }
-        console.error('[AUTH] Public registration error:', err.message);
+        logger.error({ err, email }, '[AUTH] Public registration error');
         res.status(500).json({ ok: false, error: 'server error' });
     }
 });

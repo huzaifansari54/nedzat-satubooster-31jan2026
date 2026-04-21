@@ -3,6 +3,7 @@ const router = express.Router();
 const db = require('../database');
 const { authGuard, adminOnly } = require('../middleware/auth');
 const crypto = require('crypto');
+const { logger } = require('../utils');
 
 /**
  * Generate a secure API key
@@ -28,7 +29,7 @@ router.get('/', authGuard, async (req, res) => {
 
         res.json({ ok: true, keys });
     } catch (err) {
-        console.error('[APIKEYS] GET error:', err.message);
+        logger.error({ err }, '[APIKEYS] GET error');
         res.status(500).json({ ok: false, error: 'server error' });
     }
 });
@@ -55,7 +56,7 @@ router.post('/', authGuard, async (req, res) => {
             label: label || ''
         });
     } catch (err) {
-        console.error('[APIKEYS] POST error:', err.message);
+        logger.error({ err }, '[APIKEYS] POST error');
         res.status(500).json({ ok: false, error: 'server error' });
     }
 });
@@ -90,7 +91,7 @@ router.put('/:id', authGuard, async (req, res) => {
 
         res.json({ ok: true, id, label });
     } catch (err) {
-        console.error('[APIKEYS] PUT error:', err.message);
+        logger.error({ err, keyId: req.params.id }, '[APIKEYS] PUT error');
         res.status(500).json({ ok: false, error: 'server error' });
     }
 });
@@ -120,7 +121,7 @@ router.delete('/:id', authGuard, async (req, res) => {
 
         res.json({ ok: true });
     } catch (err) {
-        console.error('[APIKEYS] DELETE error:', err.message);
+        logger.error({ err, keyId: req.params.id }, '[APIKEYS] DELETE error');
         res.status(500).json({ ok: false, error: 'server error' });
     }
 });
@@ -157,7 +158,7 @@ router.post('/:id/regenerate', authGuard, async (req, res) => {
             label: existing.label
         });
     } catch (err) {
-        console.error('[APIKEYS] REGENERATE error:', err.message);
+        logger.error({ err, keyId: req.params.id }, '[APIKEYS] REGENERATE error');
         res.status(500).json({ ok: false, error: 'server error' });
     }
 });

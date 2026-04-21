@@ -2,6 +2,7 @@ const express = require('express');
 const router = express.Router();
 const db = require('../database');
 const { authGuard } = require('../middleware/auth');
+const { logger } = require('../utils');
 
 // Helper functions (would normally be in a service, but keeping implementation simple)
 async function ensureOwnAccountOrHistory(req, accId) {
@@ -427,7 +428,7 @@ router.delete('/:acc_id/:jid', authGuard, async (req, res) => {
                 await db.run('ROLLBACK');
             } catch (_) { }
         }
-        console.error('[CONTACTS] DELETE error:', err.message);
+        logger.error({ err }, '[CONTACTS] DELETE error');
         res.status(500).json({ ok: false, error: err.message });
     }
 });

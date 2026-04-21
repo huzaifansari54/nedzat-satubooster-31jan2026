@@ -2,6 +2,7 @@ const express = require('express');
 const router = express.Router();
 const db = require('../database');
 const { authGuard, adminOnly } = require('../middleware/auth');
+const { logger } = require('../utils');
 const satuCoin = require('../services/satu-coin');
 
 // ===================================================================
@@ -395,7 +396,7 @@ router.post('/check-funds', authGuard, async (req, res) => {
             pricePerLead: result.price
         });
     } catch (err) {
-        console.error('[SATU-COIN] POST check-funds error:', err.message);
+        logger.error({ err }, '[SATU-COIN] Route error');
 
         if (err.code === 'SATU_NO_FUNDS') {
             return res.json({

@@ -2,6 +2,7 @@ const express = require('express');
 const router = express.Router();
 const db = require('../database');
 const { authGuard } = require('../middleware/auth');
+const { logger } = require('../utils');
 const multer = require('multer');
 const path = require('path');
 const fs = require('fs');
@@ -28,7 +29,7 @@ const upload = multer({
     storage,
     limits: { fileSize: 100 * 1024 * 1024 }, // 100MB
     fileFilter: (req, file, cb) => {
-        const allowed = /\\.(jpg|jpeg|png|gif|webp|mp4|mp3|ogg|webm|pdf|doc|docx|xls|xlsx|zip|txt)$/i;
+        const allowed = /\.(jpg|jpeg|png|gif|webp|mp4|mp3|ogg|webm|pdf|doc|docx|xls|xlsx|zip|txt)$/i;
         if (allowed.test(path.extname(file.originalname))) {
             cb(null, true);
         } else {
@@ -60,7 +61,7 @@ function normalizeDirectJid(jid) {
     if (!jid) return '';
     jid = String(jid).trim();
     if (jid.endsWith('@s.whatsapp.net') || jid.endsWith('@lid')) return jid;
-    const digits = jid.replace(/\\D/g, '');
+    const digits = jid.replace(/\D/g, '');
     if (!digits) return '';
     return digits + '@s.whatsapp.net';
 }
@@ -74,7 +75,7 @@ function normalizeTgJid(jid) {
 
 function toPublicMediaPath(file) {
     if (!file) return '';
-    file = String(file).replace(/^\\/ / g, '');
+    file = String(file).replace(/^\/+/g, '');
     return '/' + file;
 }
 
@@ -167,7 +168,7 @@ router.get('/history', authGuard, async (req, res) => {
 
         res.json({ ok: true, messages: rows });
     } catch (err) {
-        console.error('[MESSAGES] GET /history error:', err.message);
+        logger.error({ err, path: '/history' }, '[MESSAGES] GET history error');
         res.status(500).json({ ok: false, error: err.message });
     }
 });
@@ -220,7 +221,7 @@ router.post('/send', authGuard, async (req, res) => {
         });
 
     } catch (err) {
-        console.error('[MESSAGES] POST /send error:', err.message);
+        logger.error({ err, path: '/send' }, '[MESSAGES] POST send error');
         res.status(500).json({ ok: false, error: err.message });
     }
 });
@@ -261,7 +262,7 @@ router.post('/upload', authGuard, upload.single('file'), (req, res) => {
         });
 
     } catch (err) {
-        console.error('[MESSAGES] POST /upload error:', err.message);
+        logger.error({ err, path: '/upload' }, '[MESSAGES] POST upload error');
         res.status(400).json({ ok: false, error: err.message });
     }
 });
@@ -289,7 +290,7 @@ router.delete('/upload/:filename', authGuard, async (req, res) => {
         res.json({ ok: true, message: 'File deleted successfully' });
 
     } catch (err) {
-        console.error('[MESSAGES] DELETE /upload error:', err.message);
+        logger.error({ err, path: '/upload/:filename' }, '[MESSAGES] DELETE upload error');
         res.status(400).json({ ok: false, error: err.message });
     }
 });
@@ -338,7 +339,7 @@ router.get('/stats', authGuard, async (req, res) => {
             }
         });
     } catch (err) {
-        console.error('[MESSAGES] GET /stats error:', err.message);
+        logger.error({ err, path: '/stats' }, '[MESSAGES] Route error');
         res.status(500).json({ ok: false, error: 'server error' });
     }
 });

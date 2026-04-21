@@ -1,6 +1,7 @@
 // src/sockets/emitters.js — Shared Socket Emitters
 // -------------------------------------------------
 const { getIO } = require('./index');
+const { logger } = require('../utils');
 
 /**
  * Emit 'newchat' event to a tenant
@@ -10,7 +11,7 @@ function emitNewChat(tenantId, data) {
         const io = getIO();
         io.to(`tenant_${tenantId}`).emit('newchat', data);
     } catch (err) {
-        console.error('[SOCKET][EMIT] newchat failed:', err.message);
+        logger.error({ err, tenantId }, '[SOCKET][EMIT] newchat failed');
     }
 }
 
@@ -22,7 +23,7 @@ function emitReactionUpdate(tenantId, data) {
         const io = getIO();
         io.to(`tenant_${tenantId}`).emit('reaction:update', data);
     } catch (err) {
-        console.error('[SOCKET][EMIT] reaction:update failed:', err.message);
+        logger.error({ err, tenantId }, '[SOCKET][EMIT] reaction:update failed');
     }
 }
 
@@ -34,7 +35,7 @@ function emitAccountStatus(tenantId, data) {
         const io = getIO();
         io.to(`tenant_${tenantId}`).emit('acc:status', data);
     } catch (err) {
-        console.error('[SOCKET][EMIT] acc:status failed:', err.message);
+        logger.error({ err, tenantId }, '[SOCKET][EMIT] acc:status failed');
     }
 }
 
@@ -46,7 +47,7 @@ function emitAccountUpdate(tenantId, data) {
         const io = getIO();
         io.to(`tenant_${tenantId}`).emit('acc:update', data);
     } catch (err) {
-        console.error('[SOCKET][EMIT] acc:update failed:', err.message);
+        logger.error({ err, tenantId }, '[SOCKET][EMIT] acc:update failed');
     }
 }
 
@@ -58,7 +59,7 @@ function emitAccountList(tenantId, data) {
         const io = getIO();
         io.to(`tenant_${tenantId}`).emit('acc:list', data);
     } catch (err) {
-        console.error('[SOCKET][EMIT] acc:list failed:', err.message);
+        logger.error({ err, tenantId }, '[SOCKET][EMIT] acc:list failed');
     }
 }
 
@@ -70,7 +71,7 @@ function emitAccountQR(tenantId, data) {
         const io = getIO();
         io.to(`tenant_${tenantId}`).emit('acc:qr', data);
     } catch (err) {
-        console.error('[SOCKET][EMIT] acc:qr failed:', err.message);
+        logger.error({ err, tenantId }, '[SOCKET][EMIT] acc:qr failed');
     }
 }
 
@@ -82,7 +83,7 @@ function emitTypingStatus(tenantId, data) {
         const io = getIO();
         io.to(`tenant_${tenantId}`).emit('ui:typing', data);
     } catch (err) {
-        console.error('[SOCKET][EMIT] ui:typing failed:', err.message);
+        logger.error({ err, tenantId }, '[SOCKET][EMIT] ui:typing failed');
     }
 }
 
@@ -94,7 +95,7 @@ function emitUserNotification(userId, data) {
         const io = getIO();
         io.to(`user_${userId}`).emit('notification', data);
     } catch (err) {
-        console.error('[SOCKET][EMIT] user notification failed:', err.message);
+        logger.error({ err, userId }, '[SOCKET][EMIT] user notification failed');
     }
 }
 
@@ -106,7 +107,7 @@ function emitAdminNotification(userId, data) {
         const io = getIO();
         io.to(`user_${userId}`).emit('notify:admin', data);
     } catch (err) {
-        console.error('[SOCKET][EMIT] admin notification failed:', err.message);
+        logger.error({ err, userId }, '[SOCKET][EMIT] admin notification failed');
     }
 }
 

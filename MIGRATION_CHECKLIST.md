@@ -70,12 +70,15 @@ Track your progress as you refactor from `index.js` to the new modular structure
 - [x] Extract password reset to `src/services/auth/password-reset.js`
 - [x] Test all auth flows
 
-### WhatsApp Services ✅ COMPLETED (Feb 6, 2026)
+### WhatsApp Services ✅ COMPLETED (Feb 16, 2026)
 - [x] Move `waba.js` to `src/services/whatsapp/waba-client.js`
-- [x] Extract message handler to `src/services/whatsapp/message-handler.js`
+- [x] Extract Baileys logic to `src/services/whatsapp/baileys-client.js`
+- [x] Extract message handler to `src/services/whatsapp/message-handler.js` (WABA)
+- [x] Extract Baileys message handler to `src/services/whatsapp/baileys-handler.js`
 - [x] Extract media handler to `src/services/whatsapp/media-handler.js`
 - [x] Create main export `src/services/whatsapp/index.js`
-- [ ] Test WhatsApp functionality (TODO: Integration testing)
+- [x] Implement JID/phone helpers in `src/services/whatsapp/helpers.js`
+- [x] Test WhatsApp functionality (Integration testing)
 
 ### Instagram Services ✅ COMPLETED (Feb 7, 2026)
 - [x] Extract Instagram webhook to `src/services/instagram/webhook.js`
@@ -144,7 +147,7 @@ Track your progress as you refactor from `index.js` to the new modular structure
 - [x] Create `src/routes/settings.routes.js` (Feb 12, 2026)
 - [x] Create `src/routes/apikeys.routes.js` (Feb 12, 2026)
 - [x] Create `src/routes/tenants.routes.js` (Feb 12, 2026)
-- [x] Create `src/routes/accounts.routes.js` (Feb 11, 2026)
+- [x] Create `src/routes/accounts.routes.js` (Feb 11, 2026) - Added start/logout (Feb 16)
 - [x] Create `src/routes/contacts.routes.js` (Feb 12, 2026)
 - [x] Create `src/routes/messages.routes.js` (Feb 12, 2026)
 - [x] Create `src/routes/campaigns.routes.js` (Feb 14, 2026)

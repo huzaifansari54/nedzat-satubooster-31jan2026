@@ -4,6 +4,7 @@ const db = require('../database');
 const { authGuard } = require('../middleware/auth');
 const path = require('path');
 const fs = require('fs');
+const { logger } = require('../utils');
 
 // Feature flags - would normally come from a config
 const FEATURES = {
@@ -38,7 +39,7 @@ router.get('/files', authGuard, requireFeature(FEATURES.KB), async (req, res) =>
             files: rows
         });
     } catch (err) {
-        console.error('[KNOWLEDGE] GET /files error:', err.message);
+        logger.error({ err }, '[KNOWLEDGE] GET /files error');
         res.status(500).json({ ok: false, error: 'server error' });
     }
 });
@@ -79,7 +80,7 @@ router.get('/files/:id', authGuard, async (req, res) => {
             }
         });
     } catch (err) {
-        console.error('[KNOWLEDGE] GET /files/:id error:', err.message);
+        logger.error({ err, fileId: req.params.id }, '[KNOWLEDGE] GET /files/:id error');
         res.status(500).json({ ok: false, error: 'server error' });
     }
 });
@@ -135,7 +136,7 @@ router.get('/files/:id/download', authGuard, async (req, res) => {
 
         return res.download(abs, niceName);
     } catch (err) {
-        console.error('[KNOWLEDGE] download error:', err.message);
+        logger.error({ err, fileId: req.params.id }, '[KNOWLEDGE] download error');
         return res.status(500).send('server_error');
     }
 });
@@ -181,7 +182,7 @@ router.post('/ingest', authGuard, requireFeature(FEATURES.KB), async (req, res) 
         });
 
     } catch (err) {
-        console.error('[KNOWLEDGE] POST /ingest error:', err.message);
+        logger.error({ err }, '[KNOWLEDGE] POST /ingest error');
         res.status(500).json({ ok: false, error: err.message });
     }
 });
@@ -216,7 +217,7 @@ router.delete('/files/:id', authGuard, async (req, res) => {
 
         res.json({ ok: true, message: 'File deleted successfully' });
     } catch (err) {
-        console.error('[KNOWLEDGE] DELETE /files/:id error:', err.message);
+        logger.error({ err, fileId: req.params.id }, '[KNOWLEDGE] DELETE /files/:id error');
         res.status(500).json({ ok: false, error: 'server error' });
     }
 });
@@ -250,7 +251,7 @@ router.get('/search', authGuard, requireFeature(FEATURES.KB), async (req, res) =
         });
 
     } catch (err) {
-        console.error('[KNOWLEDGE] GET /search error:', err.message);
+        logger.error({ err }, '[KNOWLEDGE] GET /search error');
         res.status(500).json({ ok: false, error: 'server error' });
     }
 });
@@ -285,7 +286,7 @@ router.get('/stats', authGuard, async (req, res) => {
             }
         });
     } catch (err) {
-        console.error('[KNOWLEDGE] GET /stats error:', err.message);
+        logger.error({ err }, '[KNOWLEDGE] GET /stats error');
         res.status(500).json({ ok: false, error: 'server error' });
     }
 });

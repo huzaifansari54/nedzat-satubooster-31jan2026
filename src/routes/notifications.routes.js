@@ -2,6 +2,7 @@ const express = require('express');
 const router = express.Router();
 const db = require('../database');
 const { authGuard } = require('../middleware/auth');
+const { logger } = require('../utils');
 
 /**
  * @route GET /api/notify/pending
@@ -44,7 +45,7 @@ router.get('/pending', authGuard, async (req, res) => {
             }
         });
     } catch (err) {
-        console.error('[NOTIFY] /pending error:', err.message);
+        logger.error({ err }, '[NOTIFY] /pending error');
         res.status(500).json({ ok: false, error: 'server error' });
     }
 });
@@ -78,7 +79,7 @@ router.post('/seen', authGuard, async (req, res) => {
         );
         res.json({ ok: true });
     } catch (err) {
-        console.error('[NOTIFY] /seen error:', err.message);
+        logger.error({ err }, '[NOTIFY] /seen error');
         res.status(500).json({ ok: false, error: 'server error' });
     }
 });

@@ -3,6 +3,7 @@ const router = express.Router();
 const db = require('../database');
 const { authGuard, adminOnly } = require('../middleware/auth');
 const analytics = require('../services/analytics');
+const { logger } = require('../utils');
 
 // ===================================================================
 // ANALYTICS ROUTES
@@ -33,7 +34,7 @@ router.post('/track', async (req, res) => {
 
         res.json({ ok: true });
     } catch (err) {
-        console.error('[ANALYTICS] Track error:', err.message);
+        logger.error({ err }, '[ANALYTICS] Track error');
         res.status(500).json({ ok: false, error: 'server error' });
     }
 });
@@ -87,7 +88,7 @@ router.get('/sessions', authGuard, adminOnly, async (req, res) => {
             end
         });
     } catch (err) {
-        console.error('[ANALYTICS] GET sessions error:', err.message);
+        logger.error({ err }, '[ANALYTICS] GET sessions error');
         res.status(500).json({ ok: false, error: 'server error' });
     }
 });
@@ -141,7 +142,7 @@ router.get('/events', authGuard, adminOnly, async (req, res) => {
             end
         });
     } catch (err) {
-        console.error('[ANALYTICS] GET events error:', err.message);
+        logger.error({ err }, '[ANALYTICS] GET events error');
         res.status(500).json({ ok: false, error: 'server error' });
     }
 });
@@ -252,7 +253,7 @@ router.get('/stats', authGuard, adminOnly, async (req, res) => {
             topPages
         });
     } catch (err) {
-        console.error('[ANALYTICS] GET stats error:', err.message);
+        logger.error({ err }, '[ANALYTICS] GET stats error');
         res.status(500).json({ ok: false, error: 'server error' });
     }
 });
@@ -299,7 +300,7 @@ router.get('/timeline', authGuard, adminOnly, async (req, res) => {
             timeline
         });
     } catch (err) {
-        console.error('[ANALYTICS] GET timeline error:', err.message);
+        logger.error({ err }, '[ANALYTICS] GET timeline error');
         res.status(500).json({ ok: false, error: 'server error' });
     }
 });
@@ -341,7 +342,7 @@ router.get('/session/:sid', authGuard, adminOnly, async (req, res) => {
             events
         });
     } catch (err) {
-        console.error('[ANALYTICS] GET session/:sid error:', err.message);
+        logger.error({ err, sid: req.params.sid }, '[ANALYTICS] GET session/:sid error');
         res.status(500).json({ ok: false, error: 'server error' });
     }
 });
@@ -387,7 +388,7 @@ router.get('/visitor/:aid', authGuard, adminOnly, async (req, res) => {
             totalEvents: eventsCount.total || 0
         });
     } catch (err) {
-        console.error('[ANALYTICS] GET visitor/:aid error:', err.message);
+        logger.error({ err, aid: req.params.aid }, '[ANALYTICS] GET visitor/:aid error');
         res.status(500).json({ ok: false, error: 'server error' });
     }
 });
@@ -441,7 +442,7 @@ router.get('/realtime', authGuard, adminOnly, async (req, res) => {
             asOf: now
         });
     } catch (err) {
-        console.error('[ANALYTICS] GET realtime error:', err.message);
+        logger.error({ err }, '[ANALYTICS] GET realtime error');
         res.status(500).json({ ok: false, error: 'server error' });
     }
 });
@@ -476,7 +477,7 @@ router.delete('/cleanup', authGuard, adminOnly, async (req, res) => {
             cutoffDate: new Date(cutoff).toISOString()
         });
     } catch (err) {
-        console.error('[ANALYTICS] DELETE cleanup error:', err.message);
+        logger.error({ err }, '[ANALYTICS] DELETE cleanup error');
         res.status(500).json({ ok: false, error: 'server error' });
     }
 });

@@ -1,12 +1,17 @@
 {
   "name": "saas-nedzat-main",
   "version": "1.0.0",
+<<<<<<< HEAD
   "main": "server.js",
   "scripts": {
     "start": "node server.js",
     "dev": "nodemon server.js",
     "dev:ui": "vite",
     "build:ui": "vite build",
+=======
+  "main": "index.js",
+  "scripts": {
+>>>>>>> c9c6c147db0f5ef4a06c22cccab17b89e2ef1296
     "test": "echo \"Error: no test specified\" && exit 1"
   },
   "keywords": [],
@@ -14,7 +19,12 @@
   "license": "ISC",
   "dependencies": {
     "@tailwindcss/vite": "^4.1.17",
+<<<<<<< HEAD
     "@whiskeysockets/baileys": "^7.0.0-rc.9",
+=======
+    "@whiskeysockets/baileys": "^6.7.9",
+    "@wppconnect-team/wppconnect": "^1.38.0",
+>>>>>>> c9c6c147db0f5ef4a06c22cccab17b89e2ef1296
     "adm-zip": "^0.5.16",
     "axios": "^1.13.2",
     "bcryptjs": "^3.0.3",
@@ -30,7 +40,11 @@
     "globby": "^15.0.0",
     "google-auth-library": "^10.5.0",
     "iconv-lite": "^0.7.0",
+<<<<<<< HEAD
     "jose": "^4.15.5",
+=======
+    "jose": "^4.15.9",
+>>>>>>> c9c6c147db0f5ef4a06c22cccab17b89e2ef1296
     "jsonwebtoken": "^9.0.2",
     "libsignal": "^2.0.1",
     "mammoth": "^1.11.0",
@@ -46,7 +60,10 @@
     "pdf-parse": "^1.1.4",
     "pdf-poppler": "^0.2.1",
     "pino": "^10.0.0",
+<<<<<<< HEAD
     "qrcode": "^1.5.4",
+=======
+>>>>>>> c9c6c147db0f5ef4a06c22cccab17b89e2ef1296
     "sharp": "^0.34.4",
     "socket.io": "^4.8.1",
     "sqlite3": "^5.1.7",
@@ -58,6 +75,7 @@
     "xlsx": "^0.18.5",
     "xml2js": "^0.6.2"
   },
+<<<<<<< HEAD
   "description": "",
   "devDependencies": {
     "@vitejs/plugin-vue": "^5.2.4",
@@ -65,3 +83,7 @@
     "vite": "^6.4.1"
   }
 }
+=======
+  "description": ""
+}
+>>>>>>> c9c6c147db0f5ef4a06c22cccab17b89e2ef1296

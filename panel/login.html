@@ -1,0 +1,1326 @@
+<!doctype html>
+<html lang="kk">
+<head>
+  <meta charset="utf-8" />
+  <title>NeDzat — кіру / тіркелу</title>
+  <!-- Disable zoom on mobile -->
+  <meta name="viewport" content="width=device-width, initial-scale=1, maximum-scale=1, user-scalable=no, viewport-fit=cover" />
+  <script src="https://cdn.tailwindcss.com"></script>
+  <script> tailwind.config = { theme: { extend: { colors: { primary: { DEFAULT: "#246bf3", 50:  "#eef4ff", 100: "#d9e6ff", 200: "#b3cdff", 300: "#8db4ff", 400: "#5f92ff", 500: "#246bf3", 600: "#1f5fde", 700: "#1b53c5", 800: "#1747ad", 900: "#133c96" } }, boxShadow: { soft: "0 10px 30px rgba(2, 6, 23, 0.08)" } } } } </script>
+  <style>
+   html, body { height: 100%; }
+   body { overflow: hidden; }
+  .noise { background-image: radial-gradient(rgba(255,255,255,0.08) 1px, transparent 1px); background-size: 14px 14px; }
+  .marquee { position: relative; overflow: hidden; mask-image: linear-gradient(to right, transparent 0%, black 10%, black 90%, transparent 100%); -webkit-mask-image: linear-gradient(to right, transparent 0%, black 10%, black 90%, transparent 100%); }
+  .marquee__track { display: flex; width: max-content; animation: marquee 18s linear infinite; gap: 12px; align-items: center; }
+  .marquee__track:hover { animation-play-state: paused; }
+  @keyframes marquee { 0% { transform: translateX(0); } 100% { transform: translateX(-50%); } }
+  .lang-dd { position: relative; }
+  .lang-btn { display: inline-flex; align-items: center; gap: 10px; padding: 10px 12px; border-radius: 999px; border: 1px solid rgba(255,255,255,0.20); background: rgba(255,255,255,0.14); color: rgba(255,255,255,0.95); backdrop-filter: blur(10px); -webkit-backdrop-filter: blur(10px); }
+  .lang-btn:focus { outline: none; box-shadow: 0 0 0 4px rgba(36,107,243,0.22); }
+  .lang-menu { position: absolute; top: calc(100% + 10px); right: 0; width: 190px; border-radius: 18px; border: 1px solid rgba(255,255,255,0.18); background: rgba(15,23,42,0.70); backdrop-filter: blur(14px); -webkit-backdrop-filter: blur(14px); overflow: auto; max-height: 60vh; box-shadow: 0 20px 60px rgba(2,6,23,0.35); z-index: 9999; }
+  .lang-item { width: 100%; text-align: left; padding: 10px 12px; color: rgba(255,255,255,0.92); font-size: 14px; display: flex; align-items: center; justify-content: space-between; gap: 10px; }
+  .lang-item:hover { background: rgba(255,255,255,0.10); }
+  .lang-item.active { background: rgba(36,107,243,0.35); }
+  .logo-card { display: inline-flex; align-items: center; justify-content: center; width: 140px; height: 52px; padding: 10px 14px; border-radius: 999px; border: 1px solid rgba(255,255,255,0.18); background: rgba(255,255,255,0.10); backdrop-filter: blur(10px); -webkit-backdrop-filter: blur(10px); flex: none; }
+  .logo-img { width: 100%; height: 100%; object-fit: contain; filter: drop-shadow(0 6px 16px rgba(0,0,0,0.18)); opacity: 0.98; }
+  .eye-btn { position: absolute; right: 10px; top: 50%; transform: translateY(-50%); width: 38px; height: 38px; border-radius: 14px; display: inline-flex; align-items: center; justify-content: center; color: rgba(100,116,139,1); }
+  .eye-btn:hover { background: rgba(148,163,184,0.18); }
+  .eye-btn:focus { outline: none; box-shadow: 0 0 0 4px rgba(36,107,243,0.18); }
+  .eye-icon { width: 18px; height: 18px; }
+  .cookie-overlay { position: fixed; inset: 0; background: rgba(2,6,23,0.35); backdrop-filter: blur(6px); -webkit-backdrop-filter: blur(6px); z-index: 10000; display: none; }
+  .cookie-card { position: absolute; left: 16px; right: 16px; bottom: 16px; max-width: 720px; margin: 0 auto; border-radius: 24px; border: 1px solid rgba(226,232,240,0.9); background: rgba(255,255,255,0.92); box-shadow: 0 20px 60px rgba(2,6,23,0.22); padding: 16px; }
+  .cookie-title { font-weight: 700; color: #0f172a; font-size: 14px; }
+  .cookie-text { margin-top: 6px; color: rgba(51,65,85,0.95); font-size: 13px; line-height: 1.4; }
+  .cookie-actions { margin-top: 12px; display: flex; gap: 10px; flex-wrap: wrap; align-items: center; justify-content: flex-end; }
+  .cookie-link { color: #246bf3; text-decoration: none; }
+  .cookie-link:hover { text-decoration: underline; }
+  .cookie-btn { border-radius: 16px; padding: 10px 14px; font-size: 13px; font-weight: 700; border: 1px solid rgba(226,232,240,1); background: white; color: #0f172a; }
+  .cookie-btn:hover { background: rgba(241,245,249,1); }
+  .cookie-btn.primary { background: #246bf3; border-color: #246bf3; color: white; }
+  .cookie-btn.primary:hover { background: #1f5fde; }
+  .snow-canvas{ position: fixed; inset: 0; width: 100%; height: 100%; pointer-events: none; z-index: 20; }
+  </style>
+</head>
+
+<body class="min-h-screen bg-slate-50">
+<canvas id="snowCanvas" class="snow-canvas"></canvas>
+  <div class="min-h-screen flex items-stretch">
+    <!-- LEFT -->
+    <aside class="hidden lg:flex w-1/2 relative overflow-hidden">
+      <div class="absolute inset-0 bg-gradient-to-br from-primary-600 via-primary-500 to-indigo-500"></div>
+      <div class="absolute inset-0 noise opacity-40"></div>
+      <div class="absolute -top-24 -left-24 w-72 h-72 rounded-full bg-white/15 blur-2xl"></div>
+      <div class="absolute -bottom-32 -right-32 w-96 h-96 rounded-full bg-black/10 blur-3xl"></div>
+
+      <div class="relative z-10 flex flex-col justify-between p-10 w-full">
+        <div class="space-y-2 text-white">
+          <div class="inline-flex items-center gap-2 bg-white/10 border border-white/15 rounded-2xl px-4 py-2">
+            <span class="w-2.5 h-2.5 rounded-full bg-white"></span>
+            <span class="text-sm font-medium">SatuBooster 🧊 NeDzat</span>
+          </div>
+
+          <h1 class="text-3xl font-semibold leading-tight" data-i18n="left_title">
+            Басқару панеліне кіру
+          </h1>
+          <p class="text-white/80 max-w-md" data-i18n="left_desc">
+            WhatsApp аккаунттары, AI-агент және токендерді ыңғайлы басқарыңыз.
+          </p>
+        </div>
+
+        <div class="mt-8">
+          <div class="bg-white/10 border border-white/15 rounded-3xl p-6 backdrop-blur-sm shadow-soft">
+            <svg viewBox="0 0 900 420" class="w-full h-auto">
+              <rect x="40" y="50" rx="26" ry="26" width="820" height="320" fill="rgba(255,255,255,0.18)" stroke="rgba(255,255,255,0.25)" />
+              <rect x="70" y="85" rx="18" ry="18" width="520" height="250" fill="rgba(255,255,255,0.14)" />
+              <rect x="610" y="85" rx="18" ry="18" width="220" height="120" fill="rgba(255,255,255,0.14)" />
+              <rect x="610" y="215" rx="18" ry="18" width="220" height="120" fill="rgba(255,255,255,0.14)" />
+              <path d="M110 300 L110 170 L180 240 L250 190 L320 220 L390 150 L460 205 L530 135"
+                    fill="none" stroke="rgba(255,255,255,0.9)" stroke-width="6" stroke-linecap="round" stroke-linejoin="round" />
+              <circle cx="110" cy="170" r="8" fill="rgba(255,255,255,0.95)"/>
+              <circle cx="180" cy="240" r="8" fill="rgba(255,255,255,0.95)"/>
+              <circle cx="250" cy="190" r="8" fill="rgba(255,255,255,0.95)"/>
+              <circle cx="320" cy="220" r="8" fill="rgba(255,255,255,0.95)"/>
+              <circle cx="390" cy="150" r="8" fill="rgba(255,255,255,0.95)"/>
+              <circle cx="460" cy="205" r="8" fill="rgba(255,255,255,0.95)"/>
+              <circle cx="530" cy="135" r="8" fill="rgba(255,255,255,0.95)"/>
+            </svg>
+
+            <div class="mt-6">
+              <div class="text-xs text-white/75 mb-2" data-i18n="trusted_by">Бізбен жұмыс істейтін компаниялар</div>
+              <div class="marquee">
+                <div class="marquee__track" id="logoTrack"></div>
+              </div>
+            </div>
+          </div>
+        </div>
+
+        <div class="text-white/70 text-xs mt-8">
+          © NeDzat • <span data-i18n="safe_login">Copyright</span> • <span data-i18n="logs">2026</span>
+        </div>
+      </div>
+    </aside>
+
+    <!-- RIGHT -->
+    <main class="flex-1 flex items-center justify-center px-4 sm:px-6 lg:px-10 py-10">
+      <div class="w-full max-w-md">
+
+        <!-- Mobile header -->
+        <div class="lg:hidden mb-6 rounded-3xl shadow-soft border border-slate-200 relative overflow-visible">
+          <div class="relative p-6 bg-gradient-to-br from-primary-600 via-primary-500 to-indigo-500 rounded-3xl overflow-hidden">
+            <div class="absolute inset-0 noise opacity-40"></div>
+
+            <div class="relative z-10 flex items-start justify-between gap-3">
+              <div>
+                <div class="inline-flex items-center gap-2 bg-white/10 border border-white/15 rounded-2xl px-4 py-2 text-white">
+                  <span class="w-2.5 h-2.5 rounded-full bg-white"></span>
+                  <span class="text-sm font-medium">NeDzat</span>
+                </div>
+                <h1 class="text-white text-xl font-semibold mt-3" data-i18n="mobile_title">Кіру / тіркелу</h1>
+                <p class="text-white/80 text-sm mt-1" data-i18n="mobile_desc">Кез келген экранға бейімделген</p>
+              </div>
+
+              <div class="lang-dd">
+                <button type="button" id="langBtnMobile" class="lang-btn">
+                  <span id="langLabelMobile">Қазақша</span>
+                  <svg width="18" height="18" viewBox="0 0 24 24" fill="none" class="opacity-95">
+                    <path d="M6 9l6 6 6-6" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"/>
+                  </svg>
+                </button>
+
+                <div id="langMenuMobile" class="lang-menu hidden">
+                  <button type="button" class="lang-item" data-lang="kk">Қазақша <span class="opacity-80">🇰🇿</span></button>
+                  <button type="button" class="lang-item" data-lang="ru">Русский <span class="opacity-80">🇷🇺</span></button>
+                  <button type="button" class="lang-item" data-lang="en">English <span class="opacity-80">🇺🇸</span></button>
+                </div>
+              </div>
+
+            </div>
+          </div>
+        </div>
+
+        <div class="bg-white rounded-3xl shadow-soft border border-slate-200 p-6 sm:p-7">
+          <div class="hidden lg:flex items-start justify-between gap-3 mb-5">
+            <div>
+              <h2 class="text-xl font-semibold text-slate-900" data-i18n="welcome">Қош келдіңіз</h2>
+              <p class="text-sm text-slate-500 mt-1" data-i18n="subtitle">Кіріңіз немесе жаңа аккаунт жасаңыз</p>
+            </div>
+
+            <div class="lang-dd">
+              <button type="button" id="langBtnDesktop"
+                      class="inline-flex items-center gap-2 border border-slate-200 rounded-2xl px-3 py-2 text-sm text-slate-700 outline-none bg-white hover:bg-slate-50 focus:ring-4 focus:ring-primary/15 focus:border-primary">
+                <span id="langLabelDesktop">Қазақша</span>
+                <svg width="18" height="18" viewBox="0 0 24 24" fill="none" class="text-slate-500">
+                  <path d="M6 9l6 6 6-6" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"/>
+                </svg>
+              </button>
+
+              <div id="langMenuDesktop" class="lang-menu hidden"
+                   style="background: rgba(255,255,255,0.95); border-color: rgba(15,23,42,0.10);">
+                <button type="button" class="lang-item text-slate-800" data-lang="kk">Қазақша <span class="opacity-70">🇰🇿</span></button>
+                <button type="button" class="lang-item text-slate-800" data-lang="ru">Русский <span class="opacity-70">🇷🇺</span></button>
+                <button type="button" class="lang-item text-slate-800" data-lang="en">English <span class="opacity-70">🇺🇸</span></button>
+              </div>
+            </div>
+          </div>
+
+          <div id="authTabsRow" class="flex gap-2 mb-4">
+            <button id="tab-login"
+                    class="flex-1 py-2.5 rounded-2xl text-sm font-medium border bg-primary text-white border-primary"
+                    data-i18n="tab_login">Кіру</button>
+
+            <button id="tab-register"
+                    class="flex-1 py-2.5 rounded-2xl text-sm font-medium border bg-white text-slate-700 border-slate-200 hover:bg-slate-50"
+                    data-i18n="tab_register">Тіркелу</button>
+          </div>
+
+          <div id="alert" class="hidden text-sm rounded-2xl px-4 py-3 border mb-4"></div>
+
+          <!-- LOGIN -->
+          <div id="panel-login" class="space-y-3">
+            <div>
+              <label class="block text-xs text-slate-500 mb-1" data-i18n="email">Email</label>
+              <input id="login-email" type="email" autocomplete="email"
+                     class="w-full border border-slate-200 rounded-2xl px-4 py-3 text-sm outline-none focus:ring-4 focus:ring-primary/15 focus:border-primary"
+                     placeholder="you@example.com" data-i18n-ph="ph_email">
+            </div>
+
+            <div>
+              <label class="block text-xs text-slate-500 mb-1" data-i18n="password">Құпиясөз</label>
+              <div class="relative">
+                <input id="login-pass" type="password" autocomplete="current-password"
+                       class="w-full border border-slate-200 rounded-2xl px-4 py-3 pr-12 text-sm outline-none focus:ring-4 focus:ring-primary/15 focus:border-primary"
+                       placeholder="••••••••">
+                <button type="button" id="toggle-login-pass" class="eye-btn" aria-label="Toggle password">
+                  <svg class="eye-icon" viewBox="0 0 24 24" fill="none">
+                    <path d="M2 12s3.5-7 10-7 10 7 10 7-3.5 7-10 7-10-7-10-7Z" stroke="currentColor" stroke-width="2"/>
+                    <circle cx="12" cy="12" r="3" stroke="currentColor" stroke-width="2"/>
+                    <path id="eyeSlashLogin" d="M4 4l16 16" stroke="currentColor" stroke-width="2" stroke-linecap="round" class="hidden"/>
+                  </svg>
+                </button>
+              </div>
+            </div>
+
+            <div class="flex items-center justify-end">
+              <button id="forgot-btn" type="button"
+                      class="text-xs text-primary font-semibold hover:underline"
+                      data-i18n="forgot_link">Забыли пароль?</button>
+            </div>
+
+            <div id="resendBox" class="hidden mt-2 text-xs text-slate-600">
+              <button type="button" id="resendVerifyBtn" class="text-primary font-semibold hover:underline" data-i18n="resend_verify">
+                Не пришло письмо? Отправить ещё раз
+              </button>
+              <span id="resendStatus" class="ml-2 text-slate-500"></span>
+            </div>
+
+            <button id="login-btn"
+                    class="w-full mt-1 py-3 rounded-2xl bg-primary text-white text-sm font-semibold hover:bg-primary-600 active:scale-[0.99] transition"
+                    data-i18n="btn_login">Кіру</button>
+            
+            <div class="relative py-2">
+              <div class="h-px bg-slate-200"></div>
+              <div class="absolute inset-0 flex items-center justify-center">
+                <span class="px-3 text-xs text-slate-500 bg-white" data-i18n="oauth_or">или</span>
+              </div>
+            </div>
+
+            <a href="/api/auth/google/start"
+              class="w-full py-3 rounded-2xl border border-slate-200 bg-white text-slate-700 font-semibold hover:bg-slate-50 transition flex items-center justify-center gap-2">
+                <img src="assets/img/google.png" alt="Google" class="w-5 h-5 object-contain">
+              <span data-i18n="btn_google">Войти через Google</span>
+            </a>
+
+            <a href="/api/auth/apple/start"
+              class="w-full py-3 rounded-2xl border border-slate-200 bg-white text-slate-700 font-semibold hover:bg-slate-50 transition flex items-center justify-center gap-2">
+                <img src="assets/img/apple.png" alt="Apple" class="w-5 h-5 object-contain">
+              <span data-i18n="btn_apple">Войти через Apple</span>
+            </a>
+
+          </div>
+
+          <!-- REGISTER -->
+          <div id="panel-register" class="hidden space-y-3">
+            <div>
+              <label class="block text-xs text-slate-500 mb-1" data-i18n="email_lower">Email (тек lowercase)</label>
+              <input id="reg-email" type="text" inputmode="email" autocomplete="email"
+                     class="w-full border border-slate-200 rounded-2xl px-4 py-3 text-sm outline-none focus:ring-4 focus:ring-primary/15 focus:border-primary"
+                     placeholder="you@example.com" data-i18n-ph="ph_email">
+              <div id="reg-email-hint"
+                   class="hidden text-xs text-amber-700 mt-2 bg-amber-50 border border-amber-200 rounded-2xl px-3 py-2"
+                   data-i18n="email_caps_hint">Email ішінде бас әріп болмайды — автоматты түрде lowercase жасалды.</div>
+            </div>
+
+            <div>
+              <label class="block text-xs text-slate-500 mb-1" data-i18n="pass_min">Құпиясөз (кемі 8 таңба)</label>
+              <div class="relative">
+                <input id="reg-pass" type="password" autocomplete="new-password"
+                       class="w-full border border-slate-200 rounded-2xl px-4 py-3 pr-12 text-sm outline-none focus:ring-4 focus:ring-primary/15 focus:border-primary"
+                       placeholder="••••••••">
+                <button type="button" id="toggle-reg-pass" class="eye-btn" aria-label="Toggle password">
+                  <svg class="eye-icon" viewBox="0 0 24 24" fill="none">
+                    <path d="M2 12s3.5-7 10-7 10 7 10 7-3.5 7-10 7-10-7-10-7Z" stroke="currentColor" stroke-width="2"/>
+                    <circle cx="12" cy="12" r="3" stroke="currentColor" stroke-width="2"/>
+                    <path id="eyeSlashReg1" d="M4 4l16 16" stroke="currentColor" stroke-width="2" stroke-linecap="round" class="hidden"/>
+                  </svg>
+                </button>
+              </div>
+            </div>
+
+            <div>
+              <label class="block text-xs text-slate-500 mb-1" data-i18n="pass_repeat">Құпиясөзді қайталаңыз</label>
+              <div class="relative">
+                <input id="reg-pass2" type="password" autocomplete="new-password"
+                       class="w-full border border-slate-200 rounded-2xl px-4 py-3 pr-12 text-sm outline-none focus:ring-4 focus:ring-primary/15 focus:border-primary"
+                       placeholder="••••••••">
+                <button type="button" id="toggle-reg-pass2" class="eye-btn" aria-label="Toggle password">
+                  <svg class="eye-icon" viewBox="0 0 24 24" fill="none">
+                    <path d="M2 12s3.5-7 10-7 10 7 10 7-3.5 7-10 7-10-7-10-7Z" stroke="currentColor" stroke-width="2"/>
+                    <circle cx="12" cy="12" r="3" stroke="currentColor" stroke-width="2"/>
+                    <path id="eyeSlashReg2" d="M4 4l16 16" stroke="currentColor" stroke-width="2" stroke-linecap="round" class="hidden"/>
+                  </svg>
+                </button>
+              </div>
+            </div>
+
+            <button id="reg-btn"
+                    class="w-full mt-1 py-3 rounded-2xl bg-slate-900 text-white text-sm font-semibold hover:bg-slate-800 active:scale-[0.99] transition"
+                    data-i18n="btn_register">Тіркелу</button>
+
+            <div class="relative py-2">
+              <div class="h-px bg-slate-200"></div>
+              <div class="absolute inset-0 flex items-center justify-center">
+                <span class="px-3 text-xs text-slate-500 bg-white" data-i18n="oauth_or">или</span>
+              </div>
+            </div>
+
+            <a href="/api/auth/google/start"
+              class="w-full py-3 rounded-2xl border border-slate-200 bg-white text-slate-700 font-semibold hover:bg-slate-50 transition flex items-center justify-center gap-2">
+                <img src="assets/img/google.png" alt="Google" class="w-5 h-5 object-contain">
+              <span data-i18n="btn_google">Войти через Google</span>
+            </a>
+
+            <a href="/api/auth/apple/start"
+              class="w-full py-3 rounded-2xl border border-slate-200 bg-white text-slate-700 font-semibold hover:bg-slate-50 transition flex items-center justify-center gap-2">
+                <img src="assets/img/apple.png" alt="Apple" class="w-5 h-5 object-contain">
+              <span data-i18n="btn_apple">Войти через Apple</span>
+            </a>
+                    
+          </div>
+
+          <!-- RESET -->
+          <div id="panel-reset" class="hidden space-y-3">
+            <div class="text-sm font-semibold text-slate-900" data-i18n="reset_title">Сброс пароля</div>
+            <div class="text-xs text-slate-500" data-i18n="reset_desc">Придумайте новый пароль.</div>
+
+            <div>
+              <label class="block text-xs text-slate-500 mb-1" data-i18n="reset_newpass">Новый пароль</label>
+              <input id="reset-pass1" type="password" autocomplete="new-password"
+                    class="w-full border border-slate-200 rounded-2xl px-4 py-3 text-sm outline-none focus:ring-4 focus:ring-primary/15 focus:border-primary"
+                    placeholder="••••••••">
+            </div>
+
+            <div>
+              <label class="block text-xs text-slate-500 mb-1" data-i18n="reset_repeat">Повторите пароль</label>
+              <input id="reset-pass2" type="password" autocomplete="new-password"
+                    class="w-full border border-slate-200 rounded-2xl px-4 py-3 text-sm outline-none focus:ring-4 focus:ring-primary/15 focus:border-primary"
+                    placeholder="••••••••">
+            </div>
+
+            <button id="reset-btn"
+                    class="w-full mt-1 py-3 rounded-2xl bg-primary text-white text-sm font-semibold hover:bg-primary-600 active:scale-[0.99] transition"
+                    data-i18n="reset_btn">Сохранить новый пароль</button>
+
+            <button id="reset-back" type="button"
+                    class="w-full py-3 rounded-2xl bg-white text-slate-700 border border-slate-200 hover:bg-slate-50 text-sm font-semibold"
+                    data-i18n="reset_back">Назад ко входу</button>
+          </div>
+
+        </div>
+      </div>
+    </main>
+  </div>
+
+  <!-- Forgot password modal -->
+  <div id="forgotModal" class="fixed inset-0 z-[60] hidden items-center justify-center px-4">
+    <div class="absolute inset-0 bg-black/40"></div>
+
+    <div class="relative w-full max-w-sm bg-white rounded-3xl shadow-soft border border-slate-200 p-5">
+      <div class="flex items-start justify-between gap-2">
+        <div>
+          <div class="text-sm font-semibold text-slate-900" data-i18n="forgot_title">Сброс пароля</div>
+          <div class="text-xs text-slate-500 mt-1" data-i18n="forgot_desc">Введите email — отправим ссылку.</div>
+        </div>
+
+        <button id="forgot-close" type="button"
+                class="h-9 w-9 rounded-2xl border border-slate-200 hover:bg-slate-50 flex items-center justify-center"
+                aria-label="Close">✕</button>
+      </div>
+
+      <div class="mt-4 space-y-3">
+        <input id="forgot-email" type="email" autocomplete="email"
+              class="w-full border border-slate-200 rounded-2xl px-4 py-3 text-sm outline-none focus:ring-4 focus:ring-primary/15 focus:border-primary"
+              placeholder="you@example.com">
+
+        <button id="forgot-send"
+                class="w-full py-3 rounded-2xl bg-slate-900 text-white text-sm font-semibold hover:bg-slate-800 active:scale-[0.99] transition"
+                data-i18n="forgot_send">Отправить ссылку</button>
+
+        <button id="forgot-cancel" type="button"
+                class="w-full py-3 rounded-2xl bg-white text-slate-700 border border-slate-200 hover:bg-slate-50 text-sm font-semibold"
+                data-i18n="forgot_cancel">Отмена</button>
+
+        <div id="forgot-status" class="text-xs text-slate-500"></div>
+      </div>
+    </div>
+  </div>
+
+  <!-- Cookie consent (first visit) -->
+  <div id="cookieOverlay" class="cookie-overlay" role="dialog" aria-modal="true" aria-labelledby="cookieTitle">
+    <div class="cookie-card">
+      <div class="cookie-title" id="cookieTitle" data-i18n="cookie_title">Cookie келісімі</div>
+      <div class="cookie-text">
+        <span data-i18n="cookie_text">Біз сайттың дұрыс жұмыс істеуі және қызметті жақсарту үшін cookie қолданамыз. </span>
+        <a class="cookie-link"
+           href="https://satubooster.kz/imagesanddocs-main/privacy-policy.pdf"
+           target="_blank" rel="noopener"
+           data-i18n="cookie_link">Құпиялық саясаты (PDF)</a>
+      </div>
+
+      <div class="cookie-actions">
+        <button type="button" id="cookieDecline" class="cookie-btn" data-i18n="cookie_decline">Қажет емес</button>
+        <button type="button" id="cookieAccept" class="cookie-btn primary" data-i18n="cookie_accept">Қабылдау</button>
+      </div>
+    </div>
+  </div>
+
+  <script>
+    const $ = (id) => document.getElementById(id);
+
+    // Prevent pinch zoom / double tap zoom (fallback)
+    document.addEventListener('gesturestart', (e)=> e.preventDefault());
+    document.addEventListener('dblclick', (e)=> e.preventDefault());
+
+    const I18N = {
+      kk: {
+        left_title: "Басқару панеліне кіру",
+        left_desc: "WhatsApp аккаунттары, AI-агент және токендерді ыңғайлы басқарыңыз.",
+        trusted_by: "Бізбен жұмыс істейтін компаниялар",
+        safe_login: "Copyright",
+        logs: "2025",
+        mobile_title: "Кіру / тіркелу",
+        mobile_desc: "Кез келген экранға бейімделген",
+        welcome: "Қош келдіңіз",
+        subtitle: "Кіріңіз немесе жаңа аккаунт жасаңыз",
+        tab_login: "Кіру",
+        tab_register: "Тіркелу",
+        email: "Email",
+        password: "Құпиясөз",
+        btn_login: "Кіру",
+        oauth_or: "немесе",
+        btn_google: "Google арқылы кіру",
+        btn_apple: "Apple арқылы кіру",
+        oauth_error_signup_disabled: "Тіркелу өшірулі (open_signup disabled).",
+        oauth_error_generic: "OAuth арқылы кіру сәтсіз аяқталды. Қайта көріңіз.",
+        email_lower: "Email (тек lowercase)",
+        email_caps_hint: "Email ішінде бас әріп болмайды — автоматты түрде lowercase жасалды.",
+        pass_min: "Құпиясөз (кемі 8 таңба)",
+        pass_repeat: "Құпиясөзді қайталаңыз",
+        btn_register: "Тіркелу",
+        ph_email: "you@example.com",
+        a_enter_email_pass: "Email және құпиясөзді енгізіңіз.",
+        a_invalid_email: "Email форматы қате.",
+        a_fill_all: "Барлық өрісті толтырыңыз.",
+        a_pass_min: "Құпиясөз кемі 8 таңба болуы керек.",
+        a_pass_mismatch: "Құпиясөздер сәйкес емес.",
+        a_timeout: "Сервер уақытында жауап бермеді. Қайта көріңіз.",
+        a_no_connection: "Сервермен байланыс жоқ. Интернет/домен/проксиді тексеріңіз.",
+        a_invalid_credentials: "Email немесе құпиясөз қате.",
+        a_email_exists: "Мұндай email бар аккаунт бар.",
+        a_signup_disabled: "Тіркелу админ тарапынан өшірулі.",
+        a_server_error: "Сервер қатесі. Кейінірек көріңіз.",
+        a_auth_error: "Авторизация қатесі.",
+        a_register_failed: "Тіркелу мүмкін болмады.",
+        cookie_title: "Cookie келісімі",
+        cookie_text: "Біз сайттың дұрыс жұмыс істеуі және қызметті жақсарту үшін cookie қолданамыз. ",
+        cookie_link: "Құпиялық саясаты (PDF)",
+        cookie_accept: "Қабылдау",
+        cookie_decline: "Қажет емес",
+        a_email_not_verified: "Пошта расталмаған. Поштаңызды тексеріп, сілтемені басыңыз.",
+        resend_verify: "Хат келмеді ме? Қайта жіберу",
+        resend_sent: "Хат қайта жіберілді. «Спам»-ды да тексеріңіз.",
+        resend_cooldown: "Күтіңіз: {s} сек.",
+        resend_failed: "Жіберу мүмкін болмады. Кейінірек қайталаңыз.",
+        forgot_link: "Құпиясөзді ұмыттыңыз ба?",
+        forgot_title: "Құпиясөзді қалпына келтіру",
+        forgot_desc: "Email енгізіңіз — біз құпиясөзді қалпына келтіру сілтемесін жібереміз.",
+        forgot_send: "Жіберу",
+        forgot_cancel: "Бас тарту"
+      },
+      ru: {
+        left_title: "Вход в панель управления",
+        left_desc: "Управляй аккаунтами WhatsApp, AI-агентом, рассылками и токенами — быстро и удобно.",
+        trusted_by: "С нами работают",
+        safe_login: "Copyright",
+        logs: "2025",
+        mobile_title: "Вход / регистрация",
+        mobile_desc: "Адаптировано под любой экран",
+        welcome: "Добро пожаловать",
+        subtitle: "Войдите или создайте новый аккаунт",
+        tab_login: "Вход",
+        tab_register: "Регистрация",
+        email: "Email",
+        password: "Пароль",
+        btn_login: "Войти",
+        oauth_or: "или",
+        btn_google: "Войти через Google",
+        btn_apple: "Войти через Apple",
+        oauth_error_signup_disabled: "Регистрация отключена (open_signup disabled).",
+        oauth_error_generic: "Не удалось войти через OAuth. Попробуйте ещё раз.",
+        email_lower: "Email (только lowercase)",
+        email_caps_hint: "В email нельзя использовать заглавные буквы — я автоматически перевёл в lowercase.",
+        pass_min: "Пароль (минимум 8 символов)",
+        pass_repeat: "Повторите пароль",
+        btn_register: "Зарегистрироваться",
+        ph_email: "you@example.com",
+        a_enter_email_pass: "Введите email и пароль.",
+        a_invalid_email: "Неверный формат email.",
+        a_fill_all: "Заполните все поля.",
+        a_pass_min: "Пароль должен быть минимум 8 символов.",
+        a_pass_mismatch: "Пароли не совпадают.",
+        a_timeout: "Сервер не ответил вовремя. Попробуйте ещё раз.",
+        a_no_connection: "Нет связи с сервером. Проверь интернет/домен/прокси.",
+        a_invalid_credentials: "Неверный email или пароль.",
+        a_email_exists: "Аккаунт с таким email уже существует.",
+        a_signup_disabled: "Регистрация сейчас отключена администратором.",
+        a_server_error: "Ошибка сервера. Попробуйте позже.",
+        a_auth_error: "Ошибка авторизации.",
+        a_register_failed: "Не удалось зарегистрироваться.",
+        cookie_title: "Согласие на cookie",
+        cookie_text: "Мы используем cookie для корректной работы сайта и улучшения сервиса. ",
+        cookie_link: "Политика конфиденциальности (PDF)",
+        cookie_accept: "Принять",
+        cookie_decline: "Не нужно",
+        a_email_not_verified: "Почта не подтверждена. Проверьте письмо и перейдите по ссылке.",
+        resend_verify: "Не пришло письмо? Отправить ещё раз",
+        resend_sent: "Письмо отправлено повторно. Проверьте «Спам».",
+        resend_cooldown: "Подождите: {s} сек.",
+        resend_failed: "Не получилось отправить. Попробуйте позже.",
+        forgot_link: "Забыли пароль?",
+        forgot_title: "Сброс пароля",
+        forgot_desc: "Введите email — мы отправим ссылку для сброса пароля.",
+        forgot_send: "Отправить",
+        forgot_cancel: "Отмена"
+      },
+      en: {
+        left_title: "Sign in to the admin panel",
+        left_desc: "Manage WhatsApp accounts, AI agent, campaigns, and tokens — fast and convenient.",
+        trusted_by: "Trusted by",
+        safe_login: "Copyright",
+        logs: "2025",
+        mobile_title: "Sign in / Sign up",
+        mobile_desc: "Responsive on any screen",
+        welcome: "Welcome back",
+        subtitle: "Sign in or create a new account",
+        tab_login: "Sign in",
+        tab_register: "Sign up",
+        email: "Email",
+        password: "Password",
+        btn_login: "Sign in",
+        oauth_or: "or",
+        btn_google: "Continue with Google",
+        btn_apple: "Continue with Apple",
+        oauth_error_signup_disabled: "Sign-up is disabled (open_signup disabled).",
+        oauth_error_generic: "OAuth sign-in failed. Please try again.",
+        email_lower: "Email (lowercase only)",
+        email_caps_hint: "Uppercase letters aren’t allowed in email — converted to lowercase.",
+        pass_min: "Password (min 8 chars)",
+        pass_repeat: "Repeat password",
+        btn_register: "Create account",
+        ph_email: "you@example.com",
+        a_enter_email_pass: "Enter email and password.",
+        a_invalid_email: "Invalid email format.",
+        a_fill_all: "Please fill in all fields.",
+        a_pass_min: "Password must be at least 8 characters.",
+        a_pass_mismatch: "Passwords do not match.",
+        a_timeout: "Server timeout. Please try again.",
+        a_no_connection: "No connection to server. Check internet/domain/proxy.",
+        a_invalid_credentials: "Invalid email or password.",
+        a_email_exists: "An account with this email already exists.",
+        a_signup_disabled: "Sign up is disabled by admin.",
+        a_server_error: "Server error. Try again later.",
+        a_auth_error: "Authentication error.",
+        a_register_failed: "Registration failed.",
+        cookie_title: "Cookie consent",
+        cookie_text: "We use cookies to ensure the site works properly and to improve the service. ",
+        cookie_link: "Privacy policy (PDF)",
+        cookie_accept: "Accept",
+        cookie_decline: "No thanks",
+        a_email_not_verified: "Email is not verified. Please check your inbox and click the link.",
+        resend_verify: "Didn't get the email? Send again",
+        resend_sent: "Verification email sent again. Also check Spam.",
+        resend_cooldown: "Please wait: {s} sec.",
+        resend_failed: "Could not send. Please try later.",
+        forgot_link: "Forgot password?",
+        forgot_title: "Reset password",
+        forgot_desc: "Enter your email — we’ll send a reset link.",
+        forgot_send: "Send",
+        forgot_cancel: "Cancel"
+      }
+    };
+    
+    let LANG = localStorage.getItem("nedzat_lang") || "kk";
+
+    function t(key){
+      return (I18N[LANG] && I18N[LANG][key]) || (I18N.kk[key] || key);
+    }
+
+    function applyLang(){
+      document.documentElement.lang = LANG;
+      document.querySelectorAll("[data-i18n]").forEach(el=>{
+        el.textContent = t(el.getAttribute("data-i18n"));
+      });
+      document.querySelectorAll("[data-i18n-ph]").forEach(el=>{
+        el.setAttribute("placeholder", t(el.getAttribute("data-i18n-ph")));
+      });
+    }
+
+    function langName(code){
+      return ({ kk:"Қазақша", ru:"Русский", en:"English" })[code] || "Қазақша";
+    }
+
+    function closeLangMenus(){
+      $("langMenuDesktop")?.classList.add("hidden");
+      $("langMenuMobile")?.classList.add("hidden");
+    }
+
+    function syncLangUI(){
+      if ($("langLabelDesktop")) $("langLabelDesktop").textContent = langName(LANG);
+      if ($("langLabelMobile")) $("langLabelMobile").textContent = langName(LANG);
+      document.querySelectorAll("#langMenuDesktop .lang-item, #langMenuMobile .lang-item").forEach(btn=>{
+        btn.classList.toggle("active", btn.getAttribute("data-lang") === LANG);
+      });
+    }
+
+    function setLang(newLang){
+      LANG = newLang;
+      localStorage.setItem("nedzat_lang", LANG);
+      applyLang();
+      syncLangUI();
+      closeLangMenus();
+    }
+
+    const COOKIE_KEY = "nedzat_cookie_consent_v1";
+
+    function showCookie(){
+      const overlay = $("cookieOverlay");
+      if(!overlay) return;
+      const saved = localStorage.getItem(COOKIE_KEY);
+      if(saved) return;
+      overlay.style.display = "block";
+    }
+
+    function hideCookie(){
+      const overlay = $("cookieOverlay");
+      if(!overlay) return;
+      overlay.style.display = "none";
+    }
+
+    function setCookieChoice(value){
+      localStorage.setItem(COOKIE_KEY, value);
+      hideCookie();
+    }
+
+    function setupLangDropdown(btnId, menuId){
+      const btn = $(btnId);
+      const menu = $(menuId);
+      if(!btn || !menu) return;
+
+      btn.addEventListener("click", (e)=>{
+        e.stopPropagation();
+        const isOpen = !menu.classList.contains("hidden");
+        closeLangMenus();
+        if(!isOpen) menu.classList.remove("hidden");
+      });
+
+      menu.querySelectorAll(".lang-item").forEach(item=>{
+        item.addEventListener("click", (e)=>{
+          e.stopPropagation();
+          setLang(item.getAttribute("data-lang"));
+        });
+      });
+    }
+
+    document.addEventListener("click", ()=>closeLangMenus());
+    document.addEventListener("keydown", (e)=>{ if(e.key === "Escape") closeLangMenus(); });
+
+    function showAlert(kind, text){
+      const box = $('alert');
+      box.classList.remove('hidden');
+      box.className = 'text-sm rounded-2xl px-4 py-3 border mb-4';
+      if(kind === 'error'){
+        box.classList.add('text-red-700','bg-red-50','border-red-200');
+      } else if(kind === 'ok'){
+        box.classList.add('text-emerald-700','bg-emerald-50','border-emerald-200');
+      } else {
+        box.classList.add('text-slate-700','bg-slate-50','border-slate-200');
+      }
+      box.textContent = text || '';
+    }
+    function hideAlert(){ $('alert').classList.add('hidden'); }
+
+    function setBusy(isBusy){
+      const btns = [$('login-btn'), $('reg-btn'), $('tab-login'), $('tab-register')].filter(Boolean);
+      btns.forEach(b => b.disabled = !!isBusy);
+
+      if(isBusy){
+        $('login-btn').textContent = (LANG === "en" ? "Signing in…" : (LANG === "ru" ? "Входим…" : "Кіру…"));
+        $('reg-btn').textContent   = (LANG === "en" ? "Creating…" : (LANG === "ru" ? "Создаём…" : "Жасалуда…"));
+      } else {
+        $('login-btn').textContent = t("btn_login");
+        $('reg-btn').textContent   = t("btn_register");
+      }
+      btns.forEach(b => b.classList.toggle('opacity-70', !!isBusy));
+    }
+
+    let pendingVerifyEmail = "";
+
+    function showResendBox(show, email){
+      const box = $("resendBox");
+      if(!box) return;
+      if (email) pendingVerifyEmail = email;
+      box.classList.toggle("hidden", !show);
+      if(!show){
+        pendingVerifyEmail = "";
+        $("resendStatus") && ($("resendStatus").textContent = "");
+      }
+    }
+
+    async function doResendVerify(){
+      hideAlert();
+
+      const email = normalizeEmail(pendingVerifyEmail || $("login-email")?.value || "");
+      if(!email || !isValidLowerEmail(email)){
+        showAlert("error", t("a_invalid_email"));
+        return;
+      }
+
+      const st = $("resendStatus");
+      if(st) st.textContent = (LANG==="ru" ? "Отправляем…" : (LANG==="en" ? "Sending…" : "Жіберілуде…"));
+
+      try{
+        const r = await fetchJSON("/api/auth/resend_verify", {
+          method: "POST",
+          body: { email }
+        });
+
+        if (st) st.textContent = "";
+        showAlert("ok", t("resend_sent"));
+      }catch(e){
+        if (st) st.textContent = "";
+
+        const status = e?.httpStatus || 0;
+        const retryIn = e?.data?.retry_in;
+
+        if(status === 429 && retryIn){
+          showAlert("info", t("resend_cooldown").replace("{s}", String(retryIn)));
+          return;
+        }
+        showAlert("error", t("resend_failed"));
+      }
+    }
+
+    async function fetchJSON(url, opt = {}) {
+      const controller = new AbortController();
+      const timeoutMs = opt.timeoutMs || 15000;
+      const tmr = setTimeout(() => controller.abort(), timeoutMs);
+
+      try{
+        const init = {
+          method: opt.method || 'GET',
+          credentials: 'include',
+          signal: controller.signal,
+          headers: opt.headers || {}
+        };
+        if (opt.body) {
+          init.headers['Content-Type'] = 'application/json';
+          init.body = JSON.stringify(opt.body);
+        }
+
+        const r = await fetch(url, init);
+        let data = null;
+        try { data = await r.json(); } catch(_) {}
+
+        if (!r.ok) {
+          const e = new Error((data && data.error) ? data.error : ('HTTP ' + r.status));
+          e.httpStatus = r.status;
+          e.data = data;
+          throw e;
+        }
+        return data;
+      } finally {
+        clearTimeout(tmr);
+      }
+    }
+
+    function normalizeEmail(raw){
+      return String(raw || '').trim().toLowerCase();
+    }
+    function isValidLowerEmail(email){
+      return /^[a-z0-9._%+-]+@[a-z0-9.-]+\.[a-z]{2,}$/.test(email);
+    }
+
+    function mapAuthError(e){
+      const status = e?.httpStatus || 0;
+      const msg = String(e?.message || '').toLowerCase();
+
+      if (e?.name === 'AbortError') return t("a_timeout");
+      if (status === 0) return t("a_no_connection");
+
+      if (msg.includes('invalid credentials')) return t("a_invalid_credentials");
+      if (status === 403 && msg.includes('email not verified')) return (LANG==="ru"
+        ? "Почта не подтверждена. Проверьте письмо и перейдите по ссылке."
+        : (LANG==="en"
+          ? "Email is not verified. Please check your inbox and click the link."
+          : "Пошта расталмаған. Хатты тексеріп, сілтемені басыңыз."
+        )
+      );
+      if (status === 409 || msg.includes('email already exists')) return t("a_email_exists");
+      if (status === 403 && msg.includes('open_signup')) return t("a_signup_disabled");
+      if (status === 400 && msg.includes('email,password required')) return t("a_enter_email_pass");
+
+      if (status >= 500) return t("a_server_error");
+      return (e && e.message) ? ('Error: ' + e.message) : t("a_server_error");
+    }
+
+    function setTab(tab){
+      hideAlert();
+
+      const isReset = (tab === 'reset');
+      const isLogin = (tab === 'login');
+
+      $('panel-login').classList.toggle('hidden', !(isLogin));
+      $('panel-register').classList.toggle('hidden', isLogin || isReset);
+      $('panel-reset').classList.toggle('hidden', !isReset);
+
+      // прячем табы, когда сброс пароля
+      const tabsRow = document.getElementById('authTabsRow');
+      if(tabsRow) tabsRow.classList.toggle('hidden', isReset);
+
+      if(isReset) return;
+
+      $('tab-login').className =
+        'flex-1 py-2.5 rounded-2xl text-sm font-medium border ' +
+        (isLogin ? 'bg-primary text-white border-primary' : 'bg-white text-slate-700 border-slate-200 hover:bg-slate-50');
+
+      $('tab-register').className =
+        'flex-1 py-2.5 rounded-2xl text-sm font-medium border ' +
+        (!isLogin ? 'bg-primary text-white border-primary' : 'bg-white text-slate-700 border-slate-200 hover:bg-slate-50');
+    }
+
+    async function doLogin(){
+      hideAlert();
+      const email = normalizeEmail($('login-email').value);
+      const pass  = $('login-pass').value || '';
+
+      if(!email || !pass){
+        showAlert('error', t("a_enter_email_pass"));
+        return;
+      }
+      if(!isValidLowerEmail(email)){
+        showAlert('error', t("a_invalid_email"));
+        return;
+      }
+
+      setBusy(true);
+      try{
+        const res = await fetchJSON('/api/auth/login', {
+          method: 'POST',
+          body: { email, password: pass }
+        });
+      if(res && res.ok){
+        // куда вести после входа: админ -> satu-admin, обычный -> панель
+        try{
+          const r2 = await fetch('/api/me', { credentials:'include' });
+          if(r2.ok){
+            const d2 = await r2.json();
+            if(d2?.user?.role === 'admin'){
+              location.replace('/public/satu-admin.html?r=' + Date.now());
+              return;
+            }
+          }
+        }catch(_){}
+        location.replace('/?r=' + Date.now());
+        return;
+      }
+        showAlert('error', t("a_auth_error"));
+      }catch(e){
+        console.error('login error', e);
+        showAlert('error', mapAuthError(e));
+
+        const msg = String(e?.message || '').toLowerCase();
+        if ((e?.httpStatus === 403) && msg.includes('email not verified')) {
+          showResendBox(true, email);
+        } else {
+          showResendBox(false);
+        }
+
+      }finally{
+        setBusy(false);
+      }
+    }
+
+    async function doRegister(){
+      hideAlert();
+
+      const email = normalizeEmail($('reg-email').value);
+      const pass  = $('reg-pass').value || '';
+      const pass2 = $('reg-pass2').value || '';
+
+      if(!email || !pass || !pass2){
+        showAlert('error', t("a_fill_all"));
+        return;
+      }
+      if(!isValidLowerEmail(email)){
+        showAlert('error', t("a_invalid_email"));
+        return;
+      }
+      if(pass.length < 8){
+        showAlert('error', t("a_pass_min"));
+        return;
+      }
+      if(pass !== pass2){
+        showAlert('error', t("a_pass_mismatch"));
+        return;
+      }
+
+      setBusy(true);
+      try{
+        const res = await fetchJSON('/api/auth/register_public', {
+          method: 'POST',
+          body: { email, password: pass }
+        });
+
+      if(res && res.ok){
+        if(res.needs_verify){
+          // cookie уже выставлена бэком — открываем панель, там будет окно "Активируйте аккаунт"
+          location.href = '/';
+          return;
+        }
+        // авто-verified домены (deshti/satubooster) — можно сразу в систему
+        location.href = '/';
+        return;
+      }
+        showAlert('error', t("a_register_failed"));
+      }catch(e){
+        console.error('register error', e);
+        showAlert('error', mapAuthError(e));
+      }finally{
+        setBusy(false);
+      }
+    }
+
+    function setupEye(inputId, btnId, slashPathId){
+      const input = $(inputId);
+      const btn = $(btnId);
+      const slash = document.getElementById(slashPathId);
+      if(!input || !btn) return;
+
+      btn.addEventListener("click", ()=>{
+        const isPass = input.type === "password";
+        input.type = isPass ? "text" : "password";
+        if(slash) slash.classList.toggle("hidden", !isPass);
+      });
+    }
+
+    const PARTNER_LOGOS = [
+      { src: "assets/img/partner-1.png", alt: "Partner 1" },
+      { src: "assets/img/partner-2.png", alt: "Partner 2" },
+      { src: "assets/img/partner-3.png", alt: "Partner 3" }
+    ];
+
+    function renderLogos(){
+      const track = $("logoTrack");
+      if(!track) return;
+
+      const one = PARTNER_LOGOS.map(p => `
+        <div class="logo-card">
+          <img class="logo-img" src="${p.src}" alt="${p.alt}" loading="lazy" />
+        </div>
+      `).join("");
+
+      track.innerHTML = one + one;
+    }
+
+        // ===== Winter: falling snow + accumulation =====
+    function initFallingSnow(){
+      const reduce = window.matchMedia && window.matchMedia('(prefers-reduced-motion: reduce)').matches;
+      if(reduce) return;
+
+      const canvas = document.getElementById("snowCanvas");
+      if(!canvas) return;
+      const ctx = canvas.getContext("2d", { alpha: true });
+
+      let w = 0, h = 0, dpr = 1;
+      const flakes = [];
+      const FLAKES = 90;
+
+      function resize(){
+        dpr = Math.max(1, Math.min(2, window.devicePixelRatio || 1));
+        w = Math.floor(window.innerWidth);
+        h = Math.floor(window.innerHeight);
+        canvas.width  = Math.floor(w * dpr);
+        canvas.height = Math.floor(h * dpr);
+        canvas.style.width = w + "px";
+        canvas.style.height = h + "px";
+        ctx.setTransform(dpr, 0, 0, dpr, 0, 0);
+      }
+
+      function rnd(min, max){ return min + Math.random() * (max - min); }
+
+      function spawn(i){
+        flakes[i] = {
+          x: rnd(0, w),
+          y: rnd(-h, 0),
+          r: rnd(1.2, 3.2),
+          vy: rnd(0.8, 2.0),
+          vx: rnd(-0.6, 0.6),
+          a: rnd(0.25, 0.75),
+          wob: rnd(0, Math.PI * 2)
+        };
+      }
+
+      resize();
+      for(let i=0;i<FLAKES;i++) spawn(i);
+
+      let t = 0;
+      let running = true;
+
+      function frame(){
+        if(!running) return;
+
+        ctx.clearRect(0,0,w,h);
+        t += 0.008;
+        const wind = Math.sin(t) * 0.35;
+
+        for(const f of flakes){
+          f.wob += 0.02;
+          f.x += (f.vx + wind + Math.sin(f.wob)*0.18);
+          f.y += f.vy;
+
+          // wrap
+          if(f.y > h + 10){ f.y = -10; f.x = rnd(0, w); }
+          if(f.x < -10) f.x = w + 10;
+          if(f.x > w + 10) f.x = -10;
+
+          ctx.globalAlpha = f.a;
+          ctx.beginPath();
+          ctx.arc(f.x, f.y, f.r, 0, Math.PI*2);
+          ctx.fillStyle = "white";
+          ctx.fill();
+        }
+        ctx.globalAlpha = 1;
+
+        requestAnimationFrame(frame);
+      }
+
+      document.addEventListener("visibilitychange", ()=>{
+        running = !document.hidden;
+        if(running) requestAnimationFrame(frame);
+      });
+
+      window.addEventListener("resize", resize, { passive:true });
+      requestAnimationFrame(frame);
+    }
+
+    function initSnowAccumulation(){
+      // На каких элементах копим снег (можешь дополнять селекторы)
+      const targets = [
+        "#login-btn",
+        "#reg-btn",
+        ".bg-white.rounded-3xl.shadow-soft.border.border-slate-200.p-6", // карточка формы
+        ".lg\\:hidden.mb-6.rounded-3xl.shadow-soft.border.border-slate-200" // мобильный хедер-карта
+      ];
+
+      const els = [];
+      targets.forEach(sel => document.querySelectorAll(sel).forEach(el => els.push(el)));
+
+      // добавим класс и стартовое значение
+      els.forEach(el => {
+        el.classList.add("snow-accum");
+        el.style.setProperty("--snow", "0");
+      });
+
+      // Снег копится со временем, а при hover — быстрее
+      const start = Date.now();
+      function tick(){
+        const sec = (Date.now() - start) / 1000;
+        els.forEach(el=>{
+          const hovered = el.matches(":hover") ? 1 : 0;
+          // базовое накопление: до 1 примерно за 60-90 сек, с ускорением при hover
+          const base = Math.min(1, sec / 75);
+          const boost = hovered ? 0.25 : 0; // +25% пока мышка на элементе
+          const snow = Math.min(1, base + boost);
+          el.style.setProperty("--snow", snow.toFixed(3));
+        });
+        requestAnimationFrame(tick);
+      }
+      requestAnimationFrame(tick);
+    }
+
+    let resetToken = "";
+
+    function openForgot(){
+      const m = document.getElementById('forgotModal');
+      if(!m) return;
+      m.classList.remove('hidden');
+      m.classList.add('flex');
+      $('forgot-status').textContent = '';
+      $('forgot-email').value = normalizeEmail($('login-email')?.value || '');
+      $('forgot-email')?.focus();
+    }
+
+    function closeForgot(){
+      const m = document.getElementById('forgotModal');
+      if(!m) return;
+      m.classList.add('hidden');
+      m.classList.remove('flex');
+    }
+
+    async function doForgot(){
+      const email = normalizeEmail($('forgot-email')?.value || '');
+      if(!email || !isValidLowerEmail(email)){
+        $('forgot-status').textContent = t("a_invalid_email");
+        return;
+      }
+
+      $('forgot-status').textContent = (LANG==="ru" ? "Отправляем…" : (LANG==="en" ? "Sending…" : "Жіберілуде…"));
+
+      try{
+        await fetchJSON('/api/auth/forgot_password', { method:'POST', body:{ email } });
+        closeForgot();
+        showAlert('ok', (LANG==="ru"
+          ? "Если email существует — мы отправили ссылку для сброса. Проверьте Входящие/Спам."
+          : (LANG==="en"
+            ? "If the email exists, we sent a reset link. Check Inbox/Spam."
+            : "Email бар болса — қалпына келтіру сілтемесін жібердік. Inbox/Spam тексеріңіз."
+          )
+        ));
+      }catch(e){
+        const status = e?.httpStatus || 0;
+        if(status === 429 && e?.data?.retry_in){
+          showAlert('info', t("resend_cooldown").replace("{s}", String(e.data.retry_in)));
+          closeForgot();
+          return;
+        }
+        showAlert('error', t("a_server_error"));
+        closeForgot();
+      }
+    }
+
+    async function doResetPassword(){
+      hideAlert();
+
+      const p1 = String($('reset-pass1')?.value || '');
+      const p2 = String($('reset-pass2')?.value || '');
+
+      if(!resetToken){
+        showAlert('error', (LANG==="ru" ? "Токен сброса не найден." : (LANG==="en" ? "Reset token not found." : "Reset токені табылмады.")));
+        return;
+      }
+      if(p1.length < 8){
+        showAlert('error', t("a_pass_min"));
+        return;
+      }
+      if(p1 !== p2){
+        showAlert('error', t("a_pass_mismatch"));
+        return;
+      }
+
+      setBusy(true);
+      try{
+        const r = await fetchJSON('/api/auth/reset_password', {
+          method:'POST',
+          body:{ token: resetToken, password: p1 }
+        });
+
+        if(r?.ok){
+          // очищаем hash, возвращаемся на логин
+          resetToken = "";
+          $('reset-pass1').value = '';
+          $('reset-pass2').value = '';
+          history.replaceState(null, '', location.pathname + location.search);
+          showAlert('ok', (LANG==="ru" ? "Пароль обновлён. Теперь можно войти." : (LANG==="en" ? "Password updated. You can sign in now." : "Құпиясөз жаңартылды. Енді кіре аласыз.")));
+          setTab('login');
+          return;
+        }
+        showAlert('error', t("a_server_error"));
+      }catch(e){
+        const msg = String(e?.message || '').toLowerCase();
+        if(msg.includes('invalid or expired token')){
+          showAlert('error', (LANG==="ru" ? "Ссылка устарела или неверная. Запросите сброс заново." : (LANG==="en" ? "Link is invalid/expired. Request reset again." : "Сілтеме жарамсыз/ескірген. Қайта сұраңыз.")));
+        }else{
+          showAlert('error', t("a_server_error"));
+        }
+      }finally{
+        setBusy(false);
+      }
+    }
+
+    // DOM-ready init (важно!)
+    document.addEventListener("DOMContentLoaded", async ()=>{
+      applyLang();
+      initFallingSnow();
+
+      const qp = new URLSearchParams(location.search);
+      if (qp.get('verified') === '1'){
+        showAlert('ok', (LANG==="ru"
+          ? "Почта подтверждена. Теперь можно войти."
+          : (LANG==="en" ? "Email verified. You can sign in now." : "Пошта расталды. Енді кіре аласыз.")
+        ));
+        setTab('login');
+      }
+
+      const oe = qp.get('oauth_error');
+      if (oe){
+        if (oe === 'signup_disabled') showAlert('error', t('oauth_error_signup_disabled'));
+        else showAlert('error', t('oauth_error_generic'));
+      }
+
+      // reset password via hash: #reset=TOKEN
+      const hm = String(location.hash || '').match(/reset=([^&]+)/i);
+      if(hm && hm[1]){
+        resetToken = decodeURIComponent(hm[1]).trim();
+        setTab('reset');
+      }
+
+      // cookie (now element exists)
+      showCookie();
+      $("cookieAccept")?.addEventListener("click", ()=>setCookieChoice("accepted"));
+      $("cookieDecline")?.addEventListener("click", ()=>setCookieChoice("declined"));
+
+      syncLangUI();
+      setupLangDropdown("langBtnDesktop","langMenuDesktop");
+      setupLangDropdown("langBtnMobile","langMenuMobile");
+
+      setupEye("login-pass","toggle-login-pass","eyeSlashLogin");
+      setupEye("reg-pass","toggle-reg-pass","eyeSlashReg1");
+      setupEye("reg-pass2","toggle-reg-pass2","eyeSlashReg2");
+
+      renderLogos();
+      setTab('login');
+
+      $('tab-login')?.addEventListener('click', ()=>setTab('login'));
+      $('tab-register')?.addEventListener('click', ()=>setTab('register'));
+      $('login-btn')?.addEventListener('click', doLogin);
+
+      $('forgot-btn')?.addEventListener('click', openForgot);
+      $('forgot-close')?.addEventListener('click', closeForgot);
+      $('forgot-cancel')?.addEventListener('click', closeForgot);
+      $('forgot-send')?.addEventListener('click', doForgot);
+
+      $('reset-btn')?.addEventListener('click', doResetPassword);
+      $('reset-back')?.addEventListener('click', ()=>{
+        resetToken = "";
+        history.replaceState(null, '', location.pathname + location.search);
+        setTab('login');
+      });
+
+      $('resendVerifyBtn')?.addEventListener('click', doResendVerify);
+      $('reg-btn')?.addEventListener('click', doRegister);
+
+      $('login-email')?.addEventListener('keydown', (e)=>{
+        if(e.key === 'Enter'){ e.preventDefault(); $('login-pass')?.focus(); }
+      });
+      $('login-pass')?.addEventListener('keydown', (e)=>{
+        if(e.key === 'Enter'){ e.preventDefault(); doLogin(); }
+      });
+
+      $('reg-email')?.addEventListener('keydown', (e)=>{
+        if(e.key === 'Enter'){ e.preventDefault(); $('reg-pass')?.focus(); }
+      });
+      $('reg-pass')?.addEventListener('keydown', (e)=>{
+        if(e.key === 'Enter'){ e.preventDefault(); $('reg-pass2')?.focus(); }
+      });
+      $('reg-pass2')?.addEventListener('keydown', (e)=>{
+        if(e.key === 'Enter'){ e.preventDefault(); doRegister(); }
+      });
+
+      $('reg-email')?.addEventListener('input', ()=>{
+        const raw = $('reg-email').value || '';
+        const lowered = raw.toLowerCase();
+        const hadCaps = raw !== lowered;
+        if(hadCaps) $('reg-email').value = lowered;
+        $('reg-email-hint')?.classList.toggle('hidden', !hadCaps);
+        if(/\s/.test($('reg-email').value)) $('reg-email').value = $('reg-email').value.replace(/\s+/g,'');
+      });
+
+      $('login-email')?.addEventListener('blur', ()=>{
+        $('login-email').value = normalizeEmail($('login-email').value);
+      });
+
+      // already logged in? redirect (401 is OK)
+      try{
+        const r = await fetch('/api/me', { credentials:'include' });
+        if(r.ok){
+          const data = await r.json();
+          if(data && data.user){
+            if(data.user.role === 'admin') location.replace('/public/satu-admin.html?r=' + Date.now());
+            else location.replace('/?r=' + Date.now());
+            return;
+          }
+        }
+      }catch(_){}
+
+      // signup enabled?
+      try{
+        const s = await fetchJSON('/api/auth/open_signup');
+        if(!s?.enabled){
+          $('tab-register').disabled = true;
+          $('tab-register').className =
+            'flex-1 py-2.5 rounded-2xl text-sm font-medium border bg-slate-50 text-slate-400 border-slate-200 cursor-not-allowed';
+          showAlert('info', t("a_signup_disabled"));
+          setTab('login');
+        }
+      }catch(_){}
+    });
+  </script>
+
+<script>
+(()=> {
+  const URL = '/api/analytics/collect';
+
+  function send(payload){
+    const data = Object.assign({
+      type: 'pageview',
+      path: location.pathname + location.search + location.hash,
+      ref: document.referrer || ''
+    }, payload || {});
+
+    try{
+      if (navigator.sendBeacon){
+        const blob = new Blob([JSON.stringify(data)], {type:'application/json'});
+        navigator.sendBeacon(URL, blob);
+        return;
+      }
+    }catch(_){}
+
+    fetch(URL, {
+      method:'POST',
+      headers:{'Content-Type':'application/json'},
+      credentials:'include',
+      keepalive:true,
+      body: JSON.stringify(data)
+    }).catch(()=>{});
+  }
+
+  // pageview
+  send({type:'pageview'});
+
+  // online + duration
+  setInterval(()=>send({type:'ping'}), 15000);
+})();
+</script>
+
+</body>
+</html>
